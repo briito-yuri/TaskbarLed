@@ -29,7 +29,7 @@ src/TaskbarLed.App/bin/Debug/net10.0-windows/TaskbarLed.exe --render-demo docs/i
 # Update the copy the maintainer runs daily (it starts with Windows):
 & "$env:LOCALAPPDATA\Programs\TaskbarLed\TaskbarLed.exe" --exit
 dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\TaskbarLed" -nodeReuse:false
-Start-Process "$env:LOCALAPPDATA\Programs\TaskbarLed\TaskbarLed.exe"
+Start-Process "$env:LOCALAPPDATA\Programs\TaskbarLed\TaskbarLed.exe"   # relaunches itself outside Claude's container
 ```
 
 Other CLI flags: `--install-hooks`, `--uninstall-hooks`, `--restart` (wait for the old instance; used by the language switch).
@@ -56,4 +56,5 @@ Release: push a tag `vX.Y.Z`; `.github/workflows/release.yml` builds, tests and 
 - **Hooks stdin is UTF-8.** Read raw bytes; the hook also strips a BOM and converts UTF-16 so scripts can call it.
 - **The Claude desktop app runs hooks but not the status line**, so plan limits (5 h / weekly) are not available; `IUsageLimitProvider` is the reserved seam (must be opt-in if it ever reads credentials).
 - **The maintainer's `~/.claude/settings.json` has TaskbarLed's hooks installed.** Never overwrite it wholesale; use `ClaudeCodeHookInstaller`, which keeps user hooks and writes a backup.
+- **The Claude desktop app is an MSIX package, and everything a Claude Code session starts runs inside its container**, even though those processes report no package identity. Writes to `%APPDATA%`, `%LOCALAPPDATA%` and `HKCU` are redirected to `%LOCALAPPDATA%\Packages\Claude_*\LocalCache` and a private hive, where Windows never looks (the auto-start `Run` value was lost this way). The app guards against it: `PackageContext.IsRedirected` probes with a file and, if redirected, relaunches through `explorer.exe`, which starts it outside. Hooks run by Claude Code are inside it too, so `HookEventServer` also drains `Packages\*\LocalCache\Local\TaskbarLed\spool`. Your shell is redirected as well: check the real state with WMI (`StdRegProv`, `CIM_DataFile`).
 - On Git Bash, multi-line `sed` inserts with `\` continuations collapse lines; prefer the Edit tool for code changes.

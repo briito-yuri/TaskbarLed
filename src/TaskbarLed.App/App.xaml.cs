@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Threading;
 using TaskbarLed.App.Demo;
 using TaskbarLed.App.Infrastructure;
+using TaskbarLed.Core.Ipc;
+using TaskbarLed.Platform.Windows.System;
 using TaskbarLed.Sources.ClaudeCode;
 
 namespace TaskbarLed.App;
@@ -56,6 +58,19 @@ public partial class App : Application
         {
             Shutdown(exitCode);
             return;
+        }
+
+        // Started from inside another app's package (e.g. a Claude Code session in the Claude desktop app):
+        // our settings, log and auto-start entry would be redirected into that package. Start over outside it.
+        if (PackageContext.IsRedirected(IpcEndpoints.DataDirectory))
+        {
+            if (Environment.ProcessPath is { } exe && PackageContext.TryRelaunchOutside(exe, IpcEndpoints.DataDirectory))
+            {
+                Shutdown(0);
+                return;
+            }
+
+            _log.Error("Running inside another app's container; settings and auto-start may not persist.");
         }
 
         var restarting = e.Args.Contains(RestartArgument);

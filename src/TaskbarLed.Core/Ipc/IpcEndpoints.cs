@@ -13,6 +13,14 @@ public static class IpcEndpoints
     public static string DataDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarLed");
 
+    /// <summary>
+    /// Where the spool lands when the hook runs inside an MSIX package (Claude Code in the Claude desktop
+    /// app): Windows redirects that package's %LOCALAPPDATA% writes to <c>&lt;package&gt;\LocalCache\Local</c>.
+    /// </summary>
+    /// <param name="packageDirectory">A folder under %LOCALAPPDATA%\Packages.</param>
+    public static string PackagedSpoolDirectory(string packageDirectory) =>
+        Path.Combine(packageDirectory, "LocalCache", "Local", "TaskbarLed", "spool");
+
     /// <summary>How long the hook waits for the panel before falling back to the spool.</summary>
     public static TimeSpan ConnectTimeout { get; } = TimeSpan.FromMilliseconds(150);
 

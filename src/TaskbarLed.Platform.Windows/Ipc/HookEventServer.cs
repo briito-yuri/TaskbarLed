@@ -37,16 +37,17 @@ public sealed class HookEventServer : IAsyncDisposable
         }
     }
 
-    /// <summary>Replays events recorded while the panel was closed, then deletes them.</summary>
+    /// <summary>
+    /// Replays events recorded while the panel was closed, then deletes them. Includes spools redirected
+    /// into an MSIX package's storage, where the hook writes when Claude Code runs inside the Claude desktop app.
+    /// </summary>
     public void DrainSpool()
     {
-        var directory = new DirectoryInfo(IpcEndpoints.SpoolDirectory);
-        if (!directory.Exists)
-        {
-            return;
-        }
+        var spools = SpoolDirectories().Where(d => d.Exists).ToList();
 
-        foreach (var file in directory.EnumerateFiles("*.json").OrderBy(f => f.Name, StringComparer.Ordinal))
+        // File names start with a UTC timestamp, so name order is arrival order across folders too.
+        var files = spools.SelectMany(d => d.EnumerateFiles("*.json")).OrderBy(f => f.Name, StringComparer.Ordinal).ToList();
+        foreach (var file in files)
         {
             try
             {
@@ -64,7 +65,7 @@ public sealed class HookEventServer : IAsyncDisposable
             }
         }
 
-        foreach (var orphan in directory.EnumerateFiles("*.tmp").Where(f => DateTime.UtcNow - f.CreationTimeUtc > SpoolMaxAge))
+        foreach (var orphan in spools.SelectMany(d => d.EnumerateFiles("*.tmp")).Where(f => DateTime.UtcNow - f.CreationTimeUtc > SpoolMaxAge))
         {
             try
             {
@@ -73,6 +74,28 @@ public sealed class HookEventServer : IAsyncDisposable
             catch (IOException)
             {
             }
+        }
+    }
+
+    private static IEnumerable<DirectoryInfo> SpoolDirectories()
+    {
+        yield return new DirectoryInfo(IpcEndpoints.SpoolDirectory);
+
+        var packages = new DirectoryInfo(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Packages"));
+        IEnumerable<DirectoryInfo> packageDirectories;
+        try
+        {
+            packageDirectories = packages.Exists ? [.. packages.EnumerateDirectories()] : [];
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            yield break;
+        }
+
+        foreach (var package in packageDirectories)
+        {
+            yield return new DirectoryInfo(IpcEndpoints.PackagedSpoolDirectory(package.FullName));
         }
     }
 
