@@ -1,0 +1,24 @@
+<!--
+  Theme "Glass": no box at all: text floats on the taskbar. The most discreet option.
+  Every theme defines the same Led.* keys. See Matrix.xaml for what each one controls.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#01000000" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#00000000" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#F3F3F3" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#9E9E9E" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#FFB547" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#6CCB5F" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#1FFFFFFF" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#60CDFF" />
+  <Color x:Key="Led.GlowColor">#00000000</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0</sys:Double>
+  <FontFamily x:Key="Led.FontFamily">Segoe UI Variable Text, Segoe UI</FontFamily>
+
+  <!-- No LED dots. -->
+  <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
+
+</ResourceDictionary>

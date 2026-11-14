@@ -1,0 +1,50 @@
+<!--
+  Theme "Matrix": green terminal LED. This is the reference theme.
+
+  To create a theme: copy this file to Themes/YourTheme.xaml, keep every x:Key, change the values,
+  add it to ThemeCatalog.cs, then run "TaskbarLed.exe /render-demo docs/images" (with two leading dashes) to preview it.
+
+  Led.BackgroundBrush      panel and alert background (a little transparency blends with the taskbar)
+  Led.BorderBrush          thin panel border
+  Led.ForegroundBrush      main text and running tabs
+  Led.DimBrush             secondary text (context usage, idle tabs)
+  Led.AttentionBrush       "waiting for you" color; must stand out from the foreground
+  Led.DoneBrush            "finished" color: done tabs, blinking outline, edge glow and alert check mark
+  Led.ChannelOffBrush      background of tabs that are not selected
+  Led.EditBrush            edit-mode outline and hint text
+  Led.GlowColor            text glow color
+  Led.GlowOpacity          text glow strength, 0 for none
+  Led.FontFamily           font list, first installed wins
+  Led.DotGridBrush         overlay that turns the feed into LED dots; a Transparent SolidColorBrush for none
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#F2020A02" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#0F3D12" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#33FF66" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#1FAE47" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#FFB02E" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#33FF66" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#0B2A0E" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#A8FFBE" />
+  <Color x:Key="Led.GlowColor">#33FF66</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0.75</sys:Double>
+  <FontFamily x:Key="Led.FontFamily">Cascadia Mono, Consolas, Courier New</FontFamily>
+
+  <!-- Dark grid drawn over everything: turns smooth text into "LED dots". -->
+  <DrawingBrush x:Key="Led.DotGridBrush" TileMode="Tile" Viewport="0,0,3,3" ViewportUnits="Absolute" Opacity="0.55">
+    <DrawingBrush.Drawing>
+      <GeometryDrawing Brush="#FF010401">
+        <GeometryDrawing.Geometry>
+          <GeometryGroup>
+            <RectangleGeometry Rect="0,2,3,1" />
+            <RectangleGeometry Rect="2,0,1,3" />
+          </GeometryGroup>
+        </GeometryDrawing.Geometry>
+      </GeometryDrawing>
+    </DrawingBrush.Drawing>
+  </DrawingBrush>
+
+</ResourceDictionary>
