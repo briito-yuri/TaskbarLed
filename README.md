@@ -1,0 +1,144 @@
+<div align="center">
+
+# TaskbarLed
+
+**A Matrix-style LED ticker on your Windows taskbar that shows what Claude Code is doing, so you never have to wonder whether your prompt is done.**
+
+[![CI](https://github.com/llorenzojorge/TaskbarLed/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzojorge/TaskbarLed/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-33ff66.svg)](LICENSE)
+![.NET 10](https://img.shields.io/badge/.NET-10-512bd4.svg)
+![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4.svg)
+
+**English** · [Português](README.pt-BR.md)
+
+<img src="docs/images/state-running-en.png" alt="TaskbarLed on the Windows 11 taskbar, showing three Claude Code sessions" width="100%">
+
+</div>
+
+You send Claude a long prompt, switch to another app, and then keep coming back to check whether it has finished. TaskbarLed puts the answer in the empty left side of the taskbar. It **appears only while the Claude window is out of sight**, shows every running conversation, and blinks when one of them is done or needs you.
+
+## What it looks like
+
+Each conversation gets a tab. The feed below drops in each new action from the top and types it out, like the Claude chat.
+
+| | |
+|---|---|
+| **Working.** The lit tab is the one in the feed. You see the current action, a prompt timer and how full the context window is. | <img src="docs/images/state-running-en.png" alt="Running"> |
+| **Needs you.** A permission request or a question turns the tab and the feed amber, blinking, and that session jumps to the front. | <img src="docs/images/state-waiting-en.png" alt="Waiting for approval"> |
+| **Done.** The tab shows `✓` and the panel blinks green **until you open Claude**, with the duration and Claude's last reply. | <img src="docs/images/state-done-en.png" alt="Finished"> |
+
+### Watching a video in full screen?
+
+Windows silences notifications in full screen. TaskbarLed draws a thin glowing line on the screen edge instead, plus a 4-second alert in the corner, only when something finishes or needs you. Clicking the alert opens Claude.
+
+<img src="docs/images/fullscreen-en.png" alt="Edge glow and alert over a full-screen video" width="100%">
+
+You can switch to a click-through mini panel, alerts only, or nothing at all. Exclusive full-screen games are never covered.
+
+## Features
+
+- **Shows up only when useful.** Hidden while Claude is on screen, including side by side with another app. Shown when Claude is minimized, covered or on another virtual desktop.
+- **Many sessions, one glance.** Numbered, named tabs with status marks you can read without color: `▸` running, `✓` done, `!` waiting.
+- **Live details.** Current action (editing a file, running a command, searching), the last reply, prompt timer and context usage.
+- **Place it your way.** On the taskbar, floating just above it, or anywhere on screen with edge snapping. Each placement remembers its own spot.
+- **Five themes, switched live.** LED or modern, see [Themes](#themes).
+- **English and Portuguese.** Follows Windows by default, or pick one in the menu.
+- **Works everywhere Claude Code runs.** Desktop app, CLI and IDE extensions (VS Code, JetBrains) share the same hooks.
+- **Light and private.** Event driven, about 60 MB of RAM, and nothing ever leaves your machine.
+
+## Themes
+
+Right-click the panel → **Theme**. The panel stays on screen while the menu is open, so you see each theme as you pick it.
+
+Two LED looks for the retro feel, and three modern ones with no dots and no glow:
+
+| | |
+|---|---|
+| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, the default | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
+| <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: clean dark card | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: no box; text floats on the taskbar |
+| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: light, for a light taskbar | |
+
+Making your own takes one XAML file. See [Create a theme](CONTRIBUTING.md#create-a-theme).
+
+## Install
+
+**Requirements:** Windows 10 or 11 (x64) and the [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0).
+
+### Download
+
+1. Get `TaskbarLed-win-x64.zip` from the [latest release](https://github.com/llorenzojorge/TaskbarLed/releases/latest).
+2. Extract it to a permanent folder, for example `%LOCALAPPDATA%\Programs\TaskbarLed`.
+3. Run `TaskbarLed.exe`.
+
+### Build from source
+
+```powershell
+git clone https://github.com/llorenzojorge/TaskbarLed.git
+cd TaskbarLed
+dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\TaskbarLed"
+& "$env:LOCALAPPDATA\Programs\TaskbarLed\TaskbarLed.exe"
+```
+
+### First run
+
+TaskbarLed asks before connecting to Claude Code. It adds its hooks to `~/.claude/settings.json`, keeps your existing hooks and settings, and saves a backup next to the file. It also starts with Windows. Both can be turned off from the menu.
+
+## Using it
+
+| To… | Do this |
+|---|---|
+| Open Claude | Click the panel, an alert or the tray icon |
+| See the next session | Scroll over the panel |
+| Open the menu | Right-click the panel or the tray icon |
+| Move or resize | Menu → **Edit position and size**. Drag to move, drag the right edge to resize, arrow keys for 1 px steps (Shift for 10 px). Finish with the **Save** or **Cancel** button on the panel, or Enter / Esc |
+| Change where it sits | Menu → **Position**: on the taskbar, above the taskbar, or anywhere |
+| Change full-screen behavior | Menu → **In full screen** |
+| Change language | Menu → **Language · Idioma** |
+
+<img src="docs/images/state-editing-en.png" alt="Edit mode" width="100%">
+
+Settings are stored in `%APPDATA%\TaskbarLed\settings.json` and the log in `%LOCALAPPDATA%\TaskbarLed\taskbarled.log`.
+
+### Uninstall
+
+1. Menu → **Disconnect from Claude Code**, and untick **Start with Windows**. Or run `TaskbarLed.exe --uninstall-hooks`.
+2. Exit (menu → **Exit**, or `TaskbarLed.exe --exit`), then delete the install folder, `%APPDATA%\TaskbarLed` and `%LOCALAPPDATA%\TaskbarLed`.
+
+## How it works
+
+```
+Claude Code hook ──stdin──▶ TaskbarLed.Hook.exe ──named pipe──▶ TaskbarLed.exe ──▶ panel, edge glow, alerts
+                                   │ (app closed?)                     ▲
+                                   └──▶ spool folder ──── on start ────┘
+```
+
+- **Hook bridge.** A tiny executable the Claude Code hooks call. It forwards the raw event in about 65 ms, never prints, and always exits 0, so it can never slow down or break Claude.
+- **Translation.** All Claude Code knowledge lives in one class (`ClaudeCodeSource`), covered by tests. Context usage comes from the tail of the conversation transcript.
+- **Visibility.** The app walks the window z-order to measure how much of the Claude window you can actually see, and checks for full-screen apps on each monitor.
+
+Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design.
+
+**Privacy:** TaskbarLed makes no network requests. Events travel over a named pipe that only your Windows user can open.
+
+## Limitations
+
+- Plan limits (5-hour and weekly) are not shown yet: the desktop app does not pass them to hooks.
+- The reply text updates once per message, not token by token.
+- **On the taskbar** placement expects a bottom taskbar (the Windows 11 default). With an auto-hidden taskbar, the panel floats above the screen edge instead.
+
+## Roadmap
+
+- [ ] More agent CLIs (Codex CLI, Gemini CLI, Cursor…) through `ISessionSource`
+- [ ] Physical signals: RGB keyboards, LED strips, smart lights
+- [ ] Plan usage limits (opt-in)
+- [ ] More languages
+
+Ideas and votes are welcome in [Issues](https://github.com/llorenzojorge/TaskbarLed/issues).
+
+## Contributing
+
+Pull requests are welcome. Good first contributions are a new theme, a translation, or support for another agent CLI. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+[MIT](LICENSE). TaskbarLed is an independent project, not affiliated with or endorsed by Anthropic. "Claude" is a trademark of Anthropic.
