@@ -1,0 +1,168 @@
+using TaskbarLed.Core.Settings;
+
+namespace TaskbarLed.Core.Visibility;
+
+/// <summary>
+/// Where the panel and its full-screen companions go on a monitor. Pure math in physical pixels,
+/// so every placement rule is unit-tested without Windows.
+/// </summary>
+public static class PanelLayout
+{
+    /// <summary>Gap between the panel and the taskbar's top and bottom edges, in DIP.</summary>
+    public const double VerticalMarginDip = 6;
+
+    /// <summary>Panel height when it is not inside the taskbar, in DIP.</summary>
+    public const double FloatingHeightDip = 36;
+
+    /// <summary>Smallest usable panel width, in DIP.</summary>
+    public const double MinWidthDip = 160;
+
+    /// <summary>Distance under which a dragged panel snaps to an edge, in DIP.</summary>
+    public const double SnapDistanceDip = 12;
+
+    /// <summary>Margin of corner overlays (mini panel, alerts) from the screen edges, in DIP.</summary>
+    public const double CornerMarginDip = 20;
+
+    /// <summary>Thickness of the full-screen edge glow, in DIP.</summary>
+    public const double EdgeThicknessDip = 3;
+
+    /// <summary>Mini panel width in full screen, in DIP.</summary>
+    public const double MiniWidthDip = 340;
+
+    /// <summary>Panel rectangle for <paramref name="settings"/> on a monitor.</summary>
+    /// <param name="settings">Placement and remembered positions.</param>
+    /// <param name="monitor">Monitor rectangle.</param>
+    /// <param name="taskbar">The monitor's taskbar, if any.</param>
+    /// <param name="scale">Monitor scale factor (1.0 = 96 DPI).</param>
+    public static PixelRect Compute(PanelSettings settings, PixelRect monitor, PixelRect? taskbar, double scale)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(scale, 0);
+
+        var position = settings.CurrentPosition;
+        var bar = UsableTaskbar(taskbar, monitor);
+
+        return settings.Placement switch
+        {
+            PanelPlacement.Taskbar when bar is { } b => InTaskbar(b, scale, position),
+            PanelPlacement.Taskbar or PanelPlacement.AboveTaskbar => AboveTaskbar(bar, monitor, scale, position, settings.AboveGap),
+            _ => Free(monitor, scale, position),
+        };
+    }
+
+    /// <summary>Converts a panel rectangle back into the position stored for the current placement.</summary>
+    public static PanelPosition ToPosition(PanelSettings settings, PixelRect rect, PixelRect monitor, PixelRect? taskbar, double scale)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(scale, 0);
+
+        var width = rect.Width / scale;
+        if (settings.Placement == PanelPlacement.Free)
+        {
+            return new PanelPosition((rect.Left - monitor.Left) / scale, (rect.Top - monitor.Top) / scale, width);
+        }
+
+        var anchorLeft = UsableTaskbar(taskbar, monitor)?.Left ?? monitor.Left;
+        return new PanelPosition(Math.Max(0, (rect.Left - anchorLeft) / scale), 0, width);
+    }
+
+    /// <summary>Pulls a dragged rectangle onto nearby monitor or taskbar edges.</summary>
+    public static PixelRect Snap(PixelRect rect, PixelRect monitor, PixelRect? taskbar, double scale)
+    {
+        var distance = (int)Math.Round(SnapDistanceDip * scale);
+        var bottomEdge = UsableTaskbar(taskbar, monitor)?.Top ?? monitor.Bottom;
+        int dx = 0, dy = 0;
+
+        if (Math.Abs(rect.Left - monitor.Left) <= distance)
+        {
+            dx = monitor.Left - rect.Left;
+        }
+        else if (Math.Abs(monitor.Right - rect.Right) <= distance)
+        {
+            dx = monitor.Right - rect.Right;
+        }
+
+        if (Math.Abs(rect.Top - monitor.Top) <= distance)
+        {
+            dy = monitor.Top - rect.Top;
+        }
+        else if (Math.Abs(bottomEdge - rect.Bottom) <= distance)
+        {
+            dy = bottomEdge - rect.Bottom;
+        }
+
+        return Offset(rect, dx, dy);
+    }
+
+    /// <summary>Compact panel in the bottom-right corner, used over full-screen content.</summary>
+    public static PixelRect MiniCorner(PixelRect monitor, double scale)
+    {
+        var width = (int)Math.Round(MiniWidthDip * scale);
+        var height = (int)Math.Round(FloatingHeightDip * scale);
+        var margin = (int)Math.Round(CornerMarginDip * scale);
+        return PixelRect.FromSize(monitor.Right - margin - width, monitor.Bottom - margin - height, width, height);
+    }
+
+    /// <summary>Thin strip along the bottom edge of the monitor.</summary>
+    public static PixelRect EdgeStrip(PixelRect monitor, double scale)
+    {
+        var thickness = Math.Max(2, (int)Math.Round(EdgeThicknessDip * scale));
+        return new PixelRect(monitor.Left, monitor.Bottom - thickness, monitor.Right, monitor.Bottom);
+    }
+
+    /// <summary>Bottom-right anchored rectangle for an alert of the given pixel size.</summary>
+    public static PixelRect Alert(PixelRect monitor, double scale, int width, int height)
+    {
+        var margin = (int)Math.Round(CornerMarginDip * scale);
+        var aboveEdge = (int)Math.Round((CornerMarginDip + EdgeThicknessDip) * scale);
+        return PixelRect.FromSize(monitor.Right - margin - width, monitor.Bottom - aboveEdge - height, width, height);
+    }
+
+    /// <summary>
+    /// The taskbar, unless it is auto-hidden (only a sliver is on screen) or not at the bottom.
+    /// </summary>
+    public static PixelRect? UsableTaskbar(PixelRect? taskbar, PixelRect monitor)
+    {
+        if (taskbar is not { } bar)
+        {
+            return null;
+        }
+
+        var onScreen = bar.Intersect(monitor);
+        var isBottom = bar.Width >= monitor.Width / 2 && bar.Bottom >= monitor.Bottom - 1;
+        return !onScreen.IsEmpty && onScreen.Height >= bar.Height / 2 && isBottom ? bar : null;
+    }
+
+    private static PixelRect InTaskbar(PixelRect taskbar, double scale, PanelPosition position)
+    {
+        var margin = (int)Math.Round(VerticalMarginDip * scale);
+        var height = Math.Max(8, taskbar.Height - (2 * margin));
+        var width = ClampWidth(position.Width, scale, taskbar.Width);
+        var offset = Math.Min((int)Math.Round(Math.Max(0, position.X) * scale), taskbar.Width - width);
+        return PixelRect.FromSize(taskbar.Left + offset, taskbar.Top + ((taskbar.Height - height) / 2), width, height);
+    }
+
+    private static PixelRect AboveTaskbar(PixelRect? taskbar, PixelRect monitor, double scale, PanelPosition position, double gapDip)
+    {
+        var anchor = taskbar ?? new PixelRect(monitor.Left, monitor.Bottom, monitor.Right, monitor.Bottom);
+        var height = (int)Math.Round(FloatingHeightDip * scale);
+        var width = ClampWidth(position.Width, scale, monitor.Width);
+        var left = Math.Clamp(anchor.Left + (int)Math.Round(Math.Max(0, position.X) * scale), monitor.Left, monitor.Right - width);
+        var bottom = anchor.Top - (int)Math.Round(gapDip * scale);
+        return PixelRect.FromSize(left, Math.Max(monitor.Top, bottom - height), width, height);
+    }
+
+    private static PixelRect Free(PixelRect monitor, double scale, PanelPosition position)
+    {
+        var height = (int)Math.Round(FloatingHeightDip * scale);
+        var width = ClampWidth(position.Width, scale, monitor.Width);
+        var left = Math.Clamp(monitor.Left + (int)Math.Round(position.X * scale), monitor.Left, monitor.Right - width);
+        var top = Math.Clamp(monitor.Top + (int)Math.Round(position.Y * scale), monitor.Top, monitor.Bottom - height);
+        return PixelRect.FromSize(left, top, width, height);
+    }
+
+    private static int ClampWidth(double widthDip, double scale, int available) =>
+        Math.Min((int)Math.Round(Math.Max(MinWidthDip, widthDip) * scale), Math.Max(1, available));
+
+    private static PixelRect Offset(PixelRect r, int dx, int dy) => new(r.Left + dx, r.Top + dy, r.Right + dx, r.Bottom + dy);
+}

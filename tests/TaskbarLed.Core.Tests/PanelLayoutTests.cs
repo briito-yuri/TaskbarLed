@@ -1,0 +1,127 @@
+using TaskbarLed.Core.Settings;
+using TaskbarLed.Core.Visibility;
+
+namespace TaskbarLed.Core.Tests;
+
+public class PanelLayoutTests
+{
+    private static readonly PixelRect Monitor = new(0, 0, 1920, 1080);
+    private static readonly PixelRect Taskbar = new(0, 1032, 1920, 1080); // 48 px tall, bottom
+
+    private static PanelSettings InTaskbar(double x = 12, double width = 420) =>
+        new() { Placement = PanelPlacement.Taskbar, TaskbarPosition = new(x, 0, width) };
+
+    [Fact]
+    public void Taskbar_mode_sits_inside_the_taskbar_vertically_centered()
+    {
+        var rect = PanelLayout.Compute(InTaskbar(), Monitor, Taskbar, 1.0);
+        Assert.Equal(new PixelRect(12, 1038, 432, 1074), rect);
+    }
+
+    [Fact]
+    public void Taskbar_mode_scales_with_monitor_dpi()
+    {
+        var monitor = new PixelRect(0, 0, 3840, 2160);
+        var taskbar = new PixelRect(0, 2088, 3840, 2160); // 72 px at 150%
+        var rect = PanelLayout.Compute(InTaskbar(10, 400), monitor, taskbar, 1.5);
+
+        Assert.Equal(15, rect.Left);
+        Assert.Equal(600, rect.Width);
+        Assert.Equal(72 - 18, rect.Height);
+    }
+
+    [Fact]
+    public void Taskbar_mode_never_leaves_the_taskbar()
+    {
+        var rect = PanelLayout.Compute(InTaskbar(5000, 5000), Monitor, Taskbar, 1.0);
+        Assert.Equal(Taskbar.Left, rect.Left);
+        Assert.Equal(Taskbar.Right, rect.Right);
+    }
+
+    [Fact]
+    public void Above_mode_floats_over_the_taskbar_with_the_gap()
+    {
+        var settings = new PanelSettings { Placement = PanelPlacement.AboveTaskbar, AbovePosition = new(20, 0, 400), AboveGap = 8 };
+
+        var rect = PanelLayout.Compute(settings, Monitor, Taskbar, 1.0);
+
+        Assert.Equal(Taskbar.Top - 8, rect.Bottom);
+        Assert.Equal(36, rect.Height);
+        Assert.Equal(20, rect.Left);
+    }
+
+    [Fact]
+    public void Auto_hidden_taskbar_makes_taskbar_mode_fall_back_to_above_the_screen_edge()
+    {
+        var hidden = new PixelRect(0, 1078, 1920, 1126); // only 2 px visible
+
+        var rect = PanelLayout.Compute(InTaskbar(), Monitor, hidden, 1.0);
+
+        Assert.Equal(Monitor.Bottom - 8, rect.Bottom);
+    }
+
+    [Fact]
+    public void Free_mode_uses_monitor_coordinates_and_stays_on_screen()
+    {
+        var settings = new PanelSettings { Placement = PanelPlacement.Free, FreePosition = new(100, 50, 400) };
+        Assert.Equal(PixelRect.FromSize(100, 50, 400, 36), PanelLayout.Compute(settings, Monitor, Taskbar, 1.0));
+
+        var offScreen = settings with { FreePosition = new(5000, 5000, 400) };
+        var rect = PanelLayout.Compute(offScreen, Monitor, Taskbar, 1.0);
+        Assert.Equal(Monitor.Right, rect.Right);
+        Assert.Equal(Monitor.Bottom, rect.Bottom);
+    }
+
+    [Theory]
+    [InlineData(PanelPlacement.Taskbar)]
+    [InlineData(PanelPlacement.AboveTaskbar)]
+    [InlineData(PanelPlacement.Free)]
+    public void Position_round_trips_through_pixels(PanelPlacement placement)
+    {
+        var settings = new PanelSettings { Placement = placement }.WithCurrentPosition(new(80, 40, 300));
+        var rect = PanelLayout.Compute(settings, Monitor, Taskbar, 1.25);
+
+        var position = PanelLayout.ToPosition(settings, rect, Monitor, Taskbar, 1.25);
+
+        Assert.Equal(80, position.X, 3);
+        Assert.Equal(300, position.Width, 3);
+        Assert.Equal(placement == PanelPlacement.Free ? 40 : 0, position.Y, 3);
+    }
+
+    [Fact]
+    public void Each_placement_remembers_its_own_position()
+    {
+        var settings = new PanelSettings().WithCurrentPosition(new(111, 0, 420));
+        var free = (settings with { Placement = PanelPlacement.Free }).WithCurrentPosition(new(222, 33, 420));
+
+        Assert.Equal(111, (free with { Placement = PanelPlacement.Taskbar }).CurrentPosition.X);
+        Assert.Equal(222, free.CurrentPosition.X);
+    }
+
+    [Fact]
+    public void Snap_pulls_near_edges_and_ignores_far_ones()
+    {
+        var nearCorner = PixelRect.FromSize(7, 9, 300, 36);
+        Assert.Equal(PixelRect.FromSize(0, 0, 300, 36), PanelLayout.Snap(nearCorner, Monitor, Taskbar, 1.0));
+
+        var nearTaskbar = PixelRect.FromSize(500, Taskbar.Top - 36 - 5, 300, 36);
+        Assert.Equal(Taskbar.Top, PanelLayout.Snap(nearTaskbar, Monitor, Taskbar, 1.0).Bottom);
+
+        var middle = PixelRect.FromSize(500, 500, 300, 36);
+        Assert.Equal(middle, PanelLayout.Snap(middle, Monitor, Taskbar, 1.0));
+    }
+
+    [Fact]
+    public void Fullscreen_companions_sit_on_the_bottom_edge_and_corner()
+    {
+        Assert.Equal(new PixelRect(0, 1077, 1920, 1080), PanelLayout.EdgeStrip(Monitor, 1.0));
+
+        var mini = PanelLayout.MiniCorner(Monitor, 1.0);
+        Assert.Equal(1900, mini.Right);
+        Assert.Equal(1060, mini.Bottom);
+
+        var alert = PanelLayout.Alert(Monitor, 1.0, 300, 30);
+        Assert.Equal(1900, alert.Right);
+        Assert.True(alert.Bottom < 1077, "alert stays above the edge glow");
+    }
+}
