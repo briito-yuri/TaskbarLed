@@ -185,8 +185,44 @@
         </ItemsControl.ItemsPanel>
       </ItemsControl>
 
+      <Grid Grid.Row="1" Grid.Column="0">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+      <!-- Optional prompt / spinner glyph before the feed (Led.FeedPrefix); it pulses while running. -->
+      <TextBlock x:Name="FeedPrefix" Grid.Column="0" VerticalAlignment="Center"
+                 Text="{DynamicResource Led.FeedPrefix}">
+        <TextBlock.Style>
+          <Style TargetType="TextBlock" BasedOn="{StaticResource FeedText}">
+            <Setter Property="Foreground" Value="{DynamicResource Led.AccentBrush}" />
+            <Setter Property="TextTrimming" Value="None" />
+            <Setter Property="Margin" Value="0,0,6,0" />
+            <Style.Triggers>
+              <!-- Themes without a glyph keep the feed exactly where it was. -->
+              <Trigger Property="Text" Value="">
+                <Setter Property="Visibility" Value="Collapsed" />
+              </Trigger>
+              <DataTrigger Binding="{Binding SelectedStatus}" Value="{x:Static s:SessionStatus.Running}">
+                <DataTrigger.EnterActions>
+                  <BeginStoryboard x:Name="PrefixPulse">
+                    <Storyboard RepeatBehavior="Forever" AutoReverse="True">
+                      <DoubleAnimation Storyboard.TargetProperty="Opacity" From="1" To="0.35" Duration="0:0:0.8" />
+                    </Storyboard>
+                  </BeginStoryboard>
+                </DataTrigger.EnterActions>
+                <DataTrigger.ExitActions>
+                  <RemoveStoryboard BeginStoryboardName="PrefixPulse" />
+                </DataTrigger.ExitActions>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </TextBlock.Style>
+      </TextBlock>
+
       <!-- Vertical feed: each new line drops in from the top and types itself out. -->
-      <Canvas x:Name="FeedHost" Grid.Row="1" Grid.Column="0" ClipToBounds="True">
+      <Canvas x:Name="FeedHost" Grid.Column="1" ClipToBounds="True">
         <Canvas.Style>
           <Style TargetType="Canvas">
             <Style.Triggers>
@@ -201,6 +237,7 @@
           <DropShadowEffect Color="{DynamicResource Led.GlowColor}" BlurRadius="8" ShadowDepth="0" Opacity="{DynamicResource Led.GlowOpacity}" />
         </Canvas.Effect>
       </Canvas>
+      </Grid>
 
       <!-- LED dots only over the feed's large text; small tab labels stay crisp. -->
       <Rectangle Grid.Row="1" Grid.Column="0" Fill="{DynamicResource Led.DotGridBrush}" IsHitTestVisible="False" />

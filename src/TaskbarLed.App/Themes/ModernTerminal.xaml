@@ -1,0 +1,25 @@
+<!--
+  Theme "Modern Terminal": a modern dark terminal. Smooth text (no LED dots), an ink-blue background,
+  cyan text, green when done and amber when waiting, with a faint glow. Keys are documented in Matrix.xaml.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#F20D1117" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#263040" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#7DE3F4" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#6B7A90" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#FFB86B" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#5EE6A0" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#161C26" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#C4B5FD" />
+  <Color x:Key="Led.GlowColor">#7DE3F4</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0.3</sys:Double>
+  <FontFamily x:Key="Led.FontFamily">Cascadia Code, JetBrains Mono, Cascadia Mono, Consolas</FontFamily>
+  <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
+
+  <x:Static x:Key="Led.FeedPrefix" Member="sys:String.Empty" />
+  <SolidColorBrush x:Key="Led.AccentBrush" Color="Transparent" />
+
+</ResourceDictionary>

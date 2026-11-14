@@ -20,14 +20,30 @@ public static class ThemeCatalog
     [
         new("Matrix", "Matrix", Uppercase: true),
         new("Mono", "Mono", Uppercase: true),
+        new("ModernTerminal", "Modern Terminal", Uppercase: false),
+        new("ClaudeCode", "Claude Code", Uppercase: false),
         new("Minimal", "Minimal", Uppercase: false),
         new("Glass", "Glass", Uppercase: false),
         new("Paper", "Paper", Uppercase: false),
     ];
 
-    /// <summary>The known theme matching <paramref name="id"/>, or the default.</summary>
-    public static ThemeInfo Resolve(string? id) =>
-        All.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase)) ?? All[0];
+    // Ids that were renamed, so a saved choice keeps working.
+    private static readonly Dictionary<string, string> RenamedIds = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["Terminal"] = "ModernTerminal",
+        ["Clay"] = "ClaudeCode",
+    };
+
+    /// <summary>The known theme matching <paramref name="id"/> (or its former name), or the default.</summary>
+    public static ThemeInfo Resolve(string? id)
+    {
+        if (id is not null && RenamedIds.TryGetValue(id, out var renamed))
+        {
+            id = renamed;
+        }
+
+        return All.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase)) ?? All[0];
+    }
 
     /// <summary>Swaps the theme dictionary in the application resources.</summary>
     public static void Apply(ResourceDictionary resources, string? id)

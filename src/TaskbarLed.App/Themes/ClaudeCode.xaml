@@ -1,0 +1,26 @@
+<!--
+  Theme "Claude Code": a warm terminal in the spirit of Claude Code's own CLI. Warm charcoal background,
+  cream text, the terracotta "✻" spinner glyph before the feed (it pulses while Claude works),
+  green when done, gold when waiting. Keys are documented in Matrix.xaml.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#F21F1E1C" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#3B3833" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#EDE9DF" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#9A958A" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#E8B04A" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#7FC08A" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#2B2925" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#D97757" />
+  <Color x:Key="Led.GlowColor">#D97757</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0.25</sys:Double>
+  <FontFamily x:Key="Led.FontFamily">Cascadia Code, JetBrains Mono, Cascadia Mono, Consolas</FontFamily>
+  <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
+
+  <sys:String x:Key="Led.FeedPrefix">✻</sys:String>
+  <SolidColorBrush x:Key="Led.AccentBrush" Color="#D97757" />
+
+</ResourceDictionary>

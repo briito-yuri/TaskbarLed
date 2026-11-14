@@ -41,7 +41,7 @@ You can switch to a click-through mini panel, alerts only, or nothing at all. Ex
 - **Many sessions, one glance.** Numbered, named tabs with status marks you can read without color: `▸` running, `✓` done, `!` waiting.
 - **Live details.** Current action (editing a file, running a command, searching), the last reply, prompt timer and context usage.
 - **Place it your way.** On the taskbar, floating just above it, or anywhere on screen with edge snapping. Each placement remembers its own spot.
-- **Five themes, switched live.** LED or modern, see [Themes](#themes).
+- **Seven themes, switched live.** LED or modern, see [Themes](#themes).
 - **English and Portuguese.** Follows Windows by default, or pick one in the menu.
 - **Works everywhere Claude Code runs.** Desktop app, CLI and IDE extensions (VS Code, JetBrains) share the same hooks.
 - **Light and private.** Event driven, about 60 MB of RAM, and nothing ever leaves your machine.
@@ -56,7 +56,8 @@ Two LED looks for the retro feel, and three modern ones with no dots and no glow
 |---|---|
 | <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, the default | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
 | <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: clean dark card | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: no box; text floats on the taskbar |
-| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: light, for a light taskbar | |
+| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: light, for a light taskbar | <img src="docs/images/theme-ModernTerminal.png" alt="Modern Terminal"><br>**Modern Terminal**: modern dark terminal, smooth text without LED dots |
+| <img src="docs/images/theme-ClaudeCode.png" alt="Claude Code"><br>**Claude Code**: warm terminal in the spirit of Claude Code, with a pulsing ✻ while it works | |
 
 Making your own takes one XAML file. See [Create a theme](CONTRIBUTING.md#create-a-theme).
 

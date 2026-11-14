@@ -21,4 +21,7 @@
   <!-- No LED dots. -->
   <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
 
+  <x:Static x:Key="Led.FeedPrefix" Member="sys:String.Empty" />
+  <SolidColorBrush x:Key="Led.AccentBrush" Color="Transparent" />
+
 </ResourceDictionary>

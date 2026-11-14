@@ -56,6 +56,7 @@ Release: push a tag `vX.Y.Z`; `.github/workflows/release.yml` builds, tests and 
 - **Stale MSBuild nodes can hang builds** after an interrupted command. Build with `-nodeReuse:false` / `MSBUILDDISABLENODEREUSE=1`.
 - **The installed app locks its files.** Run `--exit` before `dotnet publish` to the install folder.
 - **`DropShadowEffect` ignores the alpha of its color.** Glow strength comes from `Led.GlowOpacity`, not from a transparent `Led.GlowColor`.
+- **An empty `<sys:String></sys:String>` crashes XAML loading** (NullReferenceException in the binder). For an empty string resource such as `Led.FeedPrefix`, use `<x:Static Member="sys:String.Empty" />`.
 - **A fully transparent WPF window background is not clickable.** The Glass theme uses `#01000000`.
 - **Hooks stdin is UTF-8.** Read raw bytes; the hook also strips a BOM and converts UTF-16 so scripts can call it.
 - **The Claude desktop app runs hooks but not the status line**, so plan limits (5 h / weekly) are not available; `IUsageLimitProvider` is the reserved seam (must be opt-in if it ever reads credentials).

@@ -41,7 +41,7 @@ Também dá pra trocar para um mini painel no canto (os cliques passam para o v�
 - **Várias sessões num relance.** Abas numeradas e com nome, com símbolos que dá pra ler mesmo sem distinguir cor: `▸` rodando, `✓` concluída, `!` aguardando.
 - **Detalhes ao vivo.** Ação atual (editando arquivo, rodando comando, buscando), última resposta, cronômetro do prompt e uso do contexto.
 - **Do seu jeito.** Na barra de tarefas, flutuando logo acima dela, ou livre em qualquer lugar da tela, com ímã nas bordas. Cada modo lembra a própria posição.
-- **Cinco temas, troca na hora.** LED ou modernos, veja em [Temas](#temas).
+- **Sete temas, troca na hora.** LED ou modernos, veja em [Temas](#temas).
 - **Português e inglês.** Segue o idioma do Windows, ou você escolhe no menu.
 - **Funciona onde o Claude Code roda.** App desktop, CLI e extensões de IDE (VS Code, JetBrains) usam os mesmos hooks.
 - **Leve e privado.** Movido a eventos, cerca de 60 MB de RAM, e nada sai do seu computador.
@@ -56,7 +56,8 @@ São dois visuais LED, para quem curte o retrô, e três modernos, sem pontos e 
 |---|---|
 | <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: terminal LED verde, o padrão | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: terminal preto e branco |
 | <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: cartão escuro e limpo | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: sem caixa; o texto flutua sobre a barra |
-| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: claro, para barra de tarefas clara | |
+| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: claro, para barra de tarefas clara | <img src="docs/images/theme-ModernTerminal.png" alt="Modern Terminal"><br>**Modern Terminal**: terminal escuro moderno, texto liso sem pontos de LED |
+| <img src="docs/images/theme-ClaudeCode.png" alt="Claude Code"><br>**Claude Code**: terminal quente no espírito do Claude Code, com um ✻ que pulsa enquanto ele trabalha | |
 
 Criar o seu exige um único arquivo XAML. Veja em [Criar um tema](CONTRIBUTING.md#create-a-theme).
 
