@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TaskbarLed.App/TaskbarLed.App.csproj" />
+    <Project Path="src/TaskbarLed.Core/TaskbarLed.Core.csproj" />
+    <Project Path="src/TaskbarLed.Hook/TaskbarLed.Hook.csproj" />
+    <Project Path="src/TaskbarLed.Platform.Windows/TaskbarLed.Platform.Windows.csproj" />
+    <Project Path="src/TaskbarLed.Sources.ClaudeCode/TaskbarLed.Sources.ClaudeCode.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TaskbarLed.Core.Tests/TaskbarLed.Core.Tests.csproj" />
+    <Project Path="tests/TaskbarLed.Sources.ClaudeCode.Tests/TaskbarLed.Sources.ClaudeCode.Tests.csproj" />
+  </Folder>
+</Solution>
