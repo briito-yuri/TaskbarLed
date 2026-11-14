@@ -12,6 +12,30 @@ public class PanelLayoutTests
         new() { Placement = PanelPlacement.Taskbar, TaskbarPosition = new(x, 0, width) };
 
     [Fact]
+    public void Above_dock_is_centered_horizontally_and_sits_the_gap_above_the_work_area()
+    {
+        var workArea = new PixelRect(0, 25, 1440, 830); // menu bar on top, Dock below 830
+
+        var rect = PanelLayout.AboveDock(workArea, 1.0, 420, 8);
+
+        Assert.Equal(new PixelRect(510, 786, 930, 822), rect);
+    }
+
+    [Fact]
+    public void Above_dock_scales_for_retina_and_stays_inside_a_narrow_work_area()
+    {
+        var retina = PanelLayout.AboveDock(new PixelRect(0, 50, 2880, 1660), 2.0, 420, 8);
+        Assert.Equal(840, retina.Width);
+        Assert.Equal(72, retina.Height);
+        Assert.Equal(1660 - 16, retina.Bottom);
+        Assert.Equal((2880 - 840) / 2, retina.Left);
+
+        var narrow = PanelLayout.AboveDock(new PixelRect(100, 0, 400, 300), 1.0, 420, 8);
+        Assert.Equal(100, narrow.Left);
+        Assert.Equal(300, narrow.Width);
+    }
+
+    [Fact]
     public void Taskbar_mode_sits_inside_the_taskbar_vertically_centered()
     {
         var rect = PanelLayout.Compute(InTaskbar(), Monitor, Taskbar, 1.0);

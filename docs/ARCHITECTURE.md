@@ -9,12 +9,16 @@ src/
   TaskbarLed.Platform.Windows   Win32: windows, monitors, taskbar, full screen, auto-start, IPC server.
   TaskbarLed.Hook               The executable the hooks call. Forwards stdin to the app.
   TaskbarLed.App                WPF composition root: panel windows, theme, tray, settings.
+  TaskbarLed.Platform.Mac       macOS: Claude window visibility, all-Spaces window, LaunchAgent, data folders.
+  TaskbarLed.App.Avalonia       macOS port (work in progress): floating panel above the Dock, demo feed for now.
 tests/
   TaskbarLed.Core.Tests
   TaskbarLed.Sources.ClaudeCode.Tests
+  TaskbarLed.Platform.Mac.Tests
+  TaskbarLed.App.Avalonia.Tests Headless render of the floating panel (xunit v3); saves mac-floating-panel.png.
 ```
 
-Dependencies only point inward: `App → Platform.Windows, Sources.* → Core`. `Hook → Core` (for the shared IPC contract only).
+Dependencies only point inward: `App → Platform.Windows, Sources.* → Core` and `App.Avalonia → Platform.Mac → Core`. `Hook → Core` (for the shared IPC contract only). The macOS plan and its remaining steps are in [PROPOSTAS.md](PROPOSTAS.md) (P4).
 
 ## Data flow
 

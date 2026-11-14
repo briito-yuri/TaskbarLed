@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>TaskbarLed</AssemblyName>
+    <RootNamespace>TaskbarLed.App.Avalonia</RootNamespace>
+    <Description>Cross-platform TaskbarLed panel (Avalonia): a small floating panel above the macOS Dock.</Description>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TaskbarLed.App.Avalonia.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.6" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.6" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskbarLed.Core\TaskbarLed.Core.csproj" />
+    <ProjectReference Include="..\TaskbarLed.Platform.Mac\TaskbarLed.Platform.Mac.csproj" />
+  </ItemGroup>
+
+</Project>

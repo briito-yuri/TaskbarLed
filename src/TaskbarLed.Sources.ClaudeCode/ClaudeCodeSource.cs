@@ -114,7 +114,7 @@ public sealed class ClaudeCodeSource : ISessionSource
     }
 
     private static string? ProjectName(string? cwd) =>
-        string.IsNullOrWhiteSpace(cwd) ? null : Path.GetFileName(cwd.TrimEnd('/', '\\')) is { Length: > 0 } name ? name : cwd;
+        string.IsNullOrWhiteSpace(cwd) ? null : PathText.LastSegment(cwd) is { Length: > 0 } name ? name : cwd;
 
     private static string? Text(JsonElement element, string property) =>
         element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.String

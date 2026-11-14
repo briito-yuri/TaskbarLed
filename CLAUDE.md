@@ -17,6 +17,8 @@ A WPF app (.NET 10, Windows 10/11) that draws an LED panel on the taskbar showin
 | `src/TaskbarLed.Platform.Windows` | Win32 (`LibraryImport`), visibility probe, monitors/taskbars, full-screen detection, auto-start, named-pipe server | |
 | `src/TaskbarLed.Hook` | Exe the hooks call; forwards stdin to the pipe or a spool folder | Must never print, block or fail: always exit 0. |
 | `src/TaskbarLed.App` | Composition root (`AppHost`), `PanelView`/`PanelWindow`, overlays, tray menu, themes, `DemoRenderer` | |
+| `src/TaskbarLed.Platform.Mac` | CoreGraphics window list, `ClaudeWindowRules` (pure, tested), all-Spaces window, LaunchAgent, `~/Library` paths | Native calls only on macOS (`[SupportedOSPlatform("macos")]`). |
+| `src/TaskbarLed.App.Avalonia` | macOS port, in progress: `FloatingPanelWindow` centered above the Dock (`PanelLayout.AboveDock`), demo feed only | Runs on Windows too, for development. Plan and next steps: `docs/PROPOSTAS.md` P4. |
 
 ## Commands
 
@@ -31,6 +33,8 @@ src/TaskbarLed.App/bin/Debug/net10.0-windows/TaskbarLed.exe --render-demo docs/i
 dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\TaskbarLed" -nodeReuse:false
 Start-Process "$env:LOCALAPPDATA\Programs\TaskbarLed\TaskbarLed.exe"   # relaunches itself outside Claude's container
 ```
+
+macOS port: `dotnet run --project src/TaskbarLed.App.Avalonia` shows the floating panel with demo data (on Windows it stays above the taskbar). `tests/TaskbarLed.App.Avalonia.Tests` renders it headless to `bin/.../screenshots/mac-floating-panel.png`. There is no Mac here: CI's `macos` job is the check, and Dock, Spaces, Claude detection and the LaunchAgent still need a real Mac.
 
 Other CLI flags: `--install-hooks`, `--uninstall-hooks`, `--restart` (wait for the old instance; used by the language switch).
 

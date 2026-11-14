@@ -1,0 +1,27 @@
+<!--
+  Application resources. The Led.* keys mirror the WPF themes (src/TaskbarLed.App/Themes/Matrix.xaml documents them);
+  only the Matrix theme is ported so far.
+-->
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="TaskbarLed.App.Avalonia.App"
+             RequestedThemeVariant="Dark">
+
+  <Application.Styles>
+    <FluentTheme />
+  </Application.Styles>
+
+  <Application.Resources>
+    <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#F2020A02" />
+    <SolidColorBrush x:Key="Led.BorderBrush" Color="#0F3D12" />
+    <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#33FF66" />
+    <SolidColorBrush x:Key="Led.DimBrush" Color="#1FAE47" />
+    <SolidColorBrush x:Key="Led.AttentionBrush" Color="#FFB02E" />
+    <SolidColorBrush x:Key="Led.DoneBrush" Color="#33FF66" />
+    <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#0B2A0E" />
+    <Color x:Key="Led.GlowColor">#33FF66</Color>
+    <!-- Menlo and SF Mono ship with macOS; the rest cover Windows and Linux. -->
+    <FontFamily x:Key="Led.FontFamily">Menlo, SF Mono, Cascadia Mono, Consolas, DejaVu Sans Mono, monospace</FontFamily>
+  </Application.Resources>
+
+</Application>

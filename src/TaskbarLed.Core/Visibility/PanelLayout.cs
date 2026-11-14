@@ -94,6 +94,25 @@ public static class PanelLayout
         return Offset(rect, dx, dy);
     }
 
+    /// <summary>
+    /// Floating panel centered horizontally just above the bottom of the work area (macOS: above the Dock).
+    /// The work area already excludes the Dock and the menu bar, so this also works with a side or hidden Dock.
+    /// </summary>
+    /// <param name="workArea">Usable screen area, in physical pixels.</param>
+    /// <param name="scale">Screen scale factor (1.0 = 96 DPI on Windows, 2.0 on Retina).</param>
+    /// <param name="widthDip">Wanted panel width; clamped to <see cref="MinWidthDip"/> and the work area.</param>
+    /// <param name="gapDip">Space between the panel and the bottom of the work area.</param>
+    public static PixelRect AboveDock(PixelRect workArea, double scale, double widthDip, double gapDip)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(scale, 0);
+
+        var height = Math.Min((int)Math.Round(FloatingHeightDip * scale), workArea.Height);
+        var width = ClampWidth(widthDip, scale, workArea.Width);
+        var left = workArea.Left + ((workArea.Width - width) / 2);
+        var bottom = workArea.Bottom - (int)Math.Round(Math.Max(0, gapDip) * scale);
+        return PixelRect.FromSize(left, Math.Max(workArea.Top, bottom - height), width, height);
+    }
+
     /// <summary>Compact panel in the bottom-right corner, used over full-screen content.</summary>
     public static PixelRect MiniCorner(PixelRect monitor, double scale)
     {

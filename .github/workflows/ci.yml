@@ -34,3 +34,41 @@ jobs:
         with:
           name: TaskbarLed
           path: artifacts/TaskbarLed
+
+  # macOS port (docs/PROPOSTAS.md, P4): everything except the WPF app and Platform.Windows.
+  macos:
+    runs-on: macos-latest
+    env:
+      TASKBARLED_SCREENSHOTS: ${{ github.workspace }}/artifacts/screenshots
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Test
+        run: |
+          for project in \
+            tests/TaskbarLed.Core.Tests \
+            tests/TaskbarLed.Sources.ClaudeCode.Tests \
+            tests/TaskbarLed.Platform.Mac.Tests \
+            tests/TaskbarLed.App.Avalonia.Tests; do
+            dotnet test "$project" -c Release
+          done
+
+      - name: Publish app (Apple silicon)
+        run: dotnet publish src/TaskbarLed.App.Avalonia -c Release -r osx-arm64 --self-contained -o artifacts/TaskbarLed-osx-arm64
+
+      - name: Build hook
+        run: dotnet build src/TaskbarLed.Hook -c Release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TaskbarLed-macos-screenshots
+          path: artifacts/screenshots
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TaskbarLed-osx-arm64
+          path: artifacts/TaskbarLed-osx-arm64

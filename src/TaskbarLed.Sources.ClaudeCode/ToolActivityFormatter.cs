@@ -58,7 +58,7 @@ public sealed class ToolActivityFormatter
         {
             if (Text(input, property) is { } path)
             {
-                return Path.GetFileName(path.TrimEnd('/', '\\'));
+                return PathText.LastSegment(path);
             }
         }
 
