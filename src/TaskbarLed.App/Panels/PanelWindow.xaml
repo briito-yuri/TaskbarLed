@@ -1,0 +1,15 @@
+<Window x:Class="TaskbarLed.App.Panels.PanelWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:panels="clr-namespace:TaskbarLed.App.Panels"
+        Title="TaskbarLed"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        Width="420" Height="36">
+  <panels:PanelView x:Name="View" />
+</Window>

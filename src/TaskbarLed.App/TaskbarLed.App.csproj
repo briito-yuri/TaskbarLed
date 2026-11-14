@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- Only for NotifyIcon (tray). WPF has no tray icon of its own. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>TaskbarLed</AssemblyName>
+    <RootNamespace>TaskbarLed.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Description>LED ticker on the Windows taskbar that shows what your AI coding agents are doing.</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <TieredPGO>true</TieredPGO>
+    <!-- WFO0003 targets WinForms apps; this is a WPF app, where DPI awareness belongs in app.manifest. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- WinForms implicit usings clash with WPF names (Application, MessageBox, ...). -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <!-- WPF leaves System.IO out of implicit usings (Path clashes with Shapes.Path). -->
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskbarLed.Core\TaskbarLed.Core.csproj" />
+    <ProjectReference Include="..\TaskbarLed.Sources.ClaudeCode\TaskbarLed.Sources.ClaudeCode.csproj" />
+    <ProjectReference Include="..\TaskbarLed.Platform.Windows\TaskbarLed.Platform.Windows.csproj" />
+    <!-- Ships TaskbarLed.Hook.exe next to the app; hooks point at it. -->
+    <ProjectReference Include="..\TaskbarLed.Hook\TaskbarLed.Hook.csproj" />
+  </ItemGroup>
+
+</Project>
