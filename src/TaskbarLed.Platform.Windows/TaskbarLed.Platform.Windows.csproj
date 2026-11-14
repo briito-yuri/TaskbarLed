@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Description>Windows integration: windows, monitors, taskbar, full-screen detection, auto-start and hook IPC.</Description>
+    <!-- Required by LibraryImport source-generated P/Invoke. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TaskbarLed.Core\TaskbarLed.Core.csproj" />
+  </ItemGroup>
+
+</Project>
