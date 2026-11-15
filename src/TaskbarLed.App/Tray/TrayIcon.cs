@@ -28,12 +28,16 @@ public sealed record TrayCommands(
     Action ToggleStartWithWindows,
     Action ToggleClaudeCode,
     Action OpenSettingsFolder,
+    Action OpenThemesFolder,
     Action OpenClaude,
     Action Exit);
 
 /// <summary>Notification-area icon and menu. The icon color mirrors the most urgent session.</summary>
 public sealed class TrayIcon : IDisposable
 {
+    // Tag for menu items that run an action inside a "keep open" submenu.
+    private static readonly object ClosesMenu = new();
+
     private readonly NotifyIcon _icon;
     private readonly ContextMenuStrip _menu = new();
     private readonly Dictionary<SessionStatus, System.Drawing.Icon> _icons = [];
@@ -145,12 +149,20 @@ public sealed class TrayIcon : IDisposable
         _menu.Items.Add(fullscreenMenu);
 
         var themeMenu = new ToolStripMenuItem(_strings.Theme);
+        var currentTheme = Themes.ThemeCatalog.Resolve(state.Panel.Theme).Id;
         foreach (var theme in Themes.ThemeCatalog.All)
         {
-            var id = theme.Id;
-            var selected = string.Equals(Themes.ThemeCatalog.Resolve(state.Panel.Theme).Id, id, StringComparison.Ordinal);
-            themeMenu.DropDownItems.Add(Check(theme.DisplayName, selected, () => _commands.SelectTheme(id)));
+            AddTheme(themeMenu, theme, currentTheme);
         }
+
+        // The user's own JSON themes, then the way to the folder where they live.
+        themeMenu.DropDownItems.Add(new ToolStripSeparator());
+        foreach (var theme in Themes.ThemeCatalog.Custom)
+        {
+            AddTheme(themeMenu, theme, currentTheme);
+        }
+
+        themeMenu.DropDownItems.Add(new ToolStripMenuItem(_strings.OpenThemesFolder, null, (_, _) => _commands.OpenThemesFolder()) { Tag = ClosesMenu });
 
         KeepOpenOnPick(themeMenu);
         _menu.Items.Add(themeMenu);
@@ -194,6 +206,13 @@ public sealed class TrayIcon : IDisposable
     private static ToolStripMenuItem Check(string text, bool isChecked, Action onClick) =>
         new(text, null, (_, _) => onClick()) { Checked = isChecked };
 
+    private void AddTheme(ToolStripMenuItem menu, Themes.ThemeInfo theme, string currentId)
+    {
+        var id = theme.Id;
+        var selected = string.Equals(currentId, id, StringComparison.Ordinal);
+        menu.DropDownItems.Add(Check(theme.DisplayName, selected, () => _commands.SelectTheme(id)));
+    }
+
     /// <summary>
     /// Picking an option in <paramref name="submenu"/> applies it but keeps the menu open, so the user can
     /// try theme after theme (or position after position) and watch the panel change, without reopening the menu.
@@ -202,6 +221,11 @@ public sealed class TrayIcon : IDisposable
     {
         submenu.DropDown.ItemClicked += (_, e) =>
         {
+            if (ReferenceEquals(e.ClickedItem?.Tag, ClosesMenu))
+            {
+                return; // An action, not an option: let the menu close and keep the checkmarks as they are.
+            }
+
             _keepOpen = true;
             foreach (var item in submenu.DropDownItems.OfType<ToolStripMenuItem>())
             {

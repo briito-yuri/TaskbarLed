@@ -63,6 +63,7 @@ public sealed class AppHost : IDisposable
     private HostWindows _hostWindows = HostWindows.None;
     private bool _allInSight;
     private string? _selectedSessionId;
+    private HashSet<string> _reportedThemeProblems = [];
     private IReadOnlyList<MonitorInfo> _monitors = [];
     private IReadOnlyList<MonitorInfo> _targets = [];
     private Dictionary<nint, FullscreenKind> _fullscreen = [];
@@ -106,6 +107,7 @@ public sealed class AppHost : IDisposable
     public void Start()
     {
         _log.Info("Starting.");
+        LoadCustomThemes();
         ApplyTheme(_settings.Panel.Theme);
         _tray = new TrayIcon(_strings, TrayState, CreateTrayCommands());
         _tray.MenuVisibilityChanged += (_, open) => OnMenuVisibilityChanged(open);
@@ -333,6 +335,50 @@ public sealed class AppHost : IDisposable
         _viewModel.Uppercase = ThemeCatalog.Resolve(id).Uppercase;
     }
 
+    // Users' JSON themes: read at startup and again each time the menu opens, so a new or edited
+    // file shows up without a restart. Bad files are skipped and explained in the log.
+    private void LoadCustomThemes()
+    {
+        var before = ThemeCatalog.Resolve(_settings.Panel.Theme).Custom;
+        var problems = ThemeCatalog.LoadCustom(ThemeCatalog.CustomFolder);
+
+        // Each problem once, not on every menu open; a file fixed and broken again is reported again.
+        foreach (var problem in problems.Where(p => !_reportedThemeProblems.Contains(p)))
+        {
+            _log.Info(problem);
+        }
+
+        _reportedThemeProblems = [.. problems];
+
+        // The theme in use is a custom one that changed on disk: show the new version right away.
+        // Compared by content: the record holds a dictionary, which compares by reference.
+        var after = ThemeCatalog.Resolve(_settings.Panel.Theme).Custom;
+        if ((before is not null || after is not null)
+            && System.Text.Json.JsonSerializer.Serialize(before) != System.Text.Json.JsonSerializer.Serialize(after))
+        {
+            ApplyTheme(_settings.Panel.Theme);
+        }
+    }
+
+    private void OpenThemesFolder()
+    {
+        try
+        {
+            var folder = Directory.CreateDirectory(ThemeCatalog.CustomFolder);
+            if (!folder.EnumerateFiles("*.json").Any())
+            {
+                File.WriteAllText(Path.Combine(folder.FullName, ExampleTheme.FileName), ExampleTheme.Json);
+                LoadCustomThemes();
+            }
+
+            Process.Start(new ProcessStartInfo(folder.FullName) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+        {
+            _log.Error("Could not open the themes folder.", ex);
+        }
+    }
+
     // Opens the app of the session in the feed: VS Code for a VS Code session, Claude otherwise.
     private void OpenClaude()
     {
@@ -422,13 +468,17 @@ public sealed class AppHost : IDisposable
         }
     }
 
-    private TrayState TrayState() => new(
+    private TrayState TrayState()
+    {
+        LoadCustomThemes(); // The menu is about to list themes: pick up files added or edited since.
+        return new(
         _viewModel.IsEditing,
         _settings.Panel,
         _monitors,
         _settings.StartWithWindows,
         _settings.ClaudeCodeHooksEnabled == true,
         _settings.Language);
+    }
 
     private TrayCommands CreateTrayCommands() => new(
         ToggleEditing: () =>
@@ -460,6 +510,7 @@ public sealed class AppHost : IDisposable
         },
         ToggleClaudeCode: ToggleClaudeCode,
         OpenSettingsFolder: () => Process.Start(new ProcessStartInfo(Path.GetDirectoryName(_settingsStore.FilePath)!) { UseShellExecute = true })?.Dispose(),
+        OpenThemesFolder: OpenThemesFolder,
         OpenClaude: OpenClaude,
         Exit: ShutdownAfterMenu);
 

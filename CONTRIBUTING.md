@@ -14,6 +14,8 @@ The build treats warnings as errors and runs the .NET analyzers. Fix the warning
 
 ## Create a theme
 
+Just want your own colors? You don't need to build anything: drop a JSON file in `%APPDATA%\TaskbarLed\themes` (see "Make your own theme" in the README). The steps below are for a theme that ships with TaskbarLed.
+
 1. Copy `src/TaskbarLed.App/Themes/Matrix.xaml` to `Themes/YourTheme.xaml`. The comment at the top explains every key.
 2. Change the colors. Keep every `Led.*` key, and make `Led.AttentionBrush` clearly different from `Led.ForegroundBrush`.
 3. Add one line to `Themes/ThemeCatalog.cs`.

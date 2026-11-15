@@ -41,7 +41,7 @@ You can switch to a click-through mini panel, alerts only, or nothing at all. Ex
 - **Many sessions, one glance.** Numbered, named tabs with status marks you can read without color: `▸` running, `✓` done, `!` waiting.
 - **Live details.** Current action (editing a file, running a command, searching), the last reply, prompt timer and context usage.
 - **Place it your way.** On the taskbar, floating just above it, or anywhere on screen with edge snapping. Each placement remembers its own spot.
-- **Seven themes, switched live.** Claude Code by default, plus terminal, LED and modern looks, see [Themes](#themes).
+- **Seven themes, switched live.** Claude Code by default, plus terminal, LED and modern looks, or [your own](#make-your-own-theme) from a small JSON file.
 - **English and Portuguese.** Follows Windows by default, or pick one in the menu.
 - **Works everywhere Claude Code runs.** Desktop app, CLI and IDE extensions (VS Code, JetBrains) share the same hooks.
 - **Light and private.** Event driven, about 60 MB of RAM, and nothing ever leaves your machine.
@@ -59,7 +59,38 @@ Two modern terminals, two retro LED looks, and three clean cards:
 | <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: clean dark card | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: no box; text floats on the taskbar |
 | <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: light, for a light taskbar | |
 
-Making your own takes one XAML file. See [Create a theme](CONTRIBUTING.md#create-a-theme).
+### Make your own theme
+
+No coding or rebuilding needed: a theme is a small JSON file.
+
+1. Right-click the panel → **Theme** → **Your own themes…**. This opens `%APPDATA%\TaskbarLed\themes` and puts an example there, `ocean.json`.
+2. Copy it, rename it and change the values. Save.
+3. Open the menu again: your theme is listed under the built-in ones. Edits to the theme in use show up the next time you open the menu.
+
+<img src="docs/images/theme-custom-example.png" alt="The Ocean example theme" width="560">
+
+Every field except `name` is optional. Anything left out keeps the Claude Code theme. Colors are `"#RRGGBB"`, or `"#AARRGGBB"` with transparency.
+
+| Field | What it sets |
+|---|---|
+| `name` | Name in the menu (required, up to 40 characters) |
+| `background`, `border` | Panel background and outline |
+| `foreground` | Main text and running tabs |
+| `dim` | Secondary text (context usage, idle tabs) |
+| `attention` | "Waiting for you": make it stand out from `foreground` |
+| `done` | Finished tabs, the green blink and the edge glow |
+| `tabBackground` | Background of tabs that are not selected |
+| `edit` | Edit-mode outline |
+| `accent`, `feedPrefix` | Color and glyph before the feed line (up to 2 characters, `""` for none). The glyph pulses while Claude works |
+| `glow`, `glowStrength` | Text glow color and strength from 0 to 1 |
+| `font` | Installed font names, separated by commas |
+| `uppercase` | `true` for capitals |
+
+The full example is [docs/themes/ocean.json](docs/themes/ocean.json).
+
+**Safe to share.** A theme file holds values only. TaskbarLed never loads XAML or code from it, and fonts must be names, not paths or network locations. A file that is invalid, larger than 16 KB or breaks a rule is skipped. The reason is written to the log (`%LOCALAPPDATA%\TaskbarLed\taskbarled.log`). The LED dot effect is reserved for built-in themes.
+
+Want a theme to ship with TaskbarLed for everyone? See [Create a theme](CONTRIBUTING.md#create-a-theme).
 
 ## Install
 

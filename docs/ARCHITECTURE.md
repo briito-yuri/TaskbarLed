@@ -36,7 +36,8 @@ Dependencies only point inward: `App → Platform.Windows, Sources.* → Core` a
 | You want to… | Implement / edit | Notes |
 |---|---|---|
 | Support another agent CLI | `ISessionSource` in a new `TaskbarLed.Sources.<Name>` project | Point that tool's hooks at `TaskbarLed.Hook.exe <your-source-id>`. Register the source in `AppHost`. Never throw on unknown payloads. |
-| Add a theme | Copy `src/TaskbarLed.App/Themes/Matrix.xaml`, add it to `ThemeCatalog` | Keep every `Led.*` key. Preview with `--render-demo`, which renders the real `PanelView` to PNG (`DemoRenderer`). |
+| Use your own colors | A JSON file in `%APPDATA%\TaskbarLed\themes` | No build. Values only, validated by `CustomTheme` (Core). See the README. |
+| Add a built-in theme | Copy `src/TaskbarLed.App/Themes/Matrix.xaml`, add it to `ThemeCatalog` | Keep every `Led.*` key. Preview with `--render-demo`, which renders the real `PanelView` to PNG (`DemoRenderer`). |
 | Translate | `TickerStrings`, `ActivityStrings`, `UiStrings` | One factory per language, chosen by the UI culture. |
 | Show plan limits | `IUsageLimitProvider` | Must be opt-in if it reads credentials. |
 | Change when the panel hides | `IClaudeVisibilityProbe`, `VisibleThreshold` | |

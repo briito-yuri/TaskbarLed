@@ -45,7 +45,8 @@ Release: push a tag `vX.Y.Z`; `.github/workflows/release.yml` builds, tests and 
 - Warnings are errors with the .NET analyzers on. Fix them; suppress only with a written justification.
 - Tests are named as sentences (`Approval_then_tool_result_resumes_running_without_restarting_the_timer`); CA1707 is off for tests only.
 - Core produces natural-case text. Upper case is a theme choice (`ThemeInfo.Uppercase`), applied by `PanelViewModel.Cased`.
-- Themes are `Themes/*.xaml` with every `Led.*` key (documented at the top of `Matrix.xaml`) plus one line in `ThemeCatalog`. All colors are `DynamicResource`, so switching is live.
+- Built-in themes are `Themes/*.xaml` with every `Led.*` key (documented at the top of `Matrix.xaml`) plus one line in `ThemeCatalog`. All colors are `DynamicResource`, so switching is live.
+- User themes are JSON files in `%APPDATA%\TaskbarLed\themes`, read by `CustomTheme.TryParse` (Core, tested) and turned into brushes by `ThemeCatalog.Build` on top of the default theme. They are reloaded whenever the menu opens. **Never load XAML (`XamlReader`) or font paths from user files**: XAML can instantiate arbitrary objects, and a `FontFamily` with a path or UNC location loads files from there. Keep the JSON values-only and validated. The example lives in both `Themes/ExampleTheme.cs` and `docs/themes/ocean.json`; keep them in sync.
 - UI strings live in three records: `TickerStrings` (Core), `ActivityStrings` (ClaudeCode), `UiStrings` (App), each with English and Portuguese.
 - Settings: `%APPDATA%\TaskbarLed\settings.json`. Log: `%LOCALAPPDATA%\TaskbarLed\taskbarled.log`. Check the log first when something misbehaves.
 - Demo data uses generic project names (`webapp`, `api`, `site`); never put the maintainer's real project names in public files.

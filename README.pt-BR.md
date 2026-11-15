@@ -41,7 +41,7 @@ Também dá pra trocar para um mini painel no canto (os cliques passam para o v�
 - **Várias sessões num relance.** Abas numeradas e com nome, com símbolos que dá pra ler mesmo sem distinguir cor: `▸` rodando, `✓` concluída, `!` aguardando.
 - **Detalhes ao vivo.** Ação atual (editando arquivo, rodando comando, buscando), última resposta, cronômetro do prompt e uso do contexto.
 - **Do seu jeito.** Na barra de tarefas, flutuando logo acima dela, ou livre em qualquer lugar da tela, com ímã nas bordas. Cada modo lembra a própria posição.
-- **Sete temas, troca na hora.** Claude Code por padrão, além de visuais de terminal, LED e modernos, veja em [Temas](#temas).
+- **Sete temas, troca na hora.** Claude Code por padrão, além de visuais de terminal, LED e modernos, ou [o seu próprio](#crie-o-seu-próprio-tema) num pequeno arquivo JSON.
 - **Português e inglês.** Segue o idioma do Windows, ou você escolhe no menu.
 - **Funciona onde o Claude Code roda.** App desktop, CLI e extensões de IDE (VS Code, JetBrains) usam os mesmos hooks.
 - **Leve e privado.** Movido a eventos, cerca de 60 MB de RAM, e nada sai do seu computador.
@@ -59,7 +59,38 @@ São dois terminais modernos, dois visuais LED retrô e três cartões limpos:
 | <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: cartão escuro e limpo | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: sem caixa; o texto flutua sobre a barra |
 | <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: claro, para barra de tarefas clara | |
 
-Criar o seu exige um único arquivo XAML. Veja em [Criar um tema](CONTRIBUTING.md#create-a-theme).
+### Crie o seu próprio tema
+
+Sem programar e sem recompilar: um tema é um pequeno arquivo JSON.
+
+1. Botão direito no painel → **Tema** → **Seus próprios temas…**. Isso abre `%APPDATA%\TaskbarLed\themes` e coloca lá um exemplo, `ocean.json`.
+2. Copie, renomeie e mude os valores. Salve.
+3. Abra o menu de novo: o seu tema aparece abaixo dos que vêm com o app. Edições no tema em uso aparecem na próxima vez que você abrir o menu.
+
+<img src="docs/images/theme-custom-example.png" alt="O tema de exemplo Ocean" width="560">
+
+Todos os campos são opcionais, menos `name`. O que ficar de fora usa o valor do tema Claude Code. Cores são `"#RRGGBB"`, ou `"#AARRGGBB"` com transparência.
+
+| Campo | O que muda |
+|---|---|
+| `name` | Nome no menu (obrigatório, até 40 caracteres) |
+| `background`, `border` | Fundo e contorno do painel |
+| `foreground` | Texto principal e abas rodando |
+| `dim` | Texto secundário (uso do contexto, abas paradas) |
+| `attention` | "Aguardando você": precisa se destacar do `foreground` |
+| `done` | Abas concluídas, o piscar verde e a borda luminosa |
+| `tabBackground` | Fundo das abas não selecionadas |
+| `edit` | Contorno do modo de edição |
+| `accent`, `feedPrefix` | Cor e símbolo antes da linha do feed (até 2 caracteres, `""` para nenhum). O símbolo pulsa enquanto o Claude trabalha |
+| `glow`, `glowStrength` | Cor e força do brilho do texto, de 0 a 1 |
+| `font` | Nomes de fontes instaladas, separados por vírgula |
+| `uppercase` | `true` para letras maiúsculas |
+
+O exemplo completo está em [docs/themes/ocean.json](docs/themes/ocean.json).
+
+**Seguro para compartilhar.** Um arquivo de tema guarda só valores. O TaskbarLed nunca carrega XAML ou código dele, e fontes precisam ser nomes, não caminhos nem endereços de rede. Um arquivo inválido, maior que 16 KB ou fora das regras é ignorado. O motivo fica no log (`%LOCALAPPDATA%\TaskbarLed\taskbarled.log`). O efeito de pontos de LED é exclusivo dos temas que vêm com o app.
+
+Quer que um tema venha com o TaskbarLed para todo mundo? Veja em [Criar um tema](CONTRIBUTING.md#create-a-theme).
 
 ## Instalação
 

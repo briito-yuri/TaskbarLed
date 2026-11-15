@@ -48,6 +48,17 @@ internal static class DemoRenderer
             Save(Taskbar(Frame(Scenario.Mixed, english), width: 560, uppercase: theme.Uppercase, light: theme.Id == "Paper"), folder, $"theme-{theme.Id}.png");
         }
 
+        // The example user theme, drawn through the same JSON path the app uses for files in the themes folder.
+        if (Core.Themes.CustomTheme.TryParse(ExampleTheme.FileName, ExampleTheme.Json, out var example, out var error))
+        {
+            ThemeCatalog.ApplyCustom(app.Resources, example!);
+            Save(Taskbar(Frame(Scenario.Mixed, english), width: 560, uppercase: example!.Uppercase), folder, "theme-custom-example.png");
+        }
+        else
+        {
+            throw new InvalidOperationException($"The example theme does not parse: {error}");
+        }
+
         ThemeCatalog.Apply(app.Resources, ThemeCatalog.DefaultId);
     }
 
