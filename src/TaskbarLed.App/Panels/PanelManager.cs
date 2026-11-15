@@ -126,7 +126,7 @@ public sealed class PanelManager : IDisposable
     public void Dispose()
     {
         _disposed = true;
-        foreach (var window in _windows.Values)
+        foreach (var window in _windows.Values.ToList()) // Closing removes it from the dictionary.
         {
             window.Close();
         }
@@ -142,6 +142,17 @@ public sealed class PanelManager : IDisposable
         window.MenuRequested += (_, _) => MenuRequested?.Invoke(this, EventArgs.Empty);
         window.EditFinished += (_, save) => EditFinished?.Invoke(this, save);
         window.EditDrag += OnEditDrag;
+
+        // A closed WPF window can never be shown again. If something other than us closes it
+        // (Alt+F4, the shell), forget it so the next Sync creates a fresh one instead of throwing forever.
+        window.Closed += (_, _) =>
+        {
+            if (_windows.TryGetValue(monitor.Handle, out var current) && ReferenceEquals(current, window))
+            {
+                _windows.Remove(monitor.Handle);
+            }
+        };
+
         return window;
     }
 

@@ -32,6 +32,7 @@ public sealed class OverlayManager : IDisposable
             if (!_edges.TryGetValue(monitor.Handle, out var window))
             {
                 window = new EdgeGlowWindow();
+                ForgetWhenClosed(_edges, monitor.Handle, window);
                 _edges[monitor.Handle] = window;
             }
 
@@ -46,6 +47,7 @@ public sealed class OverlayManager : IDisposable
         {
             window = new AlertWindow();
             window.OpenRequested += (_, _) => OpenRequested?.Invoke(this, EventArgs.Empty);
+            ForgetWhenClosed(_alerts, monitor.Handle, window);
             _alerts[monitor.Handle] = window;
         }
 
@@ -63,12 +65,26 @@ public sealed class OverlayManager : IDisposable
 
     public void Dispose()
     {
-        foreach (var window in _edges.Values.Cast<System.Windows.Window>().Concat(_alerts.Values))
+        // Copy first: closing removes each window from its dictionary.
+        foreach (var window in _edges.Values.Cast<System.Windows.Window>().Concat(_alerts.Values).ToList())
         {
             window.Close();
         }
 
         _edges.Clear();
         _alerts.Clear();
+    }
+
+    // A closed window can never be shown again; if something else closes it, the next call creates a new one.
+    private static void ForgetWhenClosed<TWindow>(Dictionary<nint, TWindow> windows, nint monitor, TWindow window)
+        where TWindow : System.Windows.Window
+    {
+        window.Closed += (_, _) =>
+        {
+            if (windows.TryGetValue(monitor, out var current) && ReferenceEquals(current, window))
+            {
+                windows.Remove(monitor);
+            }
+        };
     }
 }
