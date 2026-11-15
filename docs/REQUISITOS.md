@@ -1,6 +1,6 @@
 # TaskbarLed — Requisitos
 
-Painel de LED estilo Matrix na área livre da barra de tarefas do Windows 11 que mostra, em tempo real, o andamento das sessões do Claude Code (app desktop, CLI e extensão do VS Code) enquanto a janela do Claude não está visível.
+Painel estilo terminal (originalmente um LED estilo Matrix) na área livre da barra de tarefas do Windows 11 que mostra, em tempo real, o andamento das sessões do Claude Code (app desktop, CLI e extensão do VS Code) enquanto a janela do Claude não está visível.
 
 ## 1. Requisitos funcionais
 
@@ -43,7 +43,7 @@ Painel de LED estilo Matrix na área livre da barra de tarefas do Windows 11 que
 | Plataforma | .NET 10 (LTS) + WPF | Moderno, padrão de mercado, bons efeitos visuais |
 | Comunicação hook → painel | Named pipe + arquivo de estado por sessão | Tempo real, com backup se o painel estiver fechado |
 | Nome | TaskbarLed | Neutro; permite suportar outras ferramentas de IA |
-| Tema inicial | Verde terminal (Matrix) | Escolha do usuário |
+| Tema inicial | Claude Code (terminal quente, ✻ terracota). Até a v1.1.0 era o verde terminal (Matrix), que continua disponível | Escolha do usuário; trocado em 2026-11-15 para ter a identidade do Claude Code |
 
 ## 4. Arquitetura (proposta)
 ```

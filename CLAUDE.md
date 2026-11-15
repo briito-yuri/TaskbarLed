@@ -6,7 +6,7 @@ The maintainer speaks Brazilian Portuguese: talk to them in pt-BR. Code, comment
 
 ## What it is
 
-A WPF app (.NET 10, Windows 10/11) that draws an LED panel on the taskbar showing Claude Code sessions: tabs per session, a vertical typed-out feed, timer, context usage. It appears only while the Claude desktop window is out of sight; amber blink = waiting for the user, green blink = done until Claude is opened. Over borderless full screen it shows an edge glow and short alerts instead.
+A WPF app (.NET 10, Windows 10/11) that draws a small terminal-style panel on the taskbar showing Claude Code sessions: tabs per session, a vertical typed-out feed, timer, context usage. The default theme is `ClaudeCode` (Claude Code's terminal colors, a pulsing `✻`); `Matrix`, the original green LED look, is still the reference file for theme keys. It appears only while the app each session runs in (Claude desktop or VS Code) is out of sight; amber/gold blink = waiting for the user, green blink = done until that app is opened. Over borderless full screen it shows an edge glow and short alerts instead.
 
 ## Layout
 

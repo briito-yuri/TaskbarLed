@@ -51,6 +51,12 @@ internal static class DemoRenderer
         ThemeCatalog.Apply(app.Resources, ThemeCatalog.DefaultId);
     }
 
+    // State and full-screen screenshots use the default theme, in its own letter case.
+    private static bool DefaultUppercase => ThemeCatalog.Resolve(ThemeCatalog.DefaultId).Uppercase;
+
+    private static string Cased(string text, bool pt) =>
+        DefaultUppercase ? text.ToUpper(CultureInfo.GetCultureInfo(pt ? "pt-BR" : "en-US")) : text;
+
     private enum Scenario
     {
         Running,
@@ -121,11 +127,11 @@ internal static class DemoRenderer
         return frame;
     }
 
-    private static Grid Taskbar(PanelFrame frame, double width = TaskbarWidth, bool halo = false, string? editing = null, bool uppercase = true, bool light = false, Infrastructure.UiStrings? ui = null)
+    private static Grid Taskbar(PanelFrame frame, double width = TaskbarWidth, bool halo = false, string? editing = null, bool? uppercase = null, bool light = false, Infrastructure.UiStrings? ui = null)
     {
         var viewModel = new PanelViewModel(editing ?? string.Empty, CultureInfo.CurrentUICulture)
         {
-            Uppercase = uppercase,
+            Uppercase = uppercase ?? DefaultUppercase,
             SaveLabel = ui?.Save ?? "Save",
             CancelLabel = ui?.Cancel ?? "Cancel",
         };
@@ -202,7 +208,7 @@ internal static class DemoRenderer
 
         var text = new TextBlock
         {
-            Text = pt ? "✓ 2 API  ›  CONCLUÍDO EM 12M47S" : "✓ 2 API  ›  DONE IN 12M47S",
+            Text = Cased(pt ? "✓ 2 API  ›  Concluído em 12m47s" : "✓ 2 API  ›  Done in 12m47s", pt),
             FontSize = 15,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(14, 8, 14, 8),

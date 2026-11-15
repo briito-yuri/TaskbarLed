@@ -1,4 +1,5 @@
 using System.Windows;
+using TaskbarLed.Core.Settings;
 
 namespace TaskbarLed.App.Themes;
 
@@ -14,14 +15,15 @@ public sealed record ThemeInfo(string Id, string DisplayName, bool Uppercase);
 /// </summary>
 public static class ThemeCatalog
 {
-    public const string DefaultId = "Matrix";
+    public const string DefaultId = PanelSettings.DefaultTheme;
 
+    // Menu order: the default first, then the other terminal looks, then the modern cards.
     public static IReadOnlyList<ThemeInfo> All { get; } =
     [
+        new("ClaudeCode", "Claude Code", Uppercase: false),
+        new("ModernTerminal", "Modern Terminal", Uppercase: false),
         new("Matrix", "Matrix", Uppercase: true),
         new("Mono", "Mono", Uppercase: true),
-        new("ModernTerminal", "Modern Terminal", Uppercase: false),
-        new("ClaudeCode", "Claude Code", Uppercase: false),
         new("Minimal", "Minimal", Uppercase: false),
         new("Glass", "Glass", Uppercase: false),
         new("Paper", "Paper", Uppercase: false),
@@ -42,8 +44,11 @@ public static class ThemeCatalog
             id = renamed;
         }
 
-        return All.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase)) ?? All[0];
+        return Find(id) ?? Find(DefaultId)!;
     }
+
+    private static ThemeInfo? Find(string? id) =>
+        All.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase));
 
     /// <summary>Swaps the theme dictionary in the application resources.</summary>
     public static void Apply(ResourceDictionary resources, string? id)

@@ -2,10 +2,10 @@
 
 # TaskbarLed
 
-**A Matrix-style LED ticker on your Windows taskbar that shows what Claude Code is doing, so you never have to wonder whether your prompt is done.**
+**A small terminal-style panel on your Windows taskbar that shows what Claude Code is doing, so you never have to wonder whether your prompt is done.**
 
 [![CI](https://github.com/llorenzojorge/TaskbarLed/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzojorge/TaskbarLed/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-33ff66.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-d97757.svg)](LICENSE)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512bd4.svg)
 ![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4.svg)
 
@@ -15,17 +15,17 @@
 
 </div>
 
-You send Claude a long prompt, switch to another app, and then keep coming back to check whether it has finished. TaskbarLed puts the answer in the empty left side of the taskbar. It **appears only while the Claude window is out of sight**, shows every running conversation, and blinks when one of them is done or needs you.
+You send Claude a long prompt, switch to another app, and then keep coming back to check whether it has finished. TaskbarLed puts the answer in the empty left side of the taskbar. It **appears only while Claude is out of sight**, shows every running conversation, and blinks when one of them is done or needs you.
 
 ## What it looks like
 
-Each conversation gets a tab. The feed below drops in each new action from the top and types it out, like the Claude chat.
+It wears the colors of the Claude Code terminal by default: cream text on warm charcoal, with a terracotta `✻` that pulses while Claude works. Each conversation gets a tab. The feed below drops in each new action from the top and types it out, like the Claude chat.
 
 | | |
 |---|---|
 | **Working.** The lit tab is the one in the feed. You see the current action, a prompt timer and how full the context window is. | <img src="docs/images/state-running-en.png" alt="Running"> |
-| **Needs you.** A permission request or a question turns the tab and the feed amber, blinking, and that session jumps to the front. | <img src="docs/images/state-waiting-en.png" alt="Waiting for approval"> |
-| **Done.** The tab shows `✓` and the panel blinks green **until you open Claude**, with the duration and Claude's last reply. | <img src="docs/images/state-done-en.png" alt="Finished"> |
+| **Needs you.** A permission request or a question turns the tab and the feed gold, blinking, and that session jumps to the front. | <img src="docs/images/state-waiting-en.png" alt="Waiting for approval"> |
+| **Done.** The tab shows `✓` and the panel blinks green **until you open the session's app** (Claude or VS Code), with the duration and Claude's last reply. | <img src="docs/images/state-done-en.png" alt="Finished"> |
 
 ### Watching a video in full screen?
 
@@ -37,11 +37,11 @@ You can switch to a click-through mini panel, alerts only, or nothing at all. Ex
 
 ## Features
 
-- **Shows up only when useful.** Hidden while Claude is on screen, including side by side with another app. Shown when Claude is minimized, covered or on another virtual desktop.
+- **Shows up only when useful.** Hidden while you can see the app each session runs in, including side by side with another app. Shown when it is minimized, covered or on another virtual desktop. A session in VS Code follows its VS Code window, so opening the Claude app does not hide it.
 - **Many sessions, one glance.** Numbered, named tabs with status marks you can read without color: `▸` running, `✓` done, `!` waiting.
 - **Live details.** Current action (editing a file, running a command, searching), the last reply, prompt timer and context usage.
 - **Place it your way.** On the taskbar, floating just above it, or anywhere on screen with edge snapping. Each placement remembers its own spot.
-- **Seven themes, switched live.** LED or modern, see [Themes](#themes).
+- **Seven themes, switched live.** Claude Code by default, plus terminal, LED and modern looks, see [Themes](#themes).
 - **English and Portuguese.** Follows Windows by default, or pick one in the menu.
 - **Works everywhere Claude Code runs.** Desktop app, CLI and IDE extensions (VS Code, JetBrains) share the same hooks.
 - **Light and private.** Event driven, about 60 MB of RAM, and nothing ever leaves your machine.
@@ -50,14 +50,14 @@ You can switch to a click-through mini panel, alerts only, or nothing at all. Ex
 
 Right-click the panel → **Theme**. The panel stays on screen while the menu is open, so you see each theme as you pick it.
 
-Two LED looks for the retro feel, and three modern ones with no dots and no glow:
+Two modern terminals, two retro LED looks, and three clean cards:
 
 | | |
 |---|---|
-| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, the default | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
+| <img src="docs/images/theme-ClaudeCode.png" alt="Claude Code"><br>**Claude Code**: warm terminal in the spirit of Claude Code, with a pulsing ✻ while it works. The default | <img src="docs/images/theme-ModernTerminal.png" alt="Modern Terminal"><br>**Modern Terminal**: ink-blue dark terminal with smooth cyan text |
+| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, the original look | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
 | <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: clean dark card | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: no box; text floats on the taskbar |
-| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: light, for a light taskbar | <img src="docs/images/theme-ModernTerminal.png" alt="Modern Terminal"><br>**Modern Terminal**: modern dark terminal, smooth text without LED dots |
-| <img src="docs/images/theme-ClaudeCode.png" alt="Claude Code"><br>**Claude Code**: warm terminal in the spirit of Claude Code, with a pulsing ✻ while it works | |
+| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: light, for a light taskbar | |
 
 Making your own takes one XAML file. See [Create a theme](CONTRIBUTING.md#create-a-theme).
 

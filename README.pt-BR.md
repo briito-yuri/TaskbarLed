@@ -2,10 +2,10 @@
 
 # TaskbarLed
 
-**Um letreiro de LED estilo Matrix na barra de tarefas do Windows que mostra o que o Claude Code está fazendo. Nunca mais fique na dúvida se o seu prompt já terminou.**
+**Um pequeno painel estilo terminal na barra de tarefas do Windows que mostra o que o Claude Code está fazendo. Nunca mais fique na dúvida se o seu prompt já terminou.**
 
 [![CI](https://github.com/llorenzojorge/TaskbarLed/actions/workflows/ci.yml/badge.svg)](https://github.com/llorenzojorge/TaskbarLed/actions/workflows/ci.yml)
-[![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-33ff66.svg)](LICENSE)
+[![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-d97757.svg)](LICENSE)
 ![.NET 10](https://img.shields.io/badge/.NET-10-512bd4.svg)
 ![Windows 10 | 11](https://img.shields.io/badge/Windows-10%20%7C%2011-0078d4.svg)
 
@@ -15,17 +15,17 @@
 
 </div>
 
-Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando para ver se ele já terminou. O TaskbarLed coloca essa resposta no espaço vazio à esquerda da barra de tarefas. Ele **só aparece quando a janela do Claude está fora de vista**, mostra todas as conversas em andamento e pisca quando alguma termina ou precisa de você.
+Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando para ver se ele já terminou. O TaskbarLed coloca essa resposta no espaço vazio à esquerda da barra de tarefas. Ele **só aparece quando o Claude está fora de vista**, mostra todas as conversas em andamento e pisca quando alguma termina ou precisa de você.
 
 ## Como ele fica
 
-Cada conversa ganha uma aba. O feed embaixo traz cada nova ação de cima para baixo e a digita letra por letra, como o chat do Claude.
+Por padrão ele usa as cores do terminal do Claude Code: texto creme sobre carvão quente, com um `✻` terracota que pulsa enquanto o Claude trabalha. Cada conversa ganha uma aba. O feed embaixo traz cada nova ação de cima para baixo e a digita letra por letra, como o chat do Claude.
 
 | | |
 |---|---|
 | **Trabalhando.** A aba acesa é a que está no feed. Você vê a ação atual, o tempo do prompt e quanto do contexto já foi usado. | <img src="docs/images/state-running-pt.png" alt="Rodando"> |
-| **Precisa de você.** Um pedido de permissão ou uma pergunta deixa a aba e o feed em âmbar piscando, e essa sessão passa na frente das outras. | <img src="docs/images/state-waiting-pt.png" alt="Aguardando aprovação"> |
-| **Pronto.** A aba mostra `✓` e o painel pisca verde **até você abrir o Claude**, com a duração e a última resposta. | <img src="docs/images/state-done-pt.png" alt="Concluído"> |
+| **Precisa de você.** Um pedido de permissão ou uma pergunta deixa a aba e o feed em dourado piscando, e essa sessão passa na frente das outras. | <img src="docs/images/state-waiting-pt.png" alt="Aguardando aprovação"> |
+| **Pronto.** A aba mostra `✓` e o painel pisca verde **até você abrir o app da sessão** (Claude ou VS Code), com a duração e a última resposta. | <img src="docs/images/state-done-pt.png" alt="Concluído"> |
 
 ### Assistindo um vídeo em tela cheia?
 
@@ -37,11 +37,11 @@ Também dá pra trocar para um mini painel no canto (os cliques passam para o v�
 
 ## Recursos
 
-- **Aparece só quando é útil.** Some quando o Claude está na tela, inclusive em tela dividida com outro app. Aparece quando o Claude está minimizado, coberto ou em outra área de trabalho virtual.
+- **Aparece só quando é útil.** Some enquanto você vê o app em que cada sessão roda, inclusive em tela dividida com outro app. Aparece quando ele está minimizado, coberto ou em outra área de trabalho virtual. Uma sessão no VS Code segue a janela do VS Code, então abrir o app do Claude não a esconde.
 - **Várias sessões num relance.** Abas numeradas e com nome, com símbolos que dá pra ler mesmo sem distinguir cor: `▸` rodando, `✓` concluída, `!` aguardando.
 - **Detalhes ao vivo.** Ação atual (editando arquivo, rodando comando, buscando), última resposta, cronômetro do prompt e uso do contexto.
 - **Do seu jeito.** Na barra de tarefas, flutuando logo acima dela, ou livre em qualquer lugar da tela, com ímã nas bordas. Cada modo lembra a própria posição.
-- **Sete temas, troca na hora.** LED ou modernos, veja em [Temas](#temas).
+- **Sete temas, troca na hora.** Claude Code por padrão, além de visuais de terminal, LED e modernos, veja em [Temas](#temas).
 - **Português e inglês.** Segue o idioma do Windows, ou você escolhe no menu.
 - **Funciona onde o Claude Code roda.** App desktop, CLI e extensões de IDE (VS Code, JetBrains) usam os mesmos hooks.
 - **Leve e privado.** Movido a eventos, cerca de 60 MB de RAM, e nada sai do seu computador.
@@ -50,14 +50,14 @@ Também dá pra trocar para um mini painel no canto (os cliques passam para o v�
 
 Botão direito no painel → **Tema**. O painel fica na tela enquanto o menu está aberto, então você vê cada tema na hora em que escolhe.
 
-São dois visuais LED, para quem curte o retrô, e três modernos, sem pontos e sem brilho:
+São dois terminais modernos, dois visuais LED retrô e três cartões limpos:
 
 | | |
 |---|---|
-| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: terminal LED verde, o padrão | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: terminal preto e branco |
+| <img src="docs/images/theme-ClaudeCode.png" alt="Claude Code"><br>**Claude Code**: terminal quente no espírito do Claude Code, com um ✻ que pulsa enquanto ele trabalha. O padrão | <img src="docs/images/theme-ModernTerminal.png" alt="Modern Terminal"><br>**Modern Terminal**: terminal escuro azul-tinta, com texto ciano liso |
+| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: terminal LED verde, o visual original | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: terminal preto e branco |
 | <img src="docs/images/theme-Minimal.png" alt="Minimal"><br>**Minimal**: cartão escuro e limpo | <img src="docs/images/theme-Glass.png" alt="Glass"><br>**Glass**: sem caixa; o texto flutua sobre a barra |
-| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: claro, para barra de tarefas clara | <img src="docs/images/theme-ModernTerminal.png" alt="Modern Terminal"><br>**Modern Terminal**: terminal escuro moderno, texto liso sem pontos de LED |
-| <img src="docs/images/theme-ClaudeCode.png" alt="Claude Code"><br>**Claude Code**: terminal quente no espírito do Claude Code, com um ✻ que pulsa enquanto ele trabalha | |
+| <img src="docs/images/theme-Paper.png" alt="Paper"><br>**Paper**: claro, para barra de tarefas clara | |
 
 Criar o seu exige um único arquivo XAML. Veja em [Criar um tema](CONTRIBUTING.md#create-a-theme).
 

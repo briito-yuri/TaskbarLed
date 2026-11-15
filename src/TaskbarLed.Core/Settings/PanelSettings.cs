@@ -84,8 +84,11 @@ public sealed record PanelSettings
     /// <summary>Hours without events before a session is dropped.</summary>
     public double StaleSessionHours { get; init; } = 12;
 
+    /// <summary>Theme used until the user picks one: the warm terminal in the spirit of Claude Code.</summary>
+    public const string DefaultTheme = "ClaudeCode";
+
     /// <summary>Theme resource name (see Themes folder in the app).</summary>
-    public string Theme { get; init; } = "Matrix";
+    public string Theme { get; init; } = DefaultTheme;
 
     /// <summary>Position for the current <see cref="Placement"/>.</summary>
     public PanelPosition CurrentPosition => Placement switch
@@ -113,7 +116,7 @@ public sealed record PanelSettings
         VisibleThreshold = Math.Clamp(VisibleThreshold, 0.05, 0.95),
         RotationSeconds = Math.Clamp(RotationSeconds, 2, 120),
         StaleSessionHours = Math.Clamp(StaleSessionHours, 0.5, 168),
-        Theme = string.IsNullOrWhiteSpace(Theme) ? "Matrix" : Theme,
+        Theme = string.IsNullOrWhiteSpace(Theme) ? DefaultTheme : Theme,
     };
 
     private static PanelPosition Clamp(PanelPosition p) =>
