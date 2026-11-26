@@ -14,8 +14,7 @@ namespace TaskbarLed.App.Avalonia.Panels;
 
 /// <summary>
 /// The small borderless panel, centered horizontally just above the Dock (or the taskbar on Windows).
-/// On macOS it follows the Claude window: shown while Claude is minimized, hidden or covered, gone when
-/// Claude is in sight. Elsewhere it simply stays up, which is handy while developing the port.
+/// Shows live sessions independently of the foreground application.
 /// </summary>
 internal sealed class FloatingPanelWindow : Window
 {
@@ -25,18 +24,24 @@ internal sealed class FloatingPanelWindow : Window
     /// <summary>Space between the panel and the Dock, in DIP/points.</summary>
     public const double DockGap = 8;
 
-    private const double VisibleThreshold = 0.3;
-    private const string OwnProcessName = "TaskbarLed";
-
     private readonly PanelViewModel _viewModel;
     private readonly Func<PanelFrame> _frames;
     private readonly DispatcherTimer _frameTimer;
-    private readonly DispatcherTimer _visibilityTimer;
+    private readonly Action<string?>? _acknowledge;
+    private readonly Action? _skip;
+    private PanelFrame? _frame;
 
-    public FloatingPanelWindow(PanelViewModel viewModel, Func<PanelFrame> frames)
+    public bool KeepVisible { get; set; }
+
+    public FloatingPanelWindow(PanelViewModel viewModel, Func<PanelFrame> frames,
+        Action<string?>? acknowledge = null, Action? skip = null, bool keepVisible = false)
     {
         _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         _frames = frames ?? throw new ArgumentNullException(nameof(frames));
+
+        _acknowledge = acknowledge;
+        _skip = skip;
+        KeepVisible = keepVisible;
 
         Title = "TaskbarLed";
         WindowDecorations = global::Avalonia.Controls.WindowDecorations.None;
@@ -51,9 +56,8 @@ internal sealed class FloatingPanelWindow : Window
         Height = PanelLayout.FloatingHeightDip;
         Content = new PanelView { DataContext = viewModel };
 
-        _frameTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Background, (_, _) => Render());
-        _visibilityTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Background, (_, _) => UpdateVisibility());
-        Render();
+        _frameTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => Render());
+        ApplyFrame();
     }
 
     protected override void OnOpened(EventArgs e)
@@ -71,13 +75,11 @@ internal sealed class FloatingPanelWindow : Window
         }
 
         _frameTimer.Start();
-        _visibilityTimer.Start();
     }
 
     protected override void OnClosed(EventArgs e)
     {
         _frameTimer.Stop();
-        _visibilityTimer.Stop();
         base.OnClosed(e);
     }
 
@@ -85,9 +87,11 @@ internal sealed class FloatingPanelWindow : Window
     {
         ArgumentNullException.ThrowIfNull(e);
         base.OnPointerPressed(e);
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && OperatingSystem.IsMacOS())
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
-            MacClaude.Open();
+            var channel = (e.Source as Control)?.DataContext as ChannelViewModel;
+            _acknowledge?.Invoke(channel?.SessionId ?? _frame?.SelectedSessionId);
+            Render();
         }
     }
 
@@ -110,16 +114,23 @@ internal sealed class FloatingPanelWindow : Window
         Position = new PixelPoint(rect.Left, rect.Top);
     }
 
-    private void Render() => _viewModel.Apply(_frames());
-
-    private void UpdateVisibility()
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
-        if (!OperatingSystem.IsMacOS())
-        {
-            return;
-        }
+        base.OnPointerWheelChanged(e);
+        _skip?.Invoke();
+        Render();
+    }
 
-        var show = _viewModel.HasActivity && !MacClaude.IsVisible(VisibleThreshold, OwnProcessName);
+    private void ApplyFrame()
+    {
+        _frame = _frames();
+        _viewModel.Apply(_frame);
+    }
+
+    private void Render()
+    {
+        ApplyFrame();
+        var show = KeepVisible || _viewModel.HasActivity;
         if (show && !IsVisible)
         {
             Show();

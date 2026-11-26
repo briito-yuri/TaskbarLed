@@ -9,6 +9,8 @@ namespace TaskbarLed.App.Avalonia.Presentation;
 /// <summary>One session tab on the panel.</summary>
 public sealed partial class ChannelViewModel : ObservableObject
 {
+    public string? SessionId { get; set; }
+
     [ObservableProperty]
     public partial string Label { get; set; } = string.Empty;
 
@@ -101,6 +103,7 @@ public sealed partial class PanelViewModel : ObservableObject
 
         for (var i = 0; i < frame.Channels.Count; i++)
         {
+            Channels[i].SessionId = frame.Channels[i].SessionId;
             Channels[i].Label = Cased(frame.Channels[i].Label);
             Channels[i].Status = frame.Channels[i].Status;
             Channels[i].IsSelected = frame.Channels[i].IsSelected;

@@ -57,11 +57,8 @@ jobs:
             dotnet test "$project" -c Release
           done
 
-      - name: Publish app (Apple silicon)
-        run: dotnet publish src/TaskbarLed.App.Avalonia -c Release -r osx-arm64 --self-contained -o artifacts/TaskbarLed-osx-arm64
-
-      - name: Build hook
-        run: dotnet build src/TaskbarLed.Hook -c Release
+      - name: Package app (Apple Silicon)
+        run: src/TaskbarLed.App.Avalonia/build-macos.sh
 
       - uses: actions/upload-artifact@v4
         with:
@@ -71,4 +68,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: TaskbarLed-osx-arm64
-          path: artifacts/TaskbarLed-osx-arm64
+          path: artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip

@@ -97,8 +97,13 @@ public sealed class ClaudeCodeSource : ISessionSource
                     : new ActivityStarted(sessionId, Id, receivedAt, activity));
                 break;
 
+            case "PostToolUseFailure":
             case "PostToolUse":
                 events.Add(new ActivityFinished(sessionId, Id, receivedAt));
+                break;
+
+            case "PermissionRequest":
+                events.Add(new AttentionRequested(sessionId, Id, receivedAt, Text(payload, "tool_name")));
                 break;
 
             case "Notification":

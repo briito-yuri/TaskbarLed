@@ -18,7 +18,7 @@ A WPF app (.NET 10, Windows 10/11) that draws a small terminal-style panel on th
 | `src/TaskbarLed.Hook` | Exe the hooks call; forwards stdin to the pipe or a spool folder | Must never print, block or fail: always exit 0. |
 | `src/TaskbarLed.App` | Composition root (`AppHost`), `PanelView`/`PanelWindow`, overlays, tray menu, themes, `DemoRenderer` | |
 | `src/TaskbarLed.Platform.Mac` | CoreGraphics window list, `ClaudeWindowRules` (pure, tested), all-Spaces window, LaunchAgent, `~/Library` paths | Native calls only on macOS (`[SupportedOSPlatform("macos")]`). |
-| `src/TaskbarLed.App.Avalonia` | macOS port, in progress: `FloatingPanelWindow` centered above the Dock (`PanelLayout.AboveDock`), demo feed only | Runs on Windows too, for development. Plan and next steps: `docs/PROPOSTAS.md` P4. |
+| `src/TaskbarLed.App.Avalonia` | macOS port: live Claude Code and orchestrator events in a floating panel centered above the Dock | Runs on Windows too, for development. Plan and next steps: `docs/PROPOSTAS.md` P4. |
 
 ## Commands
 
@@ -34,7 +34,7 @@ dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\Task
 Start-Process "$env:LOCALAPPDATA\Programs\TaskbarLed\TaskbarLed.exe"   # relaunches itself outside Claude's container
 ```
 
-macOS port: `dotnet run --project src/TaskbarLed.App.Avalonia` shows the floating panel with demo data (on Windows it stays above the taskbar). `tests/TaskbarLed.App.Avalonia.Tests` renders it headless to `bin/.../screenshots/mac-floating-panel.png`. There is no Mac here: CI's `macos` job is the check, and Dock, Spaces, Claude detection and the LaunchAgent still need a real Mac.
+macOS port: `src/TaskbarLed.App.Avalonia/build-macos.sh` packages the live arm64 app and hook. See [the macOS guide](docs/MACOS.md). Use `--demo` to show sample data. The Avalonia tests cover the live spool and headless rendering.
 
 Other CLI flags: `--install-hooks`, `--uninstall-hooks`, `--restart` (wait for the old instance; used by the language switch).
 
@@ -60,7 +60,7 @@ Release: push a tag `vX.Y.Z`; `.github/workflows/release.yml` builds, tests and 
 - Released: `v1.3.0` (Windows x64, framework-dependent, unsigned).
 - Versions: `MAJOR.MINOR.PATCH`. PATCH for fixes, MINOR for new features, and 2.0 only for a real new generation of the app. The tag is the version: the release workflow stamps it into the binaries and publishes a SHA-256 next to the zip. Local builds say `0.0.0-dev`. (v1.0.0 and v1.1.0 were built before this and say 1.0.0.)
 - Supported: Windows 10 and 11. Tested by hand only on the maintainer's Windows 11; Windows 10, a taskbar on another edge and ARM64 are not verified.
-- macOS: step 1 of P4 is done and CI's `macos` job passes (pure tests, headless render, `osx-arm64` publish). No live events, menu, settings or release artifact yet. The maintainer has no Mac, so nothing has run on a real one.
+- macOS: live panel and local arm64 bundle on the fork. See [the macOS guide](docs/MACOS.md) for requirements and differences.
 
 ## Security rules
 

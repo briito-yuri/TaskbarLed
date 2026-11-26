@@ -62,7 +62,16 @@ internal static class Program
     {
         using var stdin = Console.OpenStandardInput();
         using var buffer = new MemoryStream();
-        stdin.CopyTo(buffer);
+        var chunk = new byte[8192];
+        int count;
+        while ((count = stdin.Read(chunk)) > 0)
+        {
+            buffer.Write(chunk, 0, count);
+            if (buffer.Length > IpcEndpoints.MaxPayloadBytes)
+            {
+                return [];
+            }
+        }
         var bytes = buffer.ToArray();
 
         if (bytes is [0xEF, 0xBB, 0xBF, ..])
@@ -81,7 +90,7 @@ internal static class Program
     private static bool TrySendToPanel(byte[] envelope)
     {
         // Checking the pipe first avoids paying the connect timeout on every tool call when the panel is closed.
-        if (!File.Exists(@"\\.\pipe\" + IpcEndpoints.PipeName))
+        if (!OperatingSystem.IsWindows() || !File.Exists(@"\\.\pipe\" + IpcEndpoints.PipeName))
         {
             return false;
         }
@@ -137,7 +146,9 @@ internal static class Program
 
     private static void Spool(byte[] envelope)
     {
-        var directory = Directory.CreateDirectory(IpcEndpoints.SpoolDirectory);
+        var directory = OperatingSystem.IsMacOS()
+            ? Directory.CreateDirectory(IpcEndpoints.SpoolDirectory, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute)
+            : Directory.CreateDirectory(IpcEndpoints.SpoolDirectory);
         if (directory.EnumerateFiles("*.json").Take(MaxSpoolFiles).Count() >= MaxSpoolFiles)
         {
             return; // Panel has not run in a long time; do not fill the disk.
@@ -146,7 +157,21 @@ internal static class Program
         // Sortable, unique name; write-then-rename so the panel never reads a half-written file.
         var name = $"{DateTime.UtcNow:yyyyMMddHHmmssfffffff}-{Guid.NewGuid():N}";
         var temp = Path.Combine(directory.FullName, name + ".tmp");
-        File.WriteAllBytes(temp, envelope);
+        if (OperatingSystem.IsMacOS())
+        {
+            using var stream = new FileStream(temp, new FileStreamOptions
+            {
+                Mode = FileMode.CreateNew,
+                Access = FileAccess.Write,
+                UnixCreateMode = UnixFileMode.UserRead | UnixFileMode.UserWrite,
+            });
+            stream.Write(envelope);
+        }
+        else
+        {
+            File.WriteAllBytes(temp, envelope);
+        }
+
         File.Move(temp, Path.Combine(directory.FullName, name + ".json"));
     }
 }
