@@ -17,7 +17,7 @@
 
 ## macOS
 
-Apple Silicon Macs (M1 or newer) can run the floating panel on macOS 14+. See [building, installing and connecting agents on macOS](docs/MACOS.md).
+Apple Silicon Macs (M1 or newer) can run the floating panel on macOS 14+, with automatic detection of known local AI tools. See [building, installing and connecting agents on macOS](docs/MACOS.md).
 
 You send Claude a long prompt, switch to another app, and then keep coming back to check whether it has finished. TaskbarLed puts the answer in the empty left side of the taskbar. It **appears only while Claude is out of sight**, shows every running conversation, and blinks when one of them is done or needs you.
 

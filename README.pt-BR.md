@@ -17,7 +17,7 @@
 
 ## macOS
 
-Macs com Apple Silicon (M1 em diante) podem usar o painel flutuante no macOS 14 ou posterior. Veja [como compilar, instalar e conectar agentes no macOS](docs/MACOS.md).
+Macs com Apple Silicon (M1 em diante) podem usar o painel flutuante no macOS 14 ou posterior, com detecção automática de ferramentas de IA locais conhecidas. Veja [como compilar, instalar e conectar agentes no macOS](docs/MACOS.md).
 
 Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando para ver se ele já terminou. O TaskbarLed coloca essa resposta no espaço vazio à esquerda da barra de tarefas. Ele **só aparece quando o Claude está fora de vista**, mostra todas as conversas em andamento e pisca quando alguma termina ou precisa de você.
 

@@ -22,6 +22,20 @@ The installer merges hooks into the Claude Code user settings and saves a backup
 
 The panel floats above the Dock on the primary display. It stays visible across foreground app changes while a session is active. Amber means input is needed, green means a turn has finished, and running sessions show their activity and time. Scroll to rotate the feed. Click the feed or a completed tab to acknowledge its result. The menu bar icon can keep the panel visible when idle and quit the app.
 
+## Automatic local detection
+
+TaskbarLed detects known executables for the signed-in user, including Claude, Codex, Cursor, OpenCode, Gemini CLI, Ollama and LM Studio. It checks about every two seconds, groups multiple processes for the same tool, and shows detected tools even without hooks. A detected process can be idle or running in the background. Hooks add per-session activity, requests for input and results.
+
+To recognize a custom tool or orchestrator, add its executable filename and display name to `~/Library/Application Support/TaskbarLed/agents.json`. Changes apply on the next scan. For example:
+
+```json
+{
+  "my-ai-runner": "My AI Runner"
+}
+```
+
+The scan reads executable names, so applications hosted under generic processes like a browser or an interpreter, and tools on another machine, may need a local event adapter.
+
 ## Connect an orchestrator
 
 Claude Code processes launched by an orchestrator are covered when they run on the Mac and load the installed hooks. For other agents, send one JSON object on stdin to `TaskbarLed.Hook agent` on the Mac. Emit events from the orchestrator's lifecycle callbacks, using a stable agent name and a distinct session ID per concurrent job. Use `started` for a new turn, `running` for progress or to resume after waiting, `waiting` for input, `done` for a result, and `ended` to remove a session. `title` and `message` are optional display text. Supply the same title on subsequent events if you want to keep a custom label.

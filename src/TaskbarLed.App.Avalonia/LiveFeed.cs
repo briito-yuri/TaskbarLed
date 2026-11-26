@@ -13,7 +13,46 @@ internal sealed class LiveFeed(CultureInfo culture)
     private readonly ClaudeCodeSource _claude = new(new ToolActivityFormatter(ActivityStrings.For(culture), culture));
     private readonly PanelComposer _composer = new(new SessionRotation(TimeSpan.FromSeconds(8)), TickerStrings.For(culture), culture);
 
-    public PanelFrame Compose(DateTimeOffset now) => _composer.Compose(_store.Snapshot(), now);
+    private readonly string _detectedLabel = culture.TwoLetterISOLanguageName == "pt" ? "Processos detectados" : "Detected processes";
+    private string[] _detected = [];
+
+    public PanelFrame Compose(DateTimeOffset now)
+    {
+        var sessions = _store.Snapshot();
+        var detected = Volatile.Read(ref _detected);
+        if (detected.Length == 0)
+        {
+            return _composer.Compose(sessions, now);
+        }
+
+        var presence = detected.Select((name, index) =>
+            new ChannelState($"process:{index}:{name}", name, SessionStatus.Idle, false));
+        var frame = _composer.Compose(sessions, now);
+        if (frame.HasActivity)
+        {
+            return frame with { Channels = [.. frame.Channels, .. presence] };
+        }
+
+        return PanelFrame.Empty($"{_detectedLabel}  ›  {string.Join(", ", detected)}") with
+        {
+            Channels = [.. presence],
+            HasActivity = true,
+        };
+    }
+
+    public async Task DetectProcessesAsync(CancellationToken cancellationToken)
+    {
+        var rules = Path.Combine(IpcEndpoints.DataDirectory, "agents.json");
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
+        do
+        {
+            if (await AgentProcesses.ScanAsync(rules, cancellationToken).ConfigureAwait(false) is { } detected)
+            {
+                Volatile.Write(ref _detected, detected);
+            }
+        }
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
+    }
 
     public void Acknowledge(string? sessionId) => _store.AcknowledgeCompleted(s => s.Id == sessionId);
 

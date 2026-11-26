@@ -55,7 +55,9 @@ public sealed partial class App : Application
         var panel = new FloatingPanelWindow(viewModel, () => feed.Compose(DateTimeOffset.Now), feed.Acknowledge, feed.Skip);
         desktop.MainWindow = panel;
         var cancellation = new CancellationTokenSource();
-        var reader = Task.Run(() => feed.ReadAsync(cancellation.Token));
+        var readers = Task.WhenAll(
+            Task.Run(() => feed.ReadAsync(cancellation.Token)),
+            Task.Run(() => feed.DetectProcessesAsync(cancellation.Token)));
 
         var menu = new NativeMenu();
         var pt = culture.TwoLetterISOLanguageName == "pt";
@@ -75,7 +77,7 @@ public sealed partial class App : Application
         {
             cancellation.Cancel();
             tray.Dispose();
-            _ = reader.ContinueWith(task =>
+            _ = readers.ContinueWith(task =>
             {
                 _ = task.Exception;
                 cancellation.Dispose();
