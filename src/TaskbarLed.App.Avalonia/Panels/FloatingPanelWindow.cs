@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Platform;
@@ -30,11 +31,17 @@ internal sealed class FloatingPanelWindow : Window
     private readonly Action<string?>? _acknowledge;
     private readonly Action? _skip;
     private PanelFrame? _frame;
+    private readonly PanelView _panel;
+    private readonly bool _pt;
+    private (PixelPoint Position, double Width)? _beforeEdit;
+    private (PixelPoint Pointer, PixelPoint Window, double Width, bool Resize)? _drag;
+    private PanelPreferences _preferences;
+    private Action<PanelPreferences>? _savePreferences;
 
     public bool KeepVisible { get; set; }
 
     public FloatingPanelWindow(PanelViewModel viewModel, Func<PanelFrame> frames,
-        Action<string?>? acknowledge = null, Action? skip = null, bool keepVisible = false)
+        Action<string?>? acknowledge = null, Action? skip = null, bool keepVisible = false, bool portuguese = false)
     {
         _viewModel = viewModel ?? throw new ArgumentNullException(nameof(viewModel));
         _frames = frames ?? throw new ArgumentNullException(nameof(frames));
@@ -42,6 +49,8 @@ internal sealed class FloatingPanelWindow : Window
         _acknowledge = acknowledge;
         _skip = skip;
         KeepVisible = keepVisible;
+        _pt = portuguese;
+        _preferences = new PanelPreferences();
 
         Title = "TaskbarLed";
         WindowDecorations = global::Avalonia.Controls.WindowDecorations.None;
@@ -54,7 +63,8 @@ internal sealed class FloatingPanelWindow : Window
         WindowStartupLocation = WindowStartupLocation.Manual;
         Width = PanelWidth;
         Height = PanelLayout.FloatingHeightDip;
-        Content = new PanelView { DataContext = viewModel };
+        _panel = new PanelView { DataContext = viewModel };
+        Content = _panel;
 
         _frameTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => Render());
         ApplyFrame();
@@ -63,7 +73,7 @@ internal sealed class FloatingPanelWindow : Window
     protected override void OnOpened(EventArgs e)
     {
         base.OnOpened(e);
-        PlaceAboveDock();
+        RestorePlacement();
 
         if (OperatingSystem.IsMacOS())
         {
@@ -87,7 +97,20 @@ internal sealed class FloatingPanelWindow : Window
     {
         ArgumentNullException.ThrowIfNull(e);
         base.OnPointerPressed(e);
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        var point = e.GetCurrentPoint(this);
+        if (_beforeEdit.HasValue)
+        {
+            if (point.Properties.IsLeftButtonPressed && point.Position.Y < PanelLayout.FloatingHeightDip)
+            {
+                _drag = (this.PointToScreen(point.Position), Position, Width, point.Position.X >= Width - 18);
+                e.Pointer.Capture(this);
+                e.Handled = true;
+            }
+
+            return;
+        }
+
+        if (point.Properties.IsLeftButtonPressed)
         {
             var channel = (e.Source as Control)?.DataContext as ChannelViewModel;
             _acknowledge?.Invoke(channel?.SessionId ?? _frame?.SelectedSessionId);
@@ -100,18 +123,203 @@ internal sealed class FloatingPanelWindow : Window
         PanelLayout.AboveDock(
             new CorePixelRect(workArea.X, workArea.Y, workArea.Right, workArea.Bottom), scaling, PanelWidth, DockGap);
 
-    private void PlaceAboveDock()
+    public void ConfigurePlacement(PanelPreferences preferences, Action<PanelPreferences> save)
     {
-        var screen = Screens.Primary ?? (Screens.All.Count > 0 ? Screens.All[0] : null);
-        if (screen is null)
+        _preferences = preferences;
+        _savePreferences = save;
+    }
+
+    public void SetTheme(string id) => Persist(_preferences with { Theme = id });
+
+    public void ResetPosition()
+    {
+        if (_beforeEdit.HasValue)
+        {
+            EndEdit(save: false);
+        }
+
+        Persist(_preferences with { X = null, Y = null, Width = PanelWidth });
+        RestorePlacement();
+    }
+
+    public void BeginEdit()
+    {
+        if (_beforeEdit.HasValue)
         {
             return;
         }
 
-        var rect = Layout(screen.WorkingArea, screen.Scaling);
-        Width = rect.Width / screen.Scaling;
-        Height = rect.Height / screen.Scaling;
+        if (!IsVisible)
+        {
+            Show();
+            RestorePlacement();
+        }
+
+        _beforeEdit = (Position, Width);
+        var save = new Button { Content = _pt ? "Salvar" : "Save" };
+        var cancel = new Button { Content = _pt ? "Cancelar" : "Cancel" };
+        save.Click += (_, _) => EndEdit(save: true);
+        cancel.Click += (_, _) => EndEdit(save: false);
+
+        var grip = new Border
+        {
+            Width = 18,
+            Background = Brushes.Transparent,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Cursor = new Cursor(StandardCursorType.SizeWestEast),
+            Child = new TextBlock { Text = "⋮", HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center },
+        };
+        Content = null;
+        var preview = new Grid { Cursor = new Cursor(StandardCursorType.SizeAll), Children = { _panel, grip } };
+        var footer = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Margin = new Thickness(4),
+            Children = { save, cancel },
+        };
+        var editor = new Grid { RowDefinitions = new RowDefinitions("36,*"), Children = { preview, footer } };
+        Grid.SetRow(footer, 1);
+        var border = new Border { Child = editor, BorderThickness = new Thickness(1) };
+        border.Bind(Border.BackgroundProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.BackgroundBrush"));
+        border.Bind(Border.BorderBrushProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.EditBrush"));
+        Content = border;
+        Height = 76;
+        var screen = Screens.ScreenFromPoint(Position) ?? Screens.Primary;
+        if (screen is not null)
+        {
+            var bottom = screen.WorkingArea.Bottom - (int)Math.Ceiling(Height * screen.Scaling);
+            Position = new PixelPoint(Position.X, Constrain(Position.Y, screen.WorkingArea.Y, bottom, snap: false));
+        }
+
+        Activate();
+        save.Focus();
+    }
+
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        if (_drag is not { } drag)
+        {
+            return;
+        }
+
+        var pixel = this.PointToScreen(e.GetPosition(this));
+        var dx = pixel.X - drag.Pointer.X;
+        if (drag.Resize)
+        {
+            var screen = Screens.ScreenFromPoint(Position) ?? Screens.Primary;
+            var scale = screen?.Scaling ?? 1;
+            var max = screen is null ? 2000 : (screen.WorkingArea.Right - Position.X) / scale;
+            Width = Math.Clamp(drag.Width + dx / scale, 200, Math.Max(200, max));
+        }
+        else
+        {
+            Position = new PixelPoint(drag.Window.X + dx, drag.Window.Y + pixel.Y - drag.Pointer.Y);
+        }
+
+        e.Handled = true;
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        if (_drag.HasValue)
+        {
+            _drag = null;
+            e.Pointer.Capture(null);
+            e.Handled = true;
+        }
+    }
+
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        _drag = null;
+        base.OnPointerCaptureLost(e);
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        if (_beforeEdit.HasValue && e.Key is Key.Enter or Key.Escape)
+        {
+            EndEdit(e.Key == Key.Enter);
+            e.Handled = true;
+        }
+
+        base.OnKeyDown(e);
+    }
+
+    private void EndEdit(bool save)
+    {
+        if (_beforeEdit is not { } before)
+        {
+            return;
+        }
+
+        _beforeEdit = null;
+        _drag = null;
+        var editor = (Grid)((Border)Content!).Child!;
+        ((Grid)editor.Children[0]).Children.Remove(_panel);
+        Content = _panel;
+        Height = PanelLayout.FloatingHeightDip;
+        if (save)
+        {
+            _preferences = _preferences with { X = Position.X, Y = Position.Y, Width = Width };
+            RestorePlacement(snap: true);
+            Persist(_preferences with { X = Position.X, Y = Position.Y, Width = Width });
+        }
+        else
+        {
+            Width = before.Width;
+            Position = before.Position;
+        }
+    }
+
+    private void Persist(PanelPreferences preferences)
+    {
+        _preferences = preferences;
+        _savePreferences?.Invoke(preferences);
+    }
+
+    private void RestorePlacement(bool snap = false)
+    {
+        var primary = Screens.Primary ?? (Screens.All.Count > 0 ? Screens.All[0] : null);
+        if (primary is null)
+        {
+            return;
+        }
+
+        if (_preferences is { X: int x, Y: int y })
+        {
+            var saved = new PixelPoint(x, y);
+            var screen = Screens.ScreenFromPoint(saved) ?? primary;
+            var area = screen.WorkingArea;
+            var maxWidth = area.Width / screen.Scaling;
+            var requestedWidth = double.IsFinite(_preferences.Width) ? _preferences.Width : PanelWidth;
+            Width = Math.Clamp(requestedWidth, Math.Min(200, maxWidth), maxWidth);
+            var right = area.Right - (int)Math.Ceiling(Width * screen.Scaling);
+            var bottom = area.Bottom - (int)Math.Ceiling(Height * screen.Scaling);
+            Position = new PixelPoint(Constrain(x, area.X, right, snap), Constrain(y, area.Y, bottom, snap));
+            return;
+        }
+
+        var rect = Layout(primary.WorkingArea, primary.Scaling);
+        Width = rect.Width / primary.Scaling;
+        Height = rect.Height / primary.Scaling;
         Position = new PixelPoint(rect.Left, rect.Top);
+    }
+
+    internal static int Constrain(int value, int min, int max, bool snap)
+    {
+        var clamped = Math.Clamp(value, min, Math.Max(min, max));
+        if (snap && clamped - min <= 12)
+        {
+            return min;
+        }
+
+        return snap && max >= min && max - clamped <= 12 ? max : clamped;
     }
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
@@ -130,11 +338,11 @@ internal sealed class FloatingPanelWindow : Window
     private void Render()
     {
         ApplyFrame();
-        var show = KeepVisible || _viewModel.HasActivity;
+        var show = _beforeEdit.HasValue || KeepVisible || _viewModel.HasActivity || ContextMenu?.IsOpen == true;
         if (show && !IsVisible)
         {
             Show();
-            PlaceAboveDock(); // The Dock may have moved or resized while hidden.
+            RestorePlacement();
         }
         else if (!show && IsVisible)
         {

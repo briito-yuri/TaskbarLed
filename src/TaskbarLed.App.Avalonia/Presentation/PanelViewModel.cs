@@ -58,7 +58,7 @@ public sealed partial class PanelViewModel : ObservableObject
     public partial string ElapsedText { get; set; } = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(FeedIsAttention))]
+    [NotifyPropertyChangedFor(nameof(FeedIsAttention), nameof(FeedIsRunning))]
     public partial SessionStatus SelectedStatus { get; set; }
 
     /// <summary>A session finished and the user has not opened Claude yet: the outline blinks green.</summary>
@@ -76,6 +76,8 @@ public sealed partial class PanelViewModel : ObservableObject
     /// <summary>Theme preference: LED themes shout in capitals.</summary>
     [ObservableProperty]
     public partial bool Uppercase { get; set; }
+
+    public bool FeedIsRunning => SelectedStatus == SessionStatus.Running;
 
     public bool FeedIsAttention => SelectedStatus == SessionStatus.AwaitingInput;
 

@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="../TaskbarLed.App/Themes/*.xaml" LogicalName="PanelThemes.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="TaskbarLed.App.Avalonia.Tests" />
   </ItemGroup>
 

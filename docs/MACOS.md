@@ -20,7 +20,13 @@ open "$app"
 
 The installer merges hooks into the Claude Code user settings and saves a backup. Restart existing Claude Code sessions to load the hooks. Claude Code in a terminal, IDE or Claude Desktop sends the same events when it loads those settings. For a custom configuration directory, pass `CLAUDE_CONFIG_DIR` when installing. Run `--uninstall-hooks` with the same executable to disconnect.
 
-The panel floats above the Dock on the primary display. It stays visible across foreground app changes while a session is active. Amber means input is needed, green means a turn has finished, and running sessions show their activity and time. Scroll to rotate the feed. Click the feed or a completed tab to acknowledge its result. The menu bar icon can keep the panel visible when idle and quit the app.
+By default, the panel floats above the Dock on the primary display. It stays visible across foreground app changes while a session is active. Amber means input is needed, green means a turn has finished, and running sessions show their activity and time. Scroll to rotate the feed. Click the feed or a completed tab to acknowledge its result. The menu bar icon can keep the panel visible when idle and quit the app.
+
+## Move, resize and change the look
+
+Right-click the panel or click the TaskbarLed menu bar icon. **Edit position and size** opens a preview you can drag to another spot. Drag the grip on the right edge to change the width. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
+
+Use **Theme** to switch live between Claude Code, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. The default is Claude Code. TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
 
 ## Automatic local detection
 
@@ -51,6 +57,6 @@ Cloud jobs and tools with no local hooks need an orchestrator or adapter on the 
 
 ## Differences from Windows
 
-The Mac build uses the existing LED theme and a floating panel. The Windows theme picker, placement editor, sounds, fullscreen edge alerts, automatic foreground-window matching, click-to-open, and login startup controls are unavailable in this build. The floating window requests visibility across Spaces, but fullscreen behavior depends on macOS and the foreground app. The build is ad hoc signed for local use. Distribution outside this Mac may require Developer ID signing and notarization.
+The Mac build uses a floating panel. Custom JSON themes, sounds, fullscreen edge alerts, automatic foreground-window matching, click-to-open, and login startup controls are unavailable in this build. The floating window requests visibility across Spaces, but fullscreen behavior depends on macOS and the foreground app. The build is ad hoc signed for local use. Distribution outside this Mac may require Developer ID signing and notarization.
 
 See also [Windows documentation](../README.md).
