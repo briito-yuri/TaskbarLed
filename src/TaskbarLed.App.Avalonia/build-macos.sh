@@ -9,9 +9,9 @@ case "$rid" in
     *) printf 'Usage: %s [osx-arm64|osx-x64]\n' "$0" >&2; exit 2 ;;
 esac
 output="$PWD/artifacts/TaskbarLed-$rid"
-app="$output/Neon TSB Agents.app"
-bin="$app/Contents/MacOS"
 stage="$(mktemp -d)"
+app="$stage/Neon TSB Agents.app"
+bin="$app/Contents/MacOS"
 trap 'rm -rf "$stage"' EXIT
 
 "$dotnet_cmd" publish src/TaskbarLed.App.Avalonia -c Release -r "$rid" --self-contained -o "$stage/app"
@@ -51,4 +51,4 @@ PLIST
 codesign --force --deep --sign - "$app"
 rm -f "$output/TaskbarLed-$rid.zip"
 ditto -c -k --keepParent "$app" "$output/TaskbarLed-$rid.zip"
-printf '%s\n' "$app"
+printf '%s\n' "$output/TaskbarLed-$rid.zip"

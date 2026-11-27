@@ -61,6 +61,7 @@
     <SolidColorBrush x:Key="Led.SessionHeaderStatusBrush" Color="#33FF66" />
     <SolidColorBrush x:Key="Led.SessionStatusBrush" Color="Transparent" />
     <SolidColorBrush x:Key="Led.SessionDividerBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="Led.BrandBackdropBrush" Color="Transparent" />
     <SolidColorBrush x:Key="Led.CompletionBrush" Color="#BFE6C8" />
     <SolidColorBrush x:Key="Led.CompletionTint" Color="#55BFE6C8" />
     <CornerRadius x:Key="Led.PanelRadius">4</CornerRadius>

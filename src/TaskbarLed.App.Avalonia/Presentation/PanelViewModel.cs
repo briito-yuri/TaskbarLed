@@ -44,6 +44,7 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     public string Label => uppercase ? Row.Label.ToUpperInvariant() : Row.Label;
 
     public bool IsLineMap => themeId == "LineMap";
+    public bool IsLiquidGlass => themeId == "LiquidGlass";
     public bool IsEditorial => themeId == "EditorialIndex";
     public bool IsViolet => themeId == "VioletPhosphor";
     public bool IsCobalt => themeId == "CobaltWindow";

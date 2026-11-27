@@ -19,10 +19,10 @@ src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64
 src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
 ```
 
-Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces `Neon TSB Agents.app` and `TaskbarLed-<rid>.zip` under `artifacts/TaskbarLed-<rid>/`. Both include the runtime for the selected architecture. Move the app to its permanent location before registering hooks.
+Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces `artifacts/TaskbarLed-<rid>/TaskbarLed-<rid>.zip` containing `Neon TSB Agents.app` and the runtime for the selected architecture. Extract the ZIP and move the app to its permanent location before registering hooks.
 
 ```sh
-app="$PWD/artifacts/TaskbarLed-osx-arm64/Neon TSB Agents.app"
+app="/Applications/Neon TSB Agents.app"
 "$app/Contents/MacOS/TaskbarLed" --install-hooks
 open "$app"
 ```

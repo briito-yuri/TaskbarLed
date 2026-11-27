@@ -22,9 +22,9 @@ internal static class PanelThemes
 
     private static readonly Dictionary<string, Palette> MacPalettes = new(StringComparer.Ordinal)
     {
-        ["LiquidGlass"] = new("#E6F5FAFF", "#C7FDFFFF", "#102638", "#455C70", "#145664", "#853C15",
-            "#315D49", "#102638", "#96F1F8FF", "Transparent", "#7894A8", Child: "#92F1F8FF",
-            Font: "Helvetica Neue", Divider: "#34718AA0", Radius: 16, Padding: new Thickness(8, 3)),
+        ["LiquidGlass"] = new("#ED28323E", "#B8E5EDFF", "#F7FAFF", "#DAE0EC", "#F5FBFF", "#FFF2C6",
+            "#FFFFFF", "#FFFFFF", "#39000000", "Transparent", "#70DEE8F8", Child: "#35000000",
+            Font: "Helvetica Neue", Divider: "#25E5EDFF", Radius: 16, Padding: new Thickness(8, 3)),
         ["Matrix"] = new("#07130C", "#30523A", "#C2EDCE", "#A1BAA7", "#95E9A6", "#FFD38D",
             "#ACDFC0", "#DBF6DF", "#102519", "Transparent", "#41644B", Divider: "#233B2B"),
         ["AmberTree"] = new("#1C1D18", "#424237", "#EEEADB", "#A9AA9C", "#DDB06D", "#ECC788",
@@ -77,10 +77,14 @@ internal static class PanelThemes
         var theme = All.FirstOrDefault(t => t.Id == themeId) ?? All[0];
         model.Uppercase = theme.Uppercase;
         model.ThemeId = theme.Id;
+        var glass = theme.Id == "LiquidGlass";
+        app.Resources["Led.CompletionBrush"] = new SolidColorBrush(Color.Parse(glass ? "#A8FFFFFF" : "#BFE6C8"));
+        app.Resources["Led.CompletionTint"] = new SolidColorBrush(Color.Parse(glass ? "#58FFFFFF" : "#55BFE6C8"));
+        app.Resources["Led.BrandBackdropBrush"] = new SolidColorBrush(Color.Parse(glass ? "#60000000" : "Transparent"));
         if (MacPalettes.TryGetValue(theme.Id, out var palette))
         {
             ApplyPalette(app, palette);
-            if (theme.Id == "LiquidGlass")
+            if (glass)
             {
                 app.Resources["Led.PanelSurfaceBrush"] = new LinearGradientBrush
                 {
@@ -88,8 +92,8 @@ internal static class PanelThemes
                     EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
                     GradientStops =
                     {
-                        new GradientStop(Color.Parse("#50F9FCFF"), 0),
-                        new GradientStop(Color.Parse("#20E3F2FB"), 1),
+                        new GradientStop(Color.Parse("#89000000"), 0),
+                        new GradientStop(Color.Parse("#74000000"), 1),
                     },
                 };
             }
