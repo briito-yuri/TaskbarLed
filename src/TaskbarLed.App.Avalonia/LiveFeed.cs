@@ -120,6 +120,9 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                 RouteLetter = route,
                 Heading = SingleLine(title),
                 LastStation = children.Length == 0,
+                ElapsedSeconds = ElapsedSeconds(parent, now),
+                IsElapsedApproximate = parent?.IsElapsedApproximate == true,
+                TotalTokens = parent?.TotalTokens,
             });
             for (var i = 0; i < children.Length; i++)
             {
@@ -132,12 +135,19 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                     RouteLetter = route,
                     StationName = name,
                     LastStation = i == children.Length - 1,
+                    ElapsedSeconds = ElapsedSeconds(child, now),
+                    IsElapsedApproximate = child.IsElapsedApproximate,
+                    TotalTokens = child.TotalTokens,
                 });
             }
         }
 
         return rows;
     }
+
+    private static long? ElapsedSeconds(Session? session, DateTimeOffset now) =>
+        session is { Status: not SessionStatus.Idle } && session.Elapsed(now) is { } elapsed
+            ? (long)elapsed.TotalSeconds : null;
 
     private static string RouteLabel(int index)
     {

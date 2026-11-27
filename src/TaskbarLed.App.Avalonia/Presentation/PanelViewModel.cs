@@ -40,7 +40,7 @@ public sealed partial class ChannelViewModel : ObservableObject
 
 public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bool portuguese, bool uppercase, string themeId) : ObservableObject
 {
-    public SessionDisplayRow Row { get; } = row with { SecondsRemaining = 0 };
+    public SessionDisplayRow Row { get; } = WithoutTelemetry(row);
     public string Label => uppercase ? Row.Label.ToUpperInvariant() : Row.Label;
 
     public bool IsLineMap => themeId == "LineMap";
@@ -81,8 +81,36 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     private static readonly IBrush TransitFallback = new SolidColorBrush(Color.Parse("#465D6B"));
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Status))]
+    [NotifyPropertyChangedFor(nameof(Status), nameof(StatusDetails))]
     public partial int SecondsRemaining { get; set; } = row.SecondsRemaining;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Status), nameof(StatusDetails))]
+    public partial long? ElapsedSeconds { get; set; } = row.ElapsedSeconds;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Status), nameof(StatusDetails))]
+    public partial long? TotalTokens { get; set; } = row.TotalTokens;
+
+    internal static SessionDisplayRow WithoutTelemetry(SessionDisplayRow value) =>
+        value with { SecondsRemaining = 0, ElapsedSeconds = null, TotalTokens = null };
+
+    private string ElapsedLabel => ElapsedSeconds is { } seconds
+        ? (Row.IsElapsedApproximate ? "~" : "") + (seconds >= 3600
+            ? $"{seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}"
+            : $"{seconds / 60:00}:{seconds % 60:00}") : "";
+
+    public string StatusDetails => string.Join(" · ", new[]
+    {
+        StatusLabel, ElapsedLabel, TotalTokens is { } tokens ? $"{tokens:N0} tokens" : "",
+    }.Where(text => text.Length > 0));
+
+    private static string CompactTokens(long tokens) => tokens switch
+    {
+        >= 1_000_000 => $"{tokens / 1_000_000d:0.#}M tok",
+        >= 1_000 => $"{tokens / 1_000d:0.#}k tok",
+        _ => $"{tokens} tok",
+    };
+
     public string? SessionId => Row.SessionId;
     public bool IsHeader => Row.IsHeader;
     public bool IsChild => !Row.IsHeader;
@@ -90,7 +118,12 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     public bool IsDone => Row.Status == SessionStatus.Completed;
     public bool IsIdle => Row.Status == SessionStatus.Idle;
 
-    public string Status => !Row.HasStatus ? "" : Row.Status switch
+    public string Status => string.Join(" · ", new[]
+    {
+        StatusLabel, ElapsedLabel, TotalTokens is { } tokens ? CompactTokens(tokens) : "",
+    }.Where(text => text.Length > 0));
+
+    private string StatusLabel => !Row.HasStatus ? "" : Row.Status switch
     {
         SessionStatus.Running => MacUiStrings.For(portuguese).Running,
         SessionStatus.AwaitingInput => MacUiStrings.For(portuguese).Waiting,
@@ -177,7 +210,7 @@ public sealed partial class PanelViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(frame);
         _frame = frame;
 
-        if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows.Select(row => row with { SecondsRemaining = 0 })))
+        if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows.Select(SessionDisplayRowViewModel.WithoutTelemetry)))
         {
             SessionRows = [.. frame.SessionRows.Select(row =>
                 new SessionDisplayRowViewModel(row, _culture.TwoLetterISOLanguageName == "pt", Uppercase, ThemeId))];
@@ -201,6 +234,8 @@ public sealed partial class PanelViewModel : ObservableObject
             for (var i = 0; i < SessionRows.Count; i++)
             {
                 SessionRows[i].SecondsRemaining = frame.SessionRows[i].SecondsRemaining;
+                SessionRows[i].ElapsedSeconds = frame.SessionRows[i].ElapsedSeconds;
+                SessionRows[i].TotalTokens = frame.SessionRows[i].TotalTokens;
             }
         }
         Feed = Cased(frame.Feed);

@@ -79,6 +79,14 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
                 input.Seek(0, SeekOrigin.Begin);
                 session = ParseEvents(first, ReadEventLines(reader), modified, out _);
             }
+            if (session is not null && cached.Session is { } previous && length >= cached.Length)
+            {
+                session = session with
+                {
+                    TotalTokens = session.TotalTokens ?? previous.TotalTokens,
+                    PromptStartedAt = session.PromptStartedAt ?? previous.PromptStartedAt,
+                };
+            }
             _cache[file.FullName] = (modified, length, session);
             return session;
         }
@@ -121,6 +129,7 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
         var project = Path.GetFileName(Text(details, "cwd"));
         var state = (SessionStatus?)null;
         DateTimeOffset? started = null;
+        long? tokens = null;
         var updated = modified;
         foreach (var line in lines)
         {
@@ -137,7 +146,14 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
                     continue;
                 }
 
-                var evt = Text(Field(doc.RootElement, "payload"), "type");
+                var payload = Field(doc.RootElement, "payload");
+                var evt = Text(payload, "type");
+                if (evt == "token_count" &&
+                    Field(Field(Field(payload, "info"), "total_token_usage"), "total_tokens") is
+                        { ValueKind: JsonValueKind.Number } total && total.TryGetInt64(out var count) && count >= 0)
+                {
+                    tokens = count;
+                }
                 var next = evt switch
                 {
                     "task_started" or "turn_started" => SessionStatus.Running,
@@ -178,6 +194,7 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
             ProjectName = project,
             ParentId = child ? $"codex:{parent:D}" : null,
             PromptStartedAt = started,
+            TotalTokens = tokens,
             PromptEndedAt = state == SessionStatus.Completed ? updated : null,
         };
     }

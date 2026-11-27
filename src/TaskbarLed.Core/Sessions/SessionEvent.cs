@@ -53,3 +53,7 @@ public sealed record SessionEnded(string SessionId, string SourceId, DateTimeOff
 /// <summary>Links a worker session to its parent.</summary>
 public sealed record ParentIdentified(string SessionId, string SourceId, DateTimeOffset Timestamp, string ParentId)
     : SessionEvent(SessionId, SourceId, Timestamp);
+
+/// <summary>Updates the cumulative token count reported by the session source.</summary>
+public sealed record TokenUsageReported(string SessionId, string SourceId, DateTimeOffset Timestamp, long TotalTokens)
+    : SessionEvent(SessionId, SourceId, Timestamp);

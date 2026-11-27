@@ -145,4 +145,22 @@ public class PanelCustomizationTests
 
     private static StackPanel EditorFooter(FloatingPanelWindow panel) =>
         Assert.IsType<StackPanel>(EditorGrid(panel).Children[1]);
+
+    [Fact]
+    public void Worker_telemetry_updates_the_existing_row()
+    {
+        var model = Model();
+        SessionDisplayRow worker = new("worker", "Subagent api", SessionStatus.Running, false)
+            { ElapsedSeconds = 62, IsElapsedApproximate = true };
+        var frame = PanelFrame.Empty("");
+        model.Apply(frame with { SessionRows = [worker] });
+        var row = Assert.Single(model.SessionRows);
+        Assert.Contains("~01:02", row.Status, StringComparison.Ordinal);
+        Assert.DoesNotContain("tok", row.Status, StringComparison.Ordinal);
+
+        model.Apply(frame with { SessionRows = [worker with { ElapsedSeconds = 63, TotalTokens = 750 }] });
+        Assert.Same(row, Assert.Single(model.SessionRows));
+        Assert.Contains("~01:03", row.Status, StringComparison.Ordinal);
+        Assert.Contains("750 tok", row.Status, StringComparison.Ordinal);
+    }
 }

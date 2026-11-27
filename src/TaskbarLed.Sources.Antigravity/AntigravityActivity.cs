@@ -5,7 +5,7 @@ namespace TaskbarLed.Sources.Antigravity;
 /// <summary>Tracks observed turns and catches workers that finish between two index reads.</summary>
 internal sealed class AntigravityActivity
 {
-    private readonly HashSet<string> _running = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, DateTimeOffset> _running = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DateTimeOffset> _lastSeen = new(StringComparer.Ordinal);
     private DateTimeOffset? _previousPoll;
 
@@ -17,14 +17,21 @@ internal sealed class AntigravityActivity
             var session = sessions[i];
             if (session.Status == SessionStatus.Running)
             {
-                _running.Add(session.Id);
+                _running.TryAdd(session.Id, started);
+                session = session with { PromptStartedAt = _running[session.Id], IsElapsedApproximate = true };
             }
-            else if (_running.Remove(session.Id) ||
+            else if (_running.Remove(session.Id, out var since) ||
                 (session.ParentId is not null && _previousPoll is { } previous
                  && session.LastUpdated > previous && session.LastUpdated <= now
                  && !_lastSeen.ContainsKey(session.Id)))
             {
-                session = session with { Status = SessionStatus.Completed, PromptEndedAt = now };
+                session = session with
+                {
+                    Status = SessionStatus.Completed,
+                    PromptEndedAt = now,
+                    PromptStartedAt = since == default ? null : since,
+                    IsElapsedApproximate = since != default,
+                };
             }
 
             rows[i] = session;

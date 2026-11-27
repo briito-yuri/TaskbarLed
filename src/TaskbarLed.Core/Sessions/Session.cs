@@ -25,7 +25,6 @@ public sealed record Session(
     DateTimeOffset LastUpdated,
     SessionHost Host = SessionHost.Unknown)
 {
-    /// <summary>Session that launched this subagent, when the source reports it.</summary>
     /// <summary>The parent session ID for a worker.</summary>
     public string? ParentId { get; init; }
 
@@ -37,6 +36,12 @@ public sealed record Session(
 
     /// <summary>The PID reported for the local provider process.</summary>
     public int? ProcessId { get; init; }
+
+    /// <summary>Cumulative token count as reported by the provider for this session.</summary>
+    public long? TotalTokens { get; init; }
+
+    /// <summary>Whether timing starts at the first local observation rather than a reported turn start.</summary>
+    public bool IsElapsedApproximate { get; init; }
 
     /// <summary>Best label to identify the session on a tiny display.</summary>
     public string DisplayName =>

@@ -47,6 +47,11 @@ public sealed class GenericAgentSource : ISessionSource
             }
 
             events.Add(evt);
+            if (evt is not SessionEnded && payload.TryGetProperty("total_tokens", out var total)
+                && total.ValueKind == JsonValueKind.Number && total.TryGetInt64(out var count) && count >= 0)
+            {
+                events.Add(new TokenUsageReported(session, agent, receivedAt, count));
+            }
         }
 
         return ValueTask.FromResult<IReadOnlyList<SessionEvent>>(events);
