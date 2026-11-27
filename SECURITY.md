@@ -10,7 +10,9 @@ Only the latest release gets security fixes.
 
 ## What TaskbarLed touches
 
-TaskbarLed runs as you, without administrator rights, and makes no internet requests. It does not update itself. On macOS, the Octo integration uses authenticated loopback TCP to read session status. The panel uses the local holder token solely for that handshake and does not log or store it. The Mac panel reads the local Antigravity conversation index and limited portions of local Codex logs for session names, parent links and turn status. It does not save those records.
+TaskbarLed runs as you, without administrator rights. It does not update itself. On Windows it makes no network requests.
+
+On macOS, the Octo integration uses authenticated loopback TCP to read session status. The panel uses the local holder token solely for that handshake and does not log or store it. The Mac panel reads the local Antigravity conversation index and limited portions of local Codex logs for session names, parent links and turn status. It does not save those records.
 
 | It reads | Why |
 |---|---|

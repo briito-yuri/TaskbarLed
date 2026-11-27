@@ -11,58 +11,11 @@
 
 **English** · [Português](README.pt-BR.md)
 
-**macOS installer preview (.pkg)**
-
-[![Apple Silicon installer](https://img.shields.io/badge/Apple%20Silicon-.pkg-286C63?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-arm64.pkg)
-[![Intel installer](https://img.shields.io/badge/Intel-.pkg-415687?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-x64.pkg)
-
-[Install instructions](docs/MACOS.md#build-and-connect-claude-code)
-
-The preview is unsigned and unnotarized. If macOS says Apple cannot verify the installer, check the file’s SHA-256. After trying to open the package, go to **System Settings → Privacy & Security → Open Anyway**. The project is open source, and you can inspect this revision and build your own copy. [Preview hashes and source](INSTALAR-MACOS.md#conferir-o-download) · [Apple instructions](https://support.apple.com/en-us/102445)
-
-[![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
-
-Apple Silicon (M1 or newer), macOS 14+. Unzip, move Neon Task Bar.app to Applications, and open it. The runtime is included.
-
 <img src="docs/images/state-running-en.png" alt="TaskbarLed on the Windows 11 taskbar, showing three Claude Code sessions" width="100%">
 
 </div>
 
-## macOS
-
-Apple Silicon Macs (M1 or newer) can run the floating panel on macOS 14+, with automatic detection of known local AI tools. See [building, installing and connecting agents on macOS](docs/MACOS.md).
-
 You send Claude a long prompt, switch to another app, and then keep coming back to check whether it has finished. TaskbarLed puts the answer in the empty left side of the taskbar. It **appears only while Claude is out of sight**, shows every running conversation, and blinks when one of them is done or needs you.
-
-**Install on Mac.** Download the ZIP above, extract it, move Neon Task Bar.app to Applications, and open it. The .NET runtime is bundled. The panel shows active agents and their subagents, including Antigravity workers when their parent is idle. See the [macOS guide](docs/MACOS.md) for first launch, hooks, supported sources and publishing a Mac build.
-
-The current macOS branch includes native Apple Silicon and Intel builds, automatic and manual sizing, theme-aware opacity, and adaptive Liquid Glass. See the macOS guide above to build it.
-
-[Installer packages from the macOS branch](docs/MACOS.md#build-and-connect-claude-code).
-
-### Themes created for macOS
-
-| Line Map | Liquid Glass |
-| --- | --- |
-| [![Line Map](docs/images/macos-themes/LineMap.png)](docs/images/macos-themes/LineMap.png) | [![Liquid Glass](docs/images/macos-themes/LiquidGlass.png)](docs/images/macos-themes/LiquidGlass.png) |
-
-| Editorial Index | Cobalt Window |
-| --- | --- |
-| [![Editorial Index](docs/images/macos-themes/EditorialIndex.png)](docs/images/macos-themes/EditorialIndex.png) | [![Cobalt Window](docs/images/macos-themes/CobaltWindow.png)](docs/images/macos-themes/CobaltWindow.png) |
-
-| Violet Phosphor | Olive LCD |
-| --- | --- |
-| [![Violet Phosphor](docs/images/macos-themes/VioletPhosphor.png)](docs/images/macos-themes/VioletPhosphor.png) | [![Olive LCD](docs/images/macos-themes/OliveLcd.png)](docs/images/macos-themes/OliveLcd.png) |
-
-| Amber Tree | Compact Charcoal |
-| --- | --- |
-| [![Amber Tree](docs/images/macos-themes/AmberTree.png)](docs/images/macos-themes/AmberTree.png) | [![Compact Charcoal](docs/images/macos-themes/CompactCharcoal.png)](docs/images/macos-themes/CompactCharcoal.png) |
-
-| Amber Ruler | Clear List |
-| --- | --- |
-| [![Amber Ruler](docs/images/macos-themes/AmberRail.png)](docs/images/macos-themes/AmberRail.png) | [![Clear List](docs/images/macos-themes/ClearList.png)](docs/images/macos-themes/ClearList.png) |
-
-[See screenshots of all 17 macOS themes](docs/MACOS-THEMES.md).
 
 ## What it looks like
 
@@ -207,6 +160,12 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design.
 - Plan limits (5-hour and weekly) are not shown yet: the desktop app does not pass them to hooks.
 - The reply text updates once per message, not token by token.
 - **On the taskbar** placement expects a bottom taskbar (the Windows 11 default). With an auto-hidden taskbar, the panel floats above the screen edge instead.
+
+## macOS edition
+
+The macOS edition runs as a floating panel above the Dock on macOS 14 or later. It has separate native installers for Apple Silicon (M1 or later) and Intel. The current installer preview uses the name **Neon TSB Agents** on macOS.
+
+[macOS downloads and installation](INSTALAR-MACOS.md) · [macOS guide](docs/MACOS.md) · [macOS theme gallery](docs/MACOS-THEMES.md)
 
 ## Roadmap
 

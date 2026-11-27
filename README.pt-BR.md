@@ -11,58 +11,11 @@
 
 [English](README.md) · **Português**
 
-**Instaladores para macOS (.pkg) · prévia**
-
-[![Apple Silicon installer](https://img.shields.io/badge/Apple%20Silicon-.pkg-286C63?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-arm64.pkg)
-[![Intel installer](https://img.shields.io/badge/Intel-.pkg-415687?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-x64.pkg)
-
-[Como instalar](INSTALAR-MACOS.md)
-
-A prévia não tem assinatura Developer ID nem notarização. Se o macOS disser que a Apple não pôde verificar o instalador, confira o SHA-256 do arquivo. Depois de tentar abri-lo, vá a **Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim**. O projeto é de código aberto. Você pode consultar o código da revisão e compilar sua própria cópia. [Hashes e código da prévia](INSTALAR-MACOS.md#conferir-o-download) · [Orientação da Apple](https://support.apple.com/pt-br/102445)
-
-[![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
-
-Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova Neon Task Bar.app para Aplicativos e abra. O runtime já vem incluído.
-
 <img src="docs/images/state-running-pt.png" alt="TaskbarLed na barra de tarefas do Windows 11, mostrando três sessões do Claude Code" width="100%">
 
 </div>
 
-## macOS
-
-Macs com Apple Silicon (M1 em diante) podem usar o painel flutuante no macOS 14 ou posterior, com detecção automática de ferramentas de IA locais conhecidas. Veja [como compilar, instalar e conectar agentes no macOS](docs/MACOS.pt-BR.md).
-
 Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando para ver se ele já terminou. O TaskbarLed coloca essa resposta no espaço vazio à esquerda da barra de tarefas. Ele **só aparece quando o Claude está fora de vista**, mostra todas as conversas em andamento e pisca quando alguma termina ou precisa de você.
-
-**Instalação no Mac.** Baixe o ZIP acima, extraia, mova o Neon Task Bar.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.pt-BR.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
-
-A branch atual do macOS inclui builds nativos para Apple Silicon e Intel, tamanho automático e manual, controle de opacidade por tema e Liquid Glass adaptável. Veja no guia acima como compilar.
-
-[Instalar pelo assistente do macOS](docs/MACOS.pt-BR.md#instalar-pelo-assistente).
-
-### Temas criados para macOS
-
-| Mapa de Linhas | Liquid Glass |
-| --- | --- |
-| [![Mapa de Linhas](docs/images/macos-themes/LineMap.png)](docs/images/macos-themes/LineMap.png) | [![Liquid Glass](docs/images/macos-themes/LiquidGlass.png)](docs/images/macos-themes/LiquidGlass.png) |
-
-| Índice Editorial | Janela Cobalto |
-| --- | --- |
-| [![Índice Editorial](docs/images/macos-themes/EditorialIndex.png)](docs/images/macos-themes/EditorialIndex.png) | [![Janela Cobalto](docs/images/macos-themes/CobaltWindow.png)](docs/images/macos-themes/CobaltWindow.png) |
-
-| Fósforo Violeta | LCD Oliva |
-| --- | --- |
-| [![Fósforo Violeta](docs/images/macos-themes/VioletPhosphor.png)](docs/images/macos-themes/VioletPhosphor.png) | [![LCD Oliva](docs/images/macos-themes/OliveLcd.png)](docs/images/macos-themes/OliveLcd.png) |
-
-| Âmbar em árvore | Carvão compacto |
-| --- | --- |
-| [![Âmbar em árvore](docs/images/macos-themes/AmberTree.png)](docs/images/macos-themes/AmberTree.png) | [![Carvão compacto](docs/images/macos-themes/CompactCharcoal.png)](docs/images/macos-themes/CompactCharcoal.png) |
-
-| Âmbar com régua | Lista Clara |
-| --- | --- |
-| [![Âmbar com régua](docs/images/macos-themes/AmberRail.png)](docs/images/macos-themes/AmberRail.png) | [![Lista Clara](docs/images/macos-themes/ClearList.png)](docs/images/macos-themes/ClearList.png) |
-
-[Veja as capturas dos 17 temas no macOS](docs/MACOS-THEMES.md).
 
 ## Como ele fica
 
@@ -207,6 +160,12 @@ O desenho completo está em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), em ing
 - O limite do plano (janela de 5h e semanal) ainda não aparece: o app desktop não repassa esse dado aos hooks.
 - O texto da resposta atualiza a cada mensagem, não palavra por palavra.
 - O modo **Na barra de tarefas** espera a barra embaixo, que é o padrão do Windows 11. Com a barra em ocultação automática, o painel flutua acima da borda da tela.
+
+## Versão para macOS
+
+A versão para macOS roda como um painel flutuante acima do Dock no macOS 14 ou posterior. Há instaladores nativos separados para Apple Silicon (M1 em diante) e Intel. A prévia do instalador usa o nome **Neon TSB Agents** no macOS.
+
+[Downloads e instalação no Mac](INSTALAR-MACOS.md) · [Guia do macOS](docs/MACOS.pt-BR.md) · [Galeria de temas do macOS](docs/MACOS-THEMES.md)
 
 ## Próximos passos
 
