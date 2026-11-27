@@ -10,7 +10,7 @@ Only the latest release gets security fixes.
 
 ## What TaskbarLed touches
 
-TaskbarLed runs as you, without administrator rights, and makes no network requests. It does not update itself.
+TaskbarLed runs as you, without administrator rights, and makes no internet requests. It does not update itself. On macOS, the Octo integration uses authenticated loopback TCP to read session status. The panel uses the local holder token solely for that handshake and does not log or store it.
 
 | It reads | Why |
 |---|---|

@@ -15,10 +15,15 @@ internal sealed class LiveFeed(CultureInfo culture)
 
     private readonly string _detectedLabel = culture.TwoLetterISOLanguageName == "pt" ? "Processos detectados" : "Detected processes";
     private string[] _detected = [];
+    private Session[] _octo = [];
+    private readonly Dictionary<string, DateTimeOffset> _seenOcto = new(StringComparer.Ordinal);
 
     public PanelFrame Compose(DateTimeOffset now)
     {
-        var sessions = _store.Snapshot();
+        var octo = Volatile.Read(ref _octo);
+        var sessions = _store.Snapshot().Concat(octo.Where(s =>
+            s.Status != SessionStatus.Completed || !_seenOcto.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))
+            .ToArray();
         var detected = Volatile.Read(ref _detected);
         if (detected.Length == 0)
         {
@@ -43,18 +48,33 @@ internal sealed class LiveFeed(CultureInfo culture)
     public async Task DetectProcessesAsync(CancellationToken cancellationToken)
     {
         var rules = Path.Combine(IpcEndpoints.DataDirectory, "agents.json");
+        var octo = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library",
+            "Application Support", "Octo", "agents");
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
         do
         {
             if (await AgentProcesses.ScanAsync(rules, cancellationToken).ConfigureAwait(false) is { } detected)
             {
                 Volatile.Write(ref _detected, detected);
+                var sessions = Array.Exists(detected, tool => tool == "Octo")
+                    ? await OctoSessions.ScanAsync(octo, cancellationToken).ConfigureAwait(false)
+                    : [];
+                Volatile.Write(ref _octo, sessions);
             }
         }
         while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
     }
 
-    public void Acknowledge(string? sessionId) => _store.AcknowledgeCompleted(s => s.Id == sessionId);
+    public void Acknowledge(string? sessionId)
+    {
+        var completed = Array.Find(Volatile.Read(ref _octo), s => s.Id == sessionId && s.Status == SessionStatus.Completed);
+        if (completed is not null)
+        {
+            _seenOcto[completed.Id] = completed.LastUpdated;
+        }
+
+        _store.AcknowledgeCompleted(s => s.Id == sessionId);
+    }
 
     public void Skip() => _composer.Rotation.Skip();
 

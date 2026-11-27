@@ -11,6 +11,10 @@
 
 [English](README.md) · **Português**
 
+[![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.1.0/TaskbarLed-osx-arm64.zip)
+
+Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova TaskbarLed.app para Aplicativos e abra. O runtime já vem incluído.
+
 <img src="docs/images/state-running-pt.png" alt="TaskbarLed na barra de tarefas do Windows 11, mostrando três sessões do Claude Code" width="100%">
 
 </div>

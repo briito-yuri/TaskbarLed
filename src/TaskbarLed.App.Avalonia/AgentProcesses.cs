@@ -9,6 +9,9 @@ internal static class AgentProcesses
 {
     private static readonly Dictionary<string, string> BuiltIn = new(StringComparer.OrdinalIgnoreCase)
     {
+        ["agy"] = "Antigravity",
+        ["antigravity"] = "Antigravity",
+        ["octo"] = "Octo",
         ["aider"] = "Aider",
         ["amp"] = "Amp",
         ["claude"] = "Claude",

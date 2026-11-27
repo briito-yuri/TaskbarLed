@@ -2,6 +2,12 @@
 
 The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
+## Install
+
+[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.1.0/TaskbarLed-osx-arm64.zip). Unzip it, move `TaskbarLed.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+
+The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
+
 ## Build and connect Claude Code
 
 From the repository root, with the .NET SDK from `global.json` and Apple's command-line tools:
@@ -30,7 +36,7 @@ Use **Theme** to switch live between Claude Code, Modern Terminal, Matrix, Mono,
 
 ## Automatic local detection
 
-TaskbarLed detects known executables for the signed-in user, including Claude, Codex, Cursor, OpenCode, Gemini CLI, Ollama and LM Studio. It checks about every two seconds, groups multiple processes for the same tool, and shows detected tools even without hooks. A detected process can be idle or running in the background. Hooks add per-session activity, requests for input and results.
+TaskbarLed detects known executables for the signed-in user, including Octo, Antigravity (`agy`), Claude, Codex, Cursor, OpenCode, Gemini CLI, Ollama and LM Studio. It checks about every two seconds, groups multiple processes for the same tool, and shows detected tools even without hooks. A detected process can be idle or running in the background. Hooks add per-session activity, requests for input and results.
 
 To recognize a custom tool or orchestrator, add its executable filename and display name to `~/Library/Application Support/TaskbarLed/agents.json`. Changes apply on the next scan. For example:
 
@@ -41,6 +47,10 @@ To recognize a custom tool or orchestrator, add its executable filename and disp
 ```
 
 The scan reads executable names, so applications hosted under generic processes like a browser or an interpreter, and tools on another machine, may need a local event adapter.
+
+## Octo
+
+When Octo is running, TaskbarLed reads its local session status and shows working, paused for input and completed turns, including Antigravity sessions. Support uses Octo holder protocol v1, verified with Octo 0.2.52. The panel shows the engine Octo reports. For example, it displays Antigravity for a Gemini model running inside Antigravity.
 
 ## Connect an orchestrator
 
