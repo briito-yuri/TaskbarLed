@@ -163,4 +163,28 @@ public class PanelCustomizationTests
         Assert.Contains("~01:03", row.Status, StringComparison.Ordinal);
         Assert.Contains("750 tok", row.Status, StringComparison.Ordinal);
     }
+    [Fact]
+    public void Token_usage_is_independent_per_row_and_small_increments_remain_visible()
+    {
+        var model = Model();
+        SessionDisplayRow parent = new("parent", "Codex", SessionStatus.Running, true)
+            { TotalTokens = 204_900_000 };
+        SessionDisplayRow worker = new("worker", "Subagent", SessionStatus.Running, false)
+            { TotalTokens = 100_000 };
+        var frame = PanelFrame.Empty("") with
+        {
+            SessionRows = [parent, worker, worker with { SessionId = "worker-2" },
+                worker with { SessionId = "worker-3", TotalTokens = null }],
+        };
+
+        model.Apply(frame);
+        var initial = model.SessionRows[0].Status;
+        model.Apply(frame with { SessionRows = [parent with { TotalTokens = 204_900_100 }, .. frame.SessionRows.Skip(1)] });
+
+        Assert.NotEqual(initial, model.SessionRows[0].Status);
+        Assert.Contains("100k tok", model.SessionRows[1].Status, StringComparison.Ordinal);
+        Assert.Contains("100k tok", model.SessionRows[2].Status, StringComparison.Ordinal);
+        Assert.DoesNotContain("tok", model.SessionRows[3].Status, StringComparison.Ordinal);
+    }
+
 }

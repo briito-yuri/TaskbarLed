@@ -101,13 +101,14 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
 
     public string StatusDetails => string.Join(" · ", new[]
     {
-        StatusLabel, ElapsedLabel, TotalTokens is { } tokens ? $"{tokens:N0} tokens" : "",
+        StatusLabel, ElapsedLabel, !Row.HasStatus ? "" : TotalTokens is { } tokens ? $"{tokens:N0} tokens"
+            : portuguese ? "Consumo de tokens indisponível" : "Token usage unavailable",
     }.Where(text => text.Length > 0));
 
     private static string CompactTokens(long tokens) => tokens switch
     {
-        >= 1_000_000 => $"{tokens / 1_000_000d:0.#}M tok",
-        >= 1_000 => $"{tokens / 1_000d:0.#}k tok",
+        >= 1_000_000 => $"{tokens / 1_000_000d:0.####}M tok",
+        >= 1_000 => $"{tokens / 1_000d:0.###}k tok",
         _ => $"{tokens} tok",
     };
 

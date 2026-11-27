@@ -27,7 +27,7 @@ O script cria um `.pkg` e um `.zip` em `artifacts/TaskbarLed-<rid>/`. Encerre a 
 
 O TaskbarLed flutua acima do Dock. O painel aparece quando há atividade. O ícone da barra de menus permite mantê-lo visível mesmo ocioso. Clique com o botão direito para abrir **Temas**, **Editar posição e tamanho** ou **Encerrar**. Escolha o tamanho automático ou arraste a borda direita, inferior ou o canto no modo manual. A opacidade ajusta o fundo do tema e mantém o texto legível. Sessões concluídas aparecem por dez segundos. No Mapa de Linhas, a letra da rota permanece enquanto a sessão estiver visível. Liquid Glass usa o material nativo no macOS 26. Versões anteriores usam um fundo translúcido.
 
-Cada sessão e subagente mostra o tempo decorrido quando há uma hora de início conhecida. O til indica o tempo desde que o painel viu o agente do Antigravity pela primeira vez. O Codex pode mostrar o total acumulado de tokens da sessão. Outros orquestradores podem informar o total inteiro em `total_tokens` no hook abaixo. Passe o mouse sobre o estado para ver o número completo.
+Cada sessão e subagente mostra o tempo decorrido quando há uma hora de início conhecida. O til indica o tempo desde que o painel viu o agente do Antigravity pela primeira vez. A barra mostra o total acumulado que o Codex registra para cada conversa ou subagente e atualiza o valor a cada novo registro do provedor. O estado do Antigravity vem do índice de conversas, que não expõe consumo de tokens. Outros orquestradores podem informar o total inteiro em `total_tokens` no hook abaixo. Passe o mouse sobre o estado para ver o número completo.
 
 ## Conectar agentes
 
