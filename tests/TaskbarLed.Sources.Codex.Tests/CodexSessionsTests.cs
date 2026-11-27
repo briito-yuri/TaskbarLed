@@ -59,18 +59,15 @@ public class CodexSessionsTests
     }
 
     [Fact]
-    public void Reads_cumulative_token_usage_without_changing_the_turn_start()
+    public void Reads_turn_start_for_a_running_session()
     {
         const string header = """
             {"type":"session_meta","payload":{"id":"cc5911f9-02f3-49b0-b90f-7a0373ed9599"}}
             """;
         const string tail = """
             {"timestamp":"2026-01-01T12:00:00Z","type":"event_msg","payload":{"type":"task_started"}}
-            {"timestamp":"2026-01-01T12:00:03Z","type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"total_tokens":12345},"last_token_usage":{"total_tokens":34}}}}
-            {"type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"total_tokens":"bad"}}}}
             """;
         var session = Assert.IsType<Session>(CodexSessions.Parse(header, tail, DateTimeOffset.UtcNow));
-        Assert.Equal(12345, session.TotalTokens);
         Assert.Equal(new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero), session.PromptStartedAt);
     }
 }

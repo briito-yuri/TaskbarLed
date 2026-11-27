@@ -160,7 +160,7 @@
       <Grid Name="PanelContent" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
         <Grid Grid.ColumnSpan="2" Height="26" Margin="0,0,0,3">
           <Border IsVisible="{Binding ShowLineMap}" Background="{DynamicResource Led.BrandHeaderBrush}" CornerRadius="4,4,0,0" />
-          <Border HorizontalAlignment="Center" VerticalAlignment="Center" Padding="7,2"
+          <Border HorizontalAlignment="Left" VerticalAlignment="Center" Padding="7,2"
                   CornerRadius="8" Background="{DynamicResource Led.BrandBackdropBrush}">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <Image Source="/Assets/TaskbarLedMark.png" Width="17" Height="17" VerticalAlignment="Center" />
@@ -251,7 +251,7 @@
                       <Border Grid.Column="3" Background="{DynamicResource Led.SessionStatusBrush}" CornerRadius="3"
                               VerticalAlignment="Center" Padding="4,1" Margin="2,0,0,0">
                         <TextBlock Classes="session-status" Classes.waiting="{Binding IsWaiting}" Classes.idle="{Binding IsIdle}"
-                                   Text="{Binding Status}" ToolTip.Tip="{Binding StatusDetails}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5" />
+                                   Text="{Binding Status}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5" />
                       </Border>
                     </Grid>
                     <Grid ColumnDefinitions="29,*,Auto" Margin="5,0,8,0" IsVisible="{Binding IsLineMap}">
@@ -279,7 +279,7 @@
                                  FontFamily="{DynamicResource Led.FontFamily}" FontSize="12" Margin="3,0,6,0"
                                  VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                       <TextBlock Grid.Column="2" Classes="session-status" Classes.waiting="{Binding IsWaiting}" Classes.idle="{Binding IsIdle}"
-                                 Text="{Binding Status}" ToolTip.Tip="{Binding StatusDetails}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5"
+                                 Text="{Binding Status}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5"
                                  VerticalAlignment="Center" Margin="4,0,4,0" />
                     </Grid>
                   </Grid>
@@ -305,7 +305,7 @@
                                  VerticalAlignment="Center" />
                     </StackPanel>
                     <TextBlock Grid.Column="1" Classes="session-status" Classes.idle="{Binding IsIdle}"
-                               Classes.waiting="{Binding IsWaiting}" Text="{Binding Status}" ToolTip.Tip="{Binding StatusDetails}" FontSize="11"
+                               Classes.waiting="{Binding IsWaiting}" Text="{Binding Status}" FontSize="11"
                                Margin="6,0,8,0" VerticalAlignment="Center" />
                   </Grid>
                   <Border Height="1" Background="{DynamicResource Led.BorderBrush}" IsVisible="{Binding HasChildren}" />
@@ -323,7 +323,7 @@
                                        Foreground="{DynamicResource Led.ForegroundBrush}" FontSize="11" FontWeight="SemiBold"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                             <TextBlock Grid.Column="1" Classes="session-status" Classes.waiting="{Binding IsWaiting}"
-                                       Text="{Binding Status}" ToolTip.Tip="{Binding StatusDetails}" FontSize="10" Margin="2,0,6,0" VerticalAlignment="Center" />
+                                       Text="{Binding Status}" FontSize="10" Margin="2,0,6,0" VerticalAlignment="Center" />
                           </Grid>
                         </Border>
                       </DataTemplate>

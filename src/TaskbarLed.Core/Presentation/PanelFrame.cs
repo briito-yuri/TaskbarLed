@@ -19,7 +19,6 @@ public sealed record SessionDisplayRow(string? SessionId, string Label, SessionS
     public bool LastStation { get; init; }
     public long? ElapsedSeconds { get; init; }
     public bool IsElapsedApproximate { get; init; }
-    public long? TotalTokens { get; init; }
 }
 
 /// <summary>Everything the panel needs to draw one frame. UI-framework agnostic.</summary>

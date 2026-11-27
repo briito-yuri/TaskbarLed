@@ -122,7 +122,6 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                 LastStation = children.Length == 0,
                 ElapsedSeconds = ElapsedSeconds(parent, now),
                 IsElapsedApproximate = parent?.IsElapsedApproximate == true,
-                TotalTokens = parent?.TotalTokens,
             });
             for (var i = 0; i < children.Length; i++)
             {
@@ -137,7 +136,6 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                     LastStation = i == children.Length - 1,
                     ElapsedSeconds = ElapsedSeconds(child, now),
                     IsElapsedApproximate = child.IsElapsedApproximate,
-                    TotalTokens = child.TotalTokens,
                 });
             }
         }

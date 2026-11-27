@@ -81,36 +81,19 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     private static readonly IBrush TransitFallback = new SolidColorBrush(Color.Parse("#465D6B"));
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Status), nameof(StatusDetails))]
+    [NotifyPropertyChangedFor(nameof(Status))]
     public partial int SecondsRemaining { get; set; } = row.SecondsRemaining;
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Status), nameof(StatusDetails))]
+    [NotifyPropertyChangedFor(nameof(Status))]
     public partial long? ElapsedSeconds { get; set; } = row.ElapsedSeconds;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Status), nameof(StatusDetails))]
-    public partial long? TotalTokens { get; set; } = row.TotalTokens;
-
     internal static SessionDisplayRow WithoutTelemetry(SessionDisplayRow value) =>
-        value with { SecondsRemaining = 0, ElapsedSeconds = null, TotalTokens = null };
+        value with { SecondsRemaining = 0, ElapsedSeconds = null };
 
     private string ElapsedLabel => ElapsedSeconds is { } seconds
         ? (Row.IsElapsedApproximate ? "~" : "") + (seconds >= 3600
             ? $"{seconds / 3600}:{seconds / 60 % 60:00}:{seconds % 60:00}"
             : $"{seconds / 60:00}:{seconds % 60:00}") : "";
-
-    public string StatusDetails => string.Join(" · ", new[]
-    {
-        StatusLabel, ElapsedLabel, !Row.HasStatus ? "" : TotalTokens is { } tokens ? $"{tokens:N0} tokens"
-            : portuguese ? "Consumo de tokens indisponível" : "Token usage unavailable",
-    }.Where(text => text.Length > 0));
-
-    private static string CompactTokens(long tokens) => tokens switch
-    {
-        >= 1_000_000 => $"{tokens / 1_000_000d:0.####}M tok",
-        >= 1_000 => $"{tokens / 1_000d:0.###}k tok",
-        _ => $"{tokens} tok",
-    };
 
     public string? SessionId => Row.SessionId;
     public bool IsHeader => Row.IsHeader;
@@ -121,7 +104,7 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
 
     public string Status => string.Join(" · ", new[]
     {
-        StatusLabel, ElapsedLabel, TotalTokens is { } tokens ? CompactTokens(tokens) : "",
+        StatusLabel, ElapsedLabel,
     }.Where(text => text.Length > 0));
 
     private string StatusLabel => !Row.HasStatus ? "" : Row.Status switch
@@ -236,7 +219,6 @@ public sealed partial class PanelViewModel : ObservableObject
             {
                 SessionRows[i].SecondsRemaining = frame.SessionRows[i].SecondsRemaining;
                 SessionRows[i].ElapsedSeconds = frame.SessionRows[i].ElapsedSeconds;
-                SessionRows[i].TotalTokens = frame.SessionRows[i].TotalTokens;
             }
         }
         Feed = Cased(frame.Feed);

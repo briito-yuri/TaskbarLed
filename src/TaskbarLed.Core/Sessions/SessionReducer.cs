@@ -68,8 +68,6 @@ public static class SessionReducer
                 Activity = null,
             },
 
-            TokenUsageReported e when e.TotalTokens >= 0 => session with { TotalTokens = e.TotalTokens },
-
             ParentIdentified e => session with { ParentId = e.ParentId },
 
             HostIdentified e => session with { Host = e.Host },

@@ -83,7 +83,6 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
             {
                 session = session with
                 {
-                    TotalTokens = session.TotalTokens ?? previous.TotalTokens,
                     PromptStartedAt = session.PromptStartedAt ?? previous.PromptStartedAt,
                 };
             }
@@ -129,7 +128,6 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
         var project = Path.GetFileName(Text(details, "cwd"));
         var state = (SessionStatus?)null;
         DateTimeOffset? started = null;
-        long? tokens = null;
         var updated = modified;
         foreach (var line in lines)
         {
@@ -146,14 +144,7 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
                     continue;
                 }
 
-                var payload = Field(doc.RootElement, "payload");
-                var evt = Text(payload, "type");
-                if (evt == "token_count" &&
-                    Field(Field(Field(payload, "info"), "total_token_usage"), "total_tokens") is
-                        { ValueKind: JsonValueKind.Number } total && total.TryGetInt64(out var count) && count >= 0)
-                {
-                    tokens = count;
-                }
+                var evt = Text(Field(doc.RootElement, "payload"), "type");
                 var next = evt switch
                 {
                     "task_started" or "turn_started" => SessionStatus.Running,
@@ -194,7 +185,6 @@ public sealed class CodexSessions(string home = "") : ISessionScanner
             ProjectName = project,
             ParentId = child ? $"codex:{parent:D}" : null,
             PromptStartedAt = started,
-            TotalTokens = tokens,
             PromptEndedAt = state == SessionStatus.Completed ? updated : null,
         };
     }
