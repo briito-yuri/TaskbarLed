@@ -2,7 +2,7 @@
 
 Capturas dos 17 temas do painel renderizadas pelo Neon TSB Agents com duas sessões e quatro subagentes. Escolha um tema no menu **Temas** da barra.
 
-[Instalação no Mac](MACOS.md) · [Voltar ao README](../README.pt-BR.md)
+[Instalação no Mac](MACOS.pt-BR.md) · [Voltar ao README](../README.pt-BR.md)
 
 ## Temas criados para o macOS
 

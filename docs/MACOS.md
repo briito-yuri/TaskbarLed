@@ -1,5 +1,7 @@
 # Neon TSB Agents on macOS
 
+[Português do Brasil](MACOS.pt-BR.md)
+
 Neon TSB Agents can be built for Apple Silicon (M1 and newer) or Intel in two separate ZIPs. Both require macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
 ## Install

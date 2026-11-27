@@ -1,0 +1,43 @@
+# Instalação do Neon TSB Agents no macOS
+
+[English](MACOS.md) · [README em português](../README.pt-BR.md)
+
+## Apple Silicon (M1 ou posterior)
+
+O download público é a versão **0.5.1**, para Macs com Apple Silicon e macOS 14 Sonoma ou posterior. O runtime .NET já vem no pacote.
+
+1. [Baixe o ZIP para Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip).
+2. Abra o ZIP no Finder para extrair o aplicativo.
+3. Arraste **Neon Task Bar.app** para **Aplicativos** e abra por lá. A versão pública ainda usa esse nome.
+4. Procure o ícone na barra de menus. O painel aparece quando há atividade detectada. Para deixá-lo visível mesmo sem atividade, selecione **Mostrar painel sem atividade** no menu do ícone.
+
+O ZIP usa assinatura ad hoc. Se o macOS bloquear a abertura, consulte as [instruções da Apple para abrir um app de desenvolvedor que o macOS não consegue verificar](https://support.apple.com/pt-br/102445).
+
+## Mac Intel ou versão atual da branch
+
+O pacote público acima é para Apple Silicon. Para usar o app em um **Mac Intel** ou testar a versão atual da branch com os temas mais recentes, gere o ZIP da arquitetura do seu Mac. Ambas as versões exigem macOS 14 ou posterior e incluem o runtime.
+
+Com o SDK .NET indicado em `global.json` e as ferramentas de linha de comando da Apple instalados, abra o Terminal na raiz do repositório e execute o comando correspondente:
+
+| Seu Mac | Comando | ZIP gerado |
+| --- | --- | --- |
+| Chip Apple M1 ou posterior | `src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64` | `artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip` |
+| Processador Intel | `src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64` | `artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.zip` |
+
+Feche a versão anterior, extraia o ZIP e mova **Neon TSB Agents.app** para **Aplicativos**. Abra o app pelo Finder. O build Apple Silicon roda nativamente em chips da série M.
+
+## Ativar a integração com Claude Code
+
+A detecção de processos e a integração com o Octo começam quando o app abre. Para receber eventos do Claude Code, rode o instalador de hooks depois de mover o app para **Aplicativos**:
+
+```sh
+# Para o ZIP público 0.5.1:
+app="/Applications/Neon Task Bar.app"
+# Para a versão compilada da branch, use:
+# app="/Applications/Neon TSB Agents.app"
+"$app/Contents/MacOS/TaskbarLed" --install-hooks
+```
+
+Reinicie as sessões abertas do Claude Code para carregar a configuração. Se mover ou renomear o app, execute o comando de novo com o caminho atualizado. Para desativar a integração, use `--uninstall-hooks` no mesmo executável.
+
+Na versão atual da branch, clique com o botão direito no painel para abrir **Temas**, **Editar posição e tamanho…** ou **Encerrar**. [Galeria de temas](MACOS-THEMES.md) · [Guia técnico em inglês](MACOS.md)

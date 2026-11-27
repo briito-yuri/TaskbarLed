@@ -21,11 +21,11 @@ Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova Neon Ta
 
 ## macOS
 
-Macs com Apple Silicon (M1 em diante) podem usar o painel flutuante no macOS 14 ou posterior, com detecção automática de ferramentas de IA locais conhecidas. Veja [como compilar, instalar e conectar agentes no macOS](docs/MACOS.md).
+Macs com Apple Silicon (M1 em diante) podem usar o painel flutuante no macOS 14 ou posterior, com detecção automática de ferramentas de IA locais conhecidas. Veja [como compilar, instalar e conectar agentes no macOS](docs/MACOS.pt-BR.md).
 
 Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando para ver se ele já terminou. O TaskbarLed coloca essa resposta no espaço vazio à esquerda da barra de tarefas. Ele **só aparece quando o Claude está fora de vista**, mostra todas as conversas em andamento e pisca quando alguma termina ou precisa de você.
 
-**Instalação no Mac.** Baixe o ZIP acima, extraia, mova o Neon Task Bar.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
+**Instalação no Mac.** Baixe o ZIP acima, extraia, mova o Neon Task Bar.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.pt-BR.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
 
 A branch atual do macOS inclui builds nativos para Apple Silicon e Intel, tamanho automático e manual, controle de opacidade por tema e Liquid Glass adaptável. Veja no guia acima como compilar.
 
