@@ -23,6 +23,8 @@ src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
 
 Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces a ZIP and a macOS installer package under `artifacts/TaskbarLed-<rid>/`. Open `TaskbarLed-<rid>.pkg` and follow the prompts to install in Applications, or extract the ZIP and move the app to Applications yourself. Both include the runtime. The development installer needs Developer ID Installer signing and notarization for seamless public distribution.
 
+Installer preview from the `macos-port` commit `c951755`. [Apple Silicon .pkg](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-arm64.pkg) · [Intel .pkg](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-x64.pkg)
+
 ```sh
 app="/Applications/Neon TSB Agents.app"
 "$app/Contents/MacOS/TaskbarLed" --install-hooks
