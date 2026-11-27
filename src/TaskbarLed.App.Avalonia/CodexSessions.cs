@@ -62,7 +62,14 @@ internal sealed class CodexSessions
 
             var tail = new char[192 * 1024];
             var tailCount = reader.ReadBlock(tail);
-            var session = Parse(first, new string(tail, 0, tailCount), modified);
+            var session = Parse(first, new string(tail, 0, tailCount), modified, out var sawBoundary);
+            if (!sawBoundary && offset > 0)
+            {
+                // A long turn can push its start out of the tail with tool output alone.
+                reader.DiscardBufferedData();
+                input.Seek(0, SeekOrigin.Begin);
+                session = ParseEvents(first, ReadEventLines(reader), modified, out _);
+            }
             _cache[file.FullName] = (modified, length, session);
             return session;
         }
@@ -72,8 +79,26 @@ internal sealed class CodexSessions
         }
     }
 
-    internal static Session? Parse(string header, string tail, DateTimeOffset modified)
+    internal static Session? Parse(string header, string tail, DateTimeOffset modified) =>
+        Parse(header, tail, modified, out _);
+
+    private static Session? Parse(string header, string tail, DateTimeOffset modified, out bool sawBoundary) =>
+        ParseEvents(header, tail.Split('\n', StringSplitOptions.RemoveEmptyEntries), modified, out sawBoundary);
+
+    private static IEnumerable<string> ReadEventLines(StreamReader reader)
     {
+        while (reader.ReadLine() is { } line)
+        {
+            if (line.Contains("\"event_msg\"", StringComparison.Ordinal))
+            {
+                yield return line;
+            }
+        }
+    }
+
+    private static Session? ParseEvents(string header, IEnumerable<string> lines, DateTimeOffset modified, out bool sawBoundary)
+    {
+        sawBoundary = false;
         using var meta = JsonDocument.Parse(header);
         if (Text(meta.RootElement, "type") != "session_meta" || !Guid.TryParse(Text(Field(meta.RootElement, "payload"), "id"), out var id))
         {
@@ -88,7 +113,7 @@ internal sealed class CodexSessions
         var state = (SessionStatus?)null;
         DateTimeOffset? started = null;
         var updated = modified;
-        foreach (var line in tail.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+        foreach (var line in lines)
         {
             if (!line.Contains("\"event_msg\"", StringComparison.Ordinal))
             {
@@ -130,6 +155,7 @@ internal sealed class CodexSessions
             }
         }
 
+        sawBoundary = state.HasValue;
         if (state is null or SessionStatus.Idle)
         {
             return null;

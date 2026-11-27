@@ -28,5 +28,8 @@ public class SessionDeduplicationTests
         const string path = "n/tmp/rollout-2026-11-26T17-46-46-" + id + ".jsonl";
         Assert.Equal(Guid.Parse(id), CodexProcessSessions.FindConversation(path + "\n" + path));
         Assert.Null(CodexProcessSessions.FindConversation(path + "\n" + path.Replace("fd61df3", "fd61df4", StringComparison.Ordinal)));
+        var child = path.Replace("fd61df3", "fd61df4", StringComparison.Ordinal);
+        Assert.Equal(Guid.Parse(id), CodexProcessSessions.FindConversation(path + "\n" + child,
+            filename => filename == child[1..]));
     }
 }

@@ -25,4 +25,25 @@ public class CodexSessionsTests
         Assert.Equal(SessionStatus.Running, running.Status);
         Assert.Equal(SessionStatus.Completed, completed?.Status);
     }
+
+    [Fact]
+    public void Long_turn_without_a_boundary_in_the_tail_stays_running()
+    {
+        var now = DateTimeOffset.Now;
+        var home = Directory.CreateTempSubdirectory();
+        try
+        {
+            var directory = home.CreateSubdirectory($"sessions/{now:yyyy/MM/dd}");
+            var rollout = Path.Combine(directory.FullName, "rollout-long.jsonl");
+            File.WriteAllText(rollout, """
+                {"type":"session_meta","payload":{"id":"cc5911f9-02f3-49b0-b90f-7a0373ed9599"}}
+                {"type":"event_msg","payload":{"type":"task_started"}}
+                """ + "\n" + new string(' ', 240 * 1024));
+            Assert.Equal(SessionStatus.Running, Assert.Single(new CodexSessions().Scan(home.FullName, now)).Status);
+        }
+        finally
+        {
+            home.Delete(recursive: true);
+        }
+    }
 }

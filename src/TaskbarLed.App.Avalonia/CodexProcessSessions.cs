@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
 
 namespace TaskbarLed.App.Avalonia;
 
@@ -52,14 +53,16 @@ internal static class CodexProcessSessions
         }
     }
 
-    internal static Guid? FindConversation(string output)
+    internal static Guid? FindConversation(string output, Func<string, bool>? isSubagent = null)
     {
+        isSubagent ??= IsSubagent;
         Guid? conversation = null;
         foreach (var line in output.Split('\n'))
         {
             if (line.StartsWith('n') && Path.GetFileName(line) is { Length: >= 50 } name
                 && name.StartsWith("rollout-", StringComparison.Ordinal) && name.EndsWith(".jsonl", StringComparison.Ordinal)
-                && Guid.TryParse(name.AsSpan(name.Length - 42, 36), out var id))
+                && Guid.TryParse(name.AsSpan(name.Length - 42, 36), out var id)
+                && !isSubagent(line[1..]))
             {
                 if (conversation.HasValue && conversation != id)
                 {
@@ -71,5 +74,28 @@ internal static class CodexProcessSessions
         }
 
         return conversation;
+    }
+    private static bool IsSubagent(string path)
+    {
+        try
+        {
+            using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var reader = new StreamReader(input);
+            var first = reader.ReadLine();
+            if (first is null)
+            {
+                return false;
+            }
+
+            using var header = JsonDocument.Parse(first);
+            return header.RootElement.TryGetProperty("payload", out var payload)
+                && payload.TryGetProperty("source", out var source) && source.ValueKind == JsonValueKind.Object
+                && source.TryGetProperty("subagent", out var subagent) && subagent.ValueKind == JsonValueKind.Object
+                && subagent.TryGetProperty("thread_spawn", out _);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            return false;
+        }
     }
 }

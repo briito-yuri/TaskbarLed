@@ -15,9 +15,9 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
 
     private readonly string _detectedLabel = culture.TwoLetterISOLanguageName == "pt" ? "Processos detectados" : "Detected processes";
     private string[] _detected = [];
-    private Session[] _octo = [];
+    private sealed record CodexFeed(Session[] Octo, Session[] Native);
+    private CodexFeed _codexFeed = new([], []);
     private Session[] _antigravity = [];
-    private Session[] _codex = [];
     private readonly CodexSessions _codexReader = new();
     private readonly bool _pt = culture.TwoLetterISOLanguageName == "pt";
     private readonly CompletionAlerts _completions = new();
@@ -28,7 +28,8 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
 
     internal PanelFrame Compose(DateTimeOffset now, IReadOnlyList<Session> antigravity)
     {
-        var external = MergeExternal(Volatile.Read(ref _octo), antigravity, Volatile.Read(ref _codex));
+        var codexFeed = Volatile.Read(ref _codexFeed);
+        var external = MergeExternal(codexFeed.Octo, antigravity, codexFeed.Native);
         var (sessions, sound) = _completions.Update(_store.Snapshot().Concat(external), now);
         if (sound)
         {
@@ -217,7 +218,6 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                     session is { EngineName: "Codex", ConversationId: null, ProcessId: { } pid }
                         ? session with { ConversationId = await CodexProcessSessions.FindAsync(pid, cancellationToken).ConfigureAwait(false) }
                         : session)).ConfigureAwait(false);
-                Volatile.Write(ref _octo, linked);
                 var antigravity = Array.Exists(detected, tool => tool == "Antigravity")
                     ? await AntigravitySessions.ScanAsync(geminiHome, cancellationToken).ConfigureAwait(false)
                     : [];
@@ -241,8 +241,9 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
 
                 observedAntigravity.IntersectWith(antigravity.Select(s => s.Id));
                 Volatile.Write(ref _antigravity, [.. known]);
-                Volatile.Write(ref _codex, Array.Exists(detected, tool => tool == "Codex")
-                    ? _codexReader.Scan(codexHome, DateTimeOffset.UtcNow) : []);
+                var codex = detected.Contains("Codex") || linked.Any(s => s.EngineName == "Codex")
+                    ? _codexReader.Scan(codexHome, DateTimeOffset.UtcNow) : [];
+                Volatile.Write(ref _codexFeed, new(linked, codex));
             }
         }
         while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
