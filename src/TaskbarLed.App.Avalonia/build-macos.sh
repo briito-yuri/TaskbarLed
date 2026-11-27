@@ -11,7 +11,8 @@ trap 'rm -rf "$stage"' EXIT
 
 "$dotnet_cmd" publish src/TaskbarLed.App.Avalonia -c Release -r osx-arm64 --self-contained -o "$stage/app"
 "$dotnet_cmd" publish src/TaskbarLed.Hook -c Release -r osx-arm64 --self-contained -o "$stage/hook"
-mkdir -p "$bin"
+mkdir -p "$bin" "$app/Contents/Resources"
+cp LICENSE "$app/Contents/Resources/LICENSE"
 cp -R "$stage/app/." "$bin/"
 for file in TaskbarLed.Hook TaskbarLed.Hook.dll TaskbarLed.Hook.deps.json TaskbarLed.Hook.runtimeconfig.json; do
     cp "$stage/hook/$file" "$bin/"

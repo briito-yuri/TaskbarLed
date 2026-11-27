@@ -1,6 +1,6 @@
 # Neon Task Bar on macOS
 
-The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
+The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
 ## Install
 
