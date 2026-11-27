@@ -11,9 +11,9 @@
 
 [English](README.md) · **Português**
 
-[![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.0/TaskbarLed-osx-arm64.zip)
+[![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
 
-Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova TaskbarLed.app para Aplicativos e abra. O runtime já vem incluído.
+Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova Neon Task Bar.app para Aplicativos e abra. O runtime já vem incluído.
 
 <img src="docs/images/state-running-pt.png" alt="TaskbarLed na barra de tarefas do Windows 11, mostrando três sessões do Claude Code" width="100%">
 
@@ -25,7 +25,7 @@ Macs com Apple Silicon (M1 em diante) podem usar o painel flutuante no macOS 14 
 
 Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando para ver se ele já terminou. O TaskbarLed coloca essa resposta no espaço vazio à esquerda da barra de tarefas. Ele **só aparece quando o Claude está fora de vista**, mostra todas as conversas em andamento e pisca quando alguma termina ou precisa de você.
 
-**Instalação no Mac.** Baixe o ZIP acima, extraia, mova o TaskbarLed.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
+**Instalação no Mac.** Baixe o ZIP acima, extraia, mova o Neon Task Bar.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
 
 [Veja as capturas dos 16 temas no macOS](docs/MACOS-THEMES.md).
 

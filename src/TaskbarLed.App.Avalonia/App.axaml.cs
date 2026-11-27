@@ -14,6 +14,8 @@ namespace TaskbarLed.App.Avalonia;
 
 public sealed partial class App : Application
 {
+    internal const string DisplayName = "Neon Task Bar";
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -73,7 +75,7 @@ public sealed partial class App : Application
                 var close = new Button { Content = "OK" };
                 var error = new Window
                 {
-                    Title = "TaskbarLed",
+                    Title = DisplayName,
                     Width = 320,
                     Height = 115,
                     Topmost = true,
@@ -102,6 +104,8 @@ public sealed partial class App : Application
 
         var menu = new NativeMenu();
         var panelMenu = new ContextMenu();
+        panelMenu.Items.Add(new MenuItem { Header = DisplayName, IsEnabled = false });
+        panelMenu.Items.Add(new Separator());
         panel.ContextMenu = panelMenu;
         var nativeThemes = new NativeMenu();
         var contextThemes = new MenuItem { Header = pt ? "Tema" : "Theme" };
@@ -155,10 +159,8 @@ public sealed partial class App : Application
             toggle.IsChecked = panel.KeepVisible;
         };
         menu.Items.Add(toggle);
-        var quit = new NativeMenuItem(pt ? "Encerrar TaskbarLed" : "Quit TaskbarLed");
-        quit.Click += (_, _) => desktop.Shutdown();
-        menu.Items.Add(quit);
-        var tray = new TrayIcon { ToolTipText = "TaskbarLed", Icon = CreateTrayIcon(), Menu = menu, IsVisible = true };
+        AddQuitItems(menu, panelMenu, pt, () => desktop.Shutdown());
+        var tray = new TrayIcon { ToolTipText = DisplayName, Icon = CreateTrayIcon(), Menu = menu, IsVisible = true };
         TrayIcon.SetIcons(this, [tray]);
         desktop.Exit += (_, _) =>
         {
@@ -171,6 +173,23 @@ public sealed partial class App : Application
                 instance.Dispose();
             }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         };
+    }
+
+    internal static void AddQuitItems(NativeMenu menu, ContextMenu panelMenu, bool portuguese, Action shutdown)
+    {
+        var label = portuguese ? "Encerrar" : "Quit";
+        void ScheduleShutdown() => global::Avalonia.Threading.Dispatcher.UIThread.Post(shutdown,
+            global::Avalonia.Threading.DispatcherPriority.Background);
+
+        menu.Items.Add(new NativeMenuItemSeparator());
+        var native = new NativeMenuItem(label);
+        native.Click += (_, _) => ScheduleShutdown();
+        menu.Items.Add(native);
+
+        panelMenu.Items.Add(new Separator());
+        var context = new MenuItem { Header = label };
+        context.Click += (_, _) => ScheduleShutdown();
+        panelMenu.Items.Add(context);
     }
 
     private static WindowIcon CreateTrayIcon()

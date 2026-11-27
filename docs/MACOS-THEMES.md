@@ -1,40 +1,40 @@
-# Temas do TaskbarLed no macOS
+# Temas do Neon Task Bar no macOS
 
-Capturas do painel renderizadas pelo TaskbarLed com duas sessões e quatro subagentes. Escolha um tema no menu **Tema** da barra.
+Capturas do painel renderizadas pelo Neon Task Bar com duas sessões e quatro subagentes. Escolha um tema no menu **Tema** da barra.
 
 [Instalação no Mac](MACOS.md) · [Voltar ao README](../README.pt-BR.md)
 
 | Mapa de Linhas | Índice Editorial |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Mapa de Linhas](images/macos-themes/LineMap.png) | ![Painel do TaskbarLed com o tema Índice Editorial](images/macos-themes/EditorialIndex.png) |
+| ![Painel do Neon Task Bar com o tema Mapa de Linhas](images/macos-themes/LineMap.png) | ![Painel do Neon Task Bar com o tema Índice Editorial](images/macos-themes/EditorialIndex.png) |
 
 | Janela Cobalto | Fósforo Violeta |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Janela Cobalto](images/macos-themes/CobaltWindow.png) | ![Painel do TaskbarLed com o tema Fósforo Violeta](images/macos-themes/VioletPhosphor.png) |
+| ![Painel do Neon Task Bar com o tema Janela Cobalto](images/macos-themes/CobaltWindow.png) | ![Painel do Neon Task Bar com o tema Fósforo Violeta](images/macos-themes/VioletPhosphor.png) |
 
 | LCD Oliva | Lista Clara |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema LCD Oliva](images/macos-themes/OliveLcd.png) | ![Painel do TaskbarLed com o tema Lista Clara](images/macos-themes/ClearList.png) |
+| ![Painel do Neon Task Bar com o tema LCD Oliva](images/macos-themes/OliveLcd.png) | ![Painel do Neon Task Bar com o tema Lista Clara](images/macos-themes/ClearList.png) |
 
 | Âmbar em árvore | Carvão compacto |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Âmbar em árvore](images/macos-themes/AmberTree.png) | ![Painel do TaskbarLed com o tema Carvão compacto](images/macos-themes/CompactCharcoal.png) |
+| ![Painel do Neon Task Bar com o tema Âmbar em árvore](images/macos-themes/AmberTree.png) | ![Painel do Neon Task Bar com o tema Carvão compacto](images/macos-themes/CompactCharcoal.png) |
 
-| Âmbar com régua | Claude Code |
+| Âmbar com régua | Neon Task Bar |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Âmbar com régua](images/macos-themes/AmberRail.png) | ![Painel do TaskbarLed com o tema Claude Code](images/macos-themes/ClaudeCode.png) |
+| ![Painel do Neon Task Bar com o tema Âmbar com régua](images/macos-themes/AmberRail.png) | ![Painel do Neon Task Bar com o tema Neon Task Bar](images/macos-themes/ClaudeCode.png) |
 
 | Modern Terminal | Matrix |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Modern Terminal](images/macos-themes/ModernTerminal.png) | ![Painel do TaskbarLed com o tema Matrix](images/macos-themes/Matrix.png) |
+| ![Painel do Neon Task Bar com o tema Modern Terminal](images/macos-themes/ModernTerminal.png) | ![Painel do Neon Task Bar com o tema Matrix](images/macos-themes/Matrix.png) |
 
 | Mono | Minimal |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Mono](images/macos-themes/Mono.png) | ![Painel do TaskbarLed com o tema Minimal](images/macos-themes/Minimal.png) |
+| ![Painel do Neon Task Bar com o tema Mono](images/macos-themes/Mono.png) | ![Painel do Neon Task Bar com o tema Minimal](images/macos-themes/Minimal.png) |
 
 | Glass | Paper |
 | --- | --- |
-| ![Painel do TaskbarLed com o tema Glass](images/macos-themes/Glass.png) | ![Painel do TaskbarLed com o tema Paper](images/macos-themes/Paper.png) |
+| ![Painel do Neon Task Bar com o tema Glass](images/macos-themes/Glass.png) | ![Painel do Neon Task Bar com o tema Paper](images/macos-themes/Paper.png) |
 
 ## Atualizar as capturas
 

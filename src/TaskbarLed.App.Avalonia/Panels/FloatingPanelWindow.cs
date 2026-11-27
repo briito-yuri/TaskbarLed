@@ -55,7 +55,7 @@ internal sealed class FloatingPanelWindow : Window
         _pt = portuguese;
         _preferences = new PanelPreferences();
 
-        Title = "TaskbarLed";
+        Title = App.DisplayName;
         WindowDecorations = global::Avalonia.Controls.WindowDecorations.None;
         CanResize = false;
         Topmost = true;

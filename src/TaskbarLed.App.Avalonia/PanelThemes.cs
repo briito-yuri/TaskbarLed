@@ -46,7 +46,7 @@ internal static class PanelThemes
 
     public static IReadOnlyList<Theme> All { get; } =
     [
-        new("ClaudeCode", "Claude Code"),
+        new("ClaudeCode", App.DisplayName),
         new("ModernTerminal", "Modern Terminal"),
         new("Matrix", "Matrix", true),
         new("Mono", "Mono", true),

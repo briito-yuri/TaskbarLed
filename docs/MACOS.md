@@ -1,10 +1,10 @@
-# TaskbarLed on macOS
+# Neon Task Bar on macOS
 
 The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
 ## Install
 
-[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.0/TaskbarLed-osx-arm64.zip). Unzip it, move `TaskbarLed.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip). Unzip it, move `Neon Task Bar.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
 
 The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
 
@@ -16,13 +16,15 @@ From the repository root, with the .NET SDK from `global.json` and Apple's comma
 src/TaskbarLed.App.Avalonia/build-macos.sh
 ```
 
-The script produces `artifacts/TaskbarLed-osx-arm64/TaskbarLed.app` and `TaskbarLed-osx-arm64.zip` in the same directory. Move the app to its permanent location before registering hooks.
+The script produces `artifacts/TaskbarLed-osx-arm64/Neon Task Bar.app` and `TaskbarLed-osx-arm64.zip` in the same directory. Move the app to its permanent location before registering hooks.
 
 ```sh
-app="$PWD/artifacts/TaskbarLed-osx-arm64/TaskbarLed.app"
+app="$PWD/artifacts/TaskbarLed-osx-arm64/Neon Task Bar.app"
 "$app/Contents/MacOS/TaskbarLed" --install-hooks
 open "$app"
 ```
+
+If you are replacing an earlier Mac build, quit the old app first. Run the hook installer again after moving the new app so Claude Code uses the new path.
 
 The installer merges hooks into the Claude Code user settings and saves a backup. Restart existing Claude Code sessions to load the hooks. Claude Code in a terminal, IDE or Claude Desktop sends the same events when it loads those settings. For a custom configuration directory, pass `CLAUDE_CONFIG_DIR` when installing. Run `--uninstall-hooks` with the same executable to disconnect.
 
@@ -30,9 +32,9 @@ By default, the panel floats above the Dock on the primary display. It stays vis
 
 ## Move, resize and change the look
 
-Right-click the panel or click the TaskbarLed menu bar icon. **Edit position and size** opens a preview you can drag to another spot. Drag the grip on the right edge to change the width. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
+Right-click the panel or click the Neon Task Bar menu bar icon. Select **Quit** (**Encerrar** in Portuguese) to close the app. **Edit position and size** opens a preview you can drag to another spot. Drag the grip on the right edge to change the width. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
 
-Use **Theme** to switch live between Claude Code, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The five entries marked with • are Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. The default is Claude Code. [See the gallery of all 16 macOS themes](MACOS-THEMES.md). TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
+Use **Theme** to switch live between Neon Task Bar, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The five entries marked with • are Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. The default is Neon Task Bar. [See the gallery of all 16 macOS themes](MACOS-THEMES.md). TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
 
 ## Automatic local detection
 

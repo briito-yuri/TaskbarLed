@@ -11,9 +11,9 @@
 
 **English** · [Português](README.pt-BR.md)
 
-[![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.0/TaskbarLed-osx-arm64.zip)
+[![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
 
-Apple Silicon (M1 or newer), macOS 14+. Unzip, move TaskbarLed.app to Applications, and open it. The runtime is included.
+Apple Silicon (M1 or newer), macOS 14+. Unzip, move Neon Task Bar.app to Applications, and open it. The runtime is included.
 
 <img src="docs/images/state-running-en.png" alt="TaskbarLed on the Windows 11 taskbar, showing three Claude Code sessions" width="100%">
 
@@ -25,7 +25,7 @@ Apple Silicon Macs (M1 or newer) can run the floating panel on macOS 14+, with a
 
 You send Claude a long prompt, switch to another app, and then keep coming back to check whether it has finished. TaskbarLed puts the answer in the empty left side of the taskbar. It **appears only while Claude is out of sight**, shows every running conversation, and blinks when one of them is done or needs you.
 
-**Install on Mac.** Download the ZIP above, extract it, move TaskbarLed.app to Applications, and open it. The .NET runtime is bundled. The panel shows active agents and their subagents, including Antigravity workers when their parent is idle. See the [macOS guide](docs/MACOS.md) for first launch, hooks, supported sources and publishing a Mac build.
+**Install on Mac.** Download the ZIP above, extract it, move Neon Task Bar.app to Applications, and open it. The .NET runtime is bundled. The panel shows active agents and their subagents, including Antigravity workers when their parent is idle. See the [macOS guide](docs/MACOS.md) for first launch, hooks, supported sources and publishing a Mac build.
 
 [See screenshots of all 16 macOS themes](docs/MACOS-THEMES.md).
 
