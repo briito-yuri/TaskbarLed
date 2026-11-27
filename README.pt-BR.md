@@ -18,7 +18,7 @@
 
 [Como instalar](INSTALAR-MACOS.md)
 
-Se o macOS avisar que a Apple não pode verificar o instalador, tente abri-lo primeiro. Após conferir a origem no GitHub, vá a **Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim**. [Instruções da Apple](https://support.apple.com/pt-br/102445)
+A prévia não tem assinatura Developer ID nem notarização. Se o macOS disser que a Apple não pôde verificar o instalador, confira o SHA-256 do arquivo. Depois de tentar abri-lo, vá a **Ajustes do Sistema → Privacidade e Segurança → Abrir Mesmo Assim**. O projeto é de código aberto. Você pode consultar o código da revisão e compilar sua própria cópia. [Hashes e código da prévia](INSTALAR-MACOS.md#conferir-o-download) · [Orientação da Apple](https://support.apple.com/pt-br/102445)
 
 [![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
 

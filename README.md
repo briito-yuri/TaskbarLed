@@ -18,7 +18,7 @@
 
 [Install instructions](docs/MACOS.md#build-and-connect-claude-code)
 
-If macOS says Apple cannot check the preview for malicious software, try opening the package first. After verifying it came from the official GitHub release, use **System Settings → Privacy & Security → Open Anyway**. [Apple instructions](https://support.apple.com/en-us/102445)
+The preview is unsigned and unnotarized. If macOS says Apple cannot verify the installer, check the file’s SHA-256. After trying to open the package, go to **System Settings → Privacy & Security → Open Anyway**. The project is open source, and you can inspect this revision and build your own copy. [Preview hashes and source](INSTALAR-MACOS.md#conferir-o-download) · [Apple instructions](https://support.apple.com/en-us/102445)
 
 [![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
 
