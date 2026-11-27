@@ -13,8 +13,8 @@
 
 **macOS installer preview (.pkg)**
 
-[![Apple Silicon installer](https://img.shields.io/badge/Apple%20Silicon-.pkg-286C63?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-arm64.pkg)
-[![Intel installer](https://img.shields.io/badge/Intel-.pkg-415687?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-x64.pkg)
+[![Apple Silicon installer](https://img.shields.io/badge/Apple%20Silicon-.pkg-286C63?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-arm64.pkg)
+[![Intel installer](https://img.shields.io/badge/Intel-.pkg-415687?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-x64.pkg)
 
 [Install instructions](docs/MACOS.md#build-and-connect-claude-code)
 

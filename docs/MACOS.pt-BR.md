@@ -19,9 +19,9 @@ Os builds da branch também geram um instalador `.pkg`. Abra **TaskbarLed-osx-ar
 
 Para ativar o Claude Code sem usar o Terminal, abra o menu do Neon e clique em **Ativar integração com Claude Code…**. Reinicie as sessões do Claude Code para que carreguem a integração. A opção **Desativar integração com Claude Code…** remove os hooks instalados pelo Neon.
 
-A prévia dos instaladores foi gerada a partir do commit `c951755` da branch `macos-port`. Estes pacotes de desenvolvimento ainda precisam de assinatura Developer ID Installer e notarização para distribuição pública sem a aprovação adicional do macOS.
+A prévia dos instaladores foi gerada a partir do commit `9fb170f` da branch `macos-port`. Estes pacotes de desenvolvimento ainda precisam de assinatura Developer ID Installer e notarização para distribuição pública sem a aprovação adicional do macOS.
 
-[Baixar .pkg para Macs com chip M](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-arm64.pkg) · [Baixar .pkg para Macs Intel](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-x64.pkg)
+[Baixar .pkg para Macs com chip M](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-arm64.pkg) · [Baixar .pkg para Macs Intel](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-x64.pkg)
 
 ## Mac Intel ou versão atual da branch
 
