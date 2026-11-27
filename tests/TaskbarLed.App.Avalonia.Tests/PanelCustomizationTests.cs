@@ -30,7 +30,13 @@ public class PanelCustomizationTests
         }
 
         Assert.Equal(17, backgrounds.Count);
-        Assert.Equal(5, PanelThemes.All.Count(theme => theme.MenuLabel.StartsWith("• ", StringComparison.Ordinal)));
+        Assert.All(PanelThemes.All, theme =>
+        {
+            var option = App.CreateThemeMenuItem(theme);
+            Assert.Equal(theme.Name, option.Header);
+            Assert.DoesNotContain("•", theme.Name, StringComparison.Ordinal);
+            Assert.NotNull(option.HeaderTemplate);
+        });
         Assert.Equal("AmberTree", PanelThemes.Apply(app, model, "AmberTree").Id);
         Assert.Equal(Color.Parse("#48483B"), Assert.IsType<SolidColorBrush>(app.Resources["Led.SessionTreeBrush"]).Color);
         Assert.Equal("AmberRail", PanelThemes.Apply(app, model, "AmberRail").Id);

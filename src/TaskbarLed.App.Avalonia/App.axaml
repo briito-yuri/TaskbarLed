@@ -18,6 +18,11 @@
       <Setter Property="CornerRadius" Value="{DynamicResource Led.PanelRadius}" />
       <Setter Property="FontFamily" Value="{DynamicResource Led.FontFamily}" />
     </Style>
+    <Style Selector="MenuItem.neon-theme-option">
+      <Setter Property="FontFamily" Value="Helvetica Neue" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="CornerRadius" Value="5" />
+    </Style>
     <Style Selector="MenuItem.neon-menu-heading">
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="FontSize" Value="11" />

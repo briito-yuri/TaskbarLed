@@ -8,10 +8,7 @@ namespace TaskbarLed.App.Avalonia;
 
 internal static class PanelThemes
 {
-    internal sealed record Theme(string Id, string Name, bool Uppercase = false, bool IsNew = false)
-    {
-        public string MenuLabel => IsNew ? $"• {Name}" : Name;
-    }
+    internal sealed record Theme(string Id, string Name, bool Uppercase = false);
 
     private sealed record Palette(string Background, string Border, string Foreground, string Dim,
         string Running, string Waiting, string Done, string Title, string Header, string Rail, string Tree,
@@ -65,11 +62,11 @@ internal static class PanelThemes
         new("CompactCharcoal", "Carvão compacto"),
         new("AmberRail", "Âmbar com régua"),
         new("ClearList", "Lista Clara"),
-        new("EditorialIndex", "Índice Editorial", IsNew: true),
-        new("CobaltWindow", "Janela Cobalto", IsNew: true),
-        new("VioletPhosphor", "Fósforo Violeta", IsNew: true),
-        new("LineMap", "Mapa de Linhas", IsNew: true),
-        new("OliveLcd", "LCD Oliva", Uppercase: true, IsNew: true),
+        new("EditorialIndex", "Índice Editorial"),
+        new("CobaltWindow", "Janela Cobalto"),
+        new("VioletPhosphor", "Fósforo Violeta"),
+        new("LineMap", "Mapa de Linhas"),
+        new("OliveLcd", "LCD Oliva", Uppercase: true),
     ];
 
     public static Theme Apply(Application app, PanelViewModel model, string themeId)
@@ -101,12 +98,9 @@ internal static class PanelThemes
             return theme;
         }
 
-        using var resource = typeof(PanelThemes).Assembly.GetManifestResourceStream($"PanelThemes.{theme.Id}.xaml")!;
-        var xml = XDocument.Load(resource);
-        var keyName = XName.Get("Key", "http://schemas.microsoft.com/winfx/2006/xaml");
-        foreach (var value in xml.Root!.Elements())
+        foreach (var value in SharedThemeResources(theme.Id))
         {
-            var key = (string?)value.Attribute(keyName);
+            var key = (string?)value.Attribute(ResourceKey);
             if (key is null)
             {
                 continue;
@@ -153,6 +147,27 @@ internal static class PanelThemes
         app.Resources["Led.PanelPadding"] = DefaultPadding;
         ApplyMenuPalette(app);
         return theme;
+    }
+
+    private static readonly XName ResourceKey = XName.Get("Key", "http://schemas.microsoft.com/winfx/2006/xaml");
+
+    private static XElement[] SharedThemeResources(string id)
+    {
+        using var resource = typeof(PanelThemes).Assembly.GetManifestResourceStream($"PanelThemes.{id}.xaml")!;
+        return [.. XDocument.Load(resource).Root!.Elements()];
+    }
+
+    internal static (Color Background, Color Text) PreviewColors(Theme theme)
+    {
+        if (MacPalettes.TryGetValue(theme.Id, out var palette))
+        {
+            return (Color.Parse(palette.Background), Color.Parse(palette.Foreground));
+        }
+
+        var resources = SharedThemeResources(theme.Id);
+        Color Read(string key) => Color.Parse(resources.First(element => (string?)element.Attribute(ResourceKey) == key)
+            .Attribute("Color")!.Value);
+        return (Read("Led.BackgroundBrush"), Read("Led.ForegroundBrush"));
     }
 
     private static void ApplyPalette(Application app, Palette colors)

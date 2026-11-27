@@ -27,7 +27,29 @@ You send Claude a long prompt, switch to another app, and then keep coming back 
 
 **Install on Mac.** Download the ZIP above, extract it, move Neon Task Bar.app to Applications, and open it. The .NET runtime is bundled. The panel shows active agents and their subagents, including Antigravity workers when their parent is idle. See the [macOS guide](docs/MACOS.md) for first launch, hooks, supported sources and publishing a Mac build.
 
-![Neon TSB Agents with the Liquid Glass theme](docs/images/macos-themes/LiquidGlass.png)
+The current macOS branch includes native Apple Silicon and Intel builds, automatic and manual sizing, theme-aware opacity, and adaptive Liquid Glass. See the macOS guide above to build it.
+
+### Themes created for macOS
+
+| Line Map | Liquid Glass |
+| --- | --- |
+| [![Line Map](docs/images/macos-themes/LineMap.png)](docs/images/macos-themes/LineMap.png) | [![Liquid Glass](docs/images/macos-themes/LiquidGlass.png)](docs/images/macos-themes/LiquidGlass.png) |
+
+| Editorial Index | Cobalt Window |
+| --- | --- |
+| [![Editorial Index](docs/images/macos-themes/EditorialIndex.png)](docs/images/macos-themes/EditorialIndex.png) | [![Cobalt Window](docs/images/macos-themes/CobaltWindow.png)](docs/images/macos-themes/CobaltWindow.png) |
+
+| Violet Phosphor | Olive LCD |
+| --- | --- |
+| [![Violet Phosphor](docs/images/macos-themes/VioletPhosphor.png)](docs/images/macos-themes/VioletPhosphor.png) | [![Olive LCD](docs/images/macos-themes/OliveLcd.png)](docs/images/macos-themes/OliveLcd.png) |
+
+| Amber Tree | Compact Charcoal |
+| --- | --- |
+| [![Amber Tree](docs/images/macos-themes/AmberTree.png)](docs/images/macos-themes/AmberTree.png) | [![Compact Charcoal](docs/images/macos-themes/CompactCharcoal.png)](docs/images/macos-themes/CompactCharcoal.png) |
+
+| Amber Ruler | Clear List |
+| --- | --- |
+| [![Amber Ruler](docs/images/macos-themes/AmberRail.png)](docs/images/macos-themes/AmberRail.png) | [![Clear List](docs/images/macos-themes/ClearList.png)](docs/images/macos-themes/ClearList.png) |
 
 [See screenshots of all 17 macOS themes](docs/MACOS-THEMES.md).
 

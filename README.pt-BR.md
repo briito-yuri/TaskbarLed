@@ -27,7 +27,29 @@ Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando
 
 **Instalação no Mac.** Baixe o ZIP acima, extraia, mova o Neon Task Bar.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
 
-![Neon TSB Agents no tema Liquid Glass](docs/images/macos-themes/LiquidGlass.png)
+A branch atual do macOS inclui builds nativos para Apple Silicon e Intel, tamanho automático e manual, controle de opacidade por tema e Liquid Glass adaptável. Veja no guia acima como compilar.
+
+### Temas criados para macOS
+
+| Mapa de Linhas | Liquid Glass |
+| --- | --- |
+| [![Mapa de Linhas](docs/images/macos-themes/LineMap.png)](docs/images/macos-themes/LineMap.png) | [![Liquid Glass](docs/images/macos-themes/LiquidGlass.png)](docs/images/macos-themes/LiquidGlass.png) |
+
+| Índice Editorial | Janela Cobalto |
+| --- | --- |
+| [![Índice Editorial](docs/images/macos-themes/EditorialIndex.png)](docs/images/macos-themes/EditorialIndex.png) | [![Janela Cobalto](docs/images/macos-themes/CobaltWindow.png)](docs/images/macos-themes/CobaltWindow.png) |
+
+| Fósforo Violeta | LCD Oliva |
+| --- | --- |
+| [![Fósforo Violeta](docs/images/macos-themes/VioletPhosphor.png)](docs/images/macos-themes/VioletPhosphor.png) | [![LCD Oliva](docs/images/macos-themes/OliveLcd.png)](docs/images/macos-themes/OliveLcd.png) |
+
+| Âmbar em árvore | Carvão compacto |
+| --- | --- |
+| [![Âmbar em árvore](docs/images/macos-themes/AmberTree.png)](docs/images/macos-themes/AmberTree.png) | [![Carvão compacto](docs/images/macos-themes/CompactCharcoal.png)](docs/images/macos-themes/CompactCharcoal.png) |
+
+| Âmbar com régua | Lista Clara |
+| --- | --- |
+| [![Âmbar com régua](docs/images/macos-themes/AmberRail.png)](docs/images/macos-themes/AmberRail.png) | [![Lista Clara](docs/images/macos-themes/ClearList.png)](docs/images/macos-themes/ClearList.png) |
 
 [Veja as capturas dos 17 temas no macOS](docs/MACOS-THEMES.md).
 

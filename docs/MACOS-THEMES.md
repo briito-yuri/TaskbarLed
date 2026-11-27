@@ -1,46 +1,56 @@
 # Temas do Neon TSB Agents no macOS
 
-Capturas do painel renderizadas pelo Neon TSB Agents com duas sessões e quatro subagentes. Escolha um tema no menu **Tema** da barra.
+Capturas dos 17 temas do painel renderizadas pelo Neon TSB Agents com duas sessões e quatro subagentes. Escolha um tema no menu **Temas** da barra.
 
 [Instalação no Mac](MACOS.md) · [Voltar ao README](../README.pt-BR.md)
 
-| Mapa de Linhas | Índice Editorial |
-| --- | --- |
-| ![Painel do Neon TSB Agents com o tema Mapa de Linhas](images/macos-themes/LineMap.png) | ![Painel do Neon TSB Agents com o tema Índice Editorial](images/macos-themes/EditorialIndex.png) |
+## Temas criados para o macOS
 
-| Janela Cobalto | Fósforo Violeta |
+| Mapa de Linhas | Liquid Glass |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema Janela Cobalto](images/macos-themes/CobaltWindow.png) | ![Painel do Neon TSB Agents com o tema Fósforo Violeta](images/macos-themes/VioletPhosphor.png) |
+| [![Mapa de Linhas](images/macos-themes/LineMap.png)](images/macos-themes/LineMap.png) | [![Liquid Glass](images/macos-themes/LiquidGlass.png)](images/macos-themes/LiquidGlass.png) |
 
-| LCD Oliva | Lista Clara |
+| Índice Editorial | Janela Cobalto |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema LCD Oliva](images/macos-themes/OliveLcd.png) | ![Painel do Neon TSB Agents com o tema Lista Clara](images/macos-themes/ClearList.png) |
+| [![Índice Editorial](images/macos-themes/EditorialIndex.png)](images/macos-themes/EditorialIndex.png) | [![Janela Cobalto](images/macos-themes/CobaltWindow.png)](images/macos-themes/CobaltWindow.png) |
+
+| Fósforo Violeta | LCD Oliva |
+| --- | --- |
+| [![Fósforo Violeta](images/macos-themes/VioletPhosphor.png)](images/macos-themes/VioletPhosphor.png) | [![LCD Oliva](images/macos-themes/OliveLcd.png)](images/macos-themes/OliveLcd.png) |
 
 | Âmbar em árvore | Carvão compacto |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema Âmbar em árvore](images/macos-themes/AmberTree.png) | ![Painel do Neon TSB Agents com o tema Carvão compacto](images/macos-themes/CompactCharcoal.png) |
+| [![Âmbar em árvore](images/macos-themes/AmberTree.png)](images/macos-themes/AmberTree.png) | [![Carvão compacto](images/macos-themes/CompactCharcoal.png)](images/macos-themes/CompactCharcoal.png) |
 
-| Âmbar com régua | Neon TSB Agents |
+| Âmbar com régua | Lista Clara |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema Âmbar com régua](images/macos-themes/AmberRail.png) | ![Painel do Neon TSB Agents com o tema Neon TSB Agents](images/macos-themes/ClaudeCode.png) |
+| [![Âmbar com régua](images/macos-themes/AmberRail.png)](images/macos-themes/AmberRail.png) | [![Lista Clara](images/macos-themes/ClearList.png)](images/macos-themes/ClearList.png) |
 
-| Modern Terminal | Matrix |
+A captura da galeria mostra o gradiente do painel. No macOS 26, o vidro nativo do AppKit deixa passar a cor do que está atrás da janela. A linha concluída recebe um pulso neutro e desaparece após dez segundos.
+
+### Editor de posição, tamanho e opacidade
+
+![Editor do Neon TSB Agents no macOS 26 com Liquid Glass, modo Manual e opacidade em 81%](images/macos-themes/LiquidGlassEditor.png)
+
+Captura do app empacotado no macOS 26.5.2. A linha concluída usa dados de teste.
+
+## Outros temas incluídos
+
+| Neon TSB Agents | Modern Terminal |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema Modern Terminal](images/macos-themes/ModernTerminal.png) | ![Painel do Neon TSB Agents com o tema Matrix](images/macos-themes/Matrix.png) |
+| [![Neon TSB Agents](images/macos-themes/ClaudeCode.png)](images/macos-themes/ClaudeCode.png) | [![Modern Terminal](images/macos-themes/ModernTerminal.png)](images/macos-themes/ModernTerminal.png) |
 
-| Mono | Minimal |
+| Matrix | Mono |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema Mono](images/macos-themes/Mono.png) | ![Painel do Neon TSB Agents com o tema Minimal](images/macos-themes/Minimal.png) |
+| [![Matrix](images/macos-themes/Matrix.png)](images/macos-themes/Matrix.png) | [![Mono](images/macos-themes/Mono.png)](images/macos-themes/Mono.png) |
 
-| Glass | Paper |
+| Minimal | Glass |
 | --- | --- |
-| ![Painel do Neon TSB Agents com o tema Glass](images/macos-themes/Glass.png) | ![Painel do Neon TSB Agents com o tema Paper](images/macos-themes/Paper.png) |
+| [![Minimal](images/macos-themes/Minimal.png)](images/macos-themes/Minimal.png) | [![Glass](images/macos-themes/Glass.png)](images/macos-themes/Glass.png) |
 
-| Liquid Glass |
+| Paper |
 | --- |
-| ![Painel do Neon TSB Agents com o tema Liquid Glass](images/macos-themes/LiquidGlass.png) |
-
-A captura de Liquid Glass mostra o gradiente da interface. No macOS 26, o tema acrescenta o material nativo do AppKit sobre o conteúdo atrás da janela.
+| [![Paper](images/macos-themes/Paper.png)](images/macos-themes/Paper.png) |
 
 ## Atualizar as capturas
 

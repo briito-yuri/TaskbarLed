@@ -109,12 +109,12 @@ public sealed partial class App : Application
         panelMenu.Items.Add(new Separator());
         panel.ContextMenu = panelMenu;
         var nativeThemes = new NativeMenu();
-        var contextThemes = new MenuItem { Header = pt ? "Tema" : "Theme" };
+        var contextThemes = new MenuItem { Header = pt ? "Temas" : "Themes" };
         var checks = new List<(PanelThemes.Theme Theme, NativeMenuItem Native, MenuItem Context)>();
         foreach (var theme in PanelThemes.All)
         {
-            var native = new NativeMenuItem(theme.MenuLabel) { ToggleType = MenuItemToggleType.CheckBox };
-            var context = new MenuItem { Header = theme.MenuLabel, ToggleType = MenuItemToggleType.CheckBox };
+            var native = new NativeMenuItem(theme.Name) { ToggleType = MenuItemToggleType.CheckBox };
+            var context = CreateThemeMenuItem(theme);
             native.Click += (_, _) => SelectTheme(theme);
             context.Click += (_, _) => SelectTheme(theme);
             nativeThemes.Items.Add(native);
@@ -149,7 +149,7 @@ public sealed partial class App : Application
 
         AddAction(pt ? "Editar posição e tamanho…" : "Edit position and size…", panel.BeginEdit);
         AddAction(pt ? "Voltar para acima do Dock" : "Reset position above Dock", panel.ResetPosition);
-        menu.Items.Add(new NativeMenuItem(pt ? "Tema" : "Theme") { Menu = nativeThemes });
+        menu.Items.Add(new NativeMenuItem(pt ? "Temas" : "Themes") { Menu = nativeThemes });
         panelMenu.Items.Add(contextThemes);
         UpdateChecks();
 
@@ -173,6 +173,40 @@ public sealed partial class App : Application
                 cancellation.Dispose();
                 instance.Dispose();
             }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        };
+    }
+
+    internal static MenuItem CreateThemeMenuItem(PanelThemes.Theme theme)
+    {
+        var (background, foreground) = PanelThemes.PreviewColors(theme);
+        return new MenuItem
+        {
+            Header = theme.Name,
+            ToggleType = MenuItemToggleType.CheckBox,
+            Classes = { "neon-theme-option" },
+            HeaderTemplate = new global::Avalonia.Controls.Templates.FuncDataTemplate<string>((name, _) =>
+            {
+                var swatch = new Border
+                {
+                    Width = 24, Height = 15, CornerRadius = new CornerRadius(4),
+                    VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+                    Background = new SolidColorBrush(Color.FromRgb(background.R, background.G, background.B)),
+                    BorderBrush = new SolidColorBrush(Color.FromArgb(105, foreground.R, foreground.G, foreground.B)),
+                    BorderThickness = new Thickness(1),
+                    Child = new Border
+                    {
+                        Width = 11, Height = 2, CornerRadius = new CornerRadius(1),
+                        HorizontalAlignment = global::Avalonia.Layout.HorizontalAlignment.Center,
+                        VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center,
+                        Background = new SolidColorBrush(foreground),
+                    },
+                };
+                return new StackPanel
+                {
+                    Orientation = global::Avalonia.Layout.Orientation.Horizontal, Spacing = 9,
+                    Children = { swatch, new TextBlock { Text = name, VerticalAlignment = global::Avalonia.Layout.VerticalAlignment.Center } },
+                };
+            }),
         };
     }
 

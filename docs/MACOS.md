@@ -1,12 +1,12 @@
 # Neon TSB Agents on macOS
 
-The fork's macOS build can be built for Apple Silicon (M1 and newer) or Intel in two separate ZIPs. Both require macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
+Neon TSB Agents can be built for Apple Silicon (M1 and newer) or Intel in two separate ZIPs. Both require macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
 ## Install
 
 [Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip). Unzip it, move `Neon Task Bar.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
 
-The download above is the latest public build. The themed context menu and alphabetic session routes are in the 0.5.2 draft.
+The download above is the latest public release. To try the branch’s current build with Liquid Glass and Intel support, follow the build instructions below. The 0.5.2 release is a draft.
 
 The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
 
@@ -31,13 +31,13 @@ If you are replacing an earlier Mac build, quit the old app first. Run the hook 
 
 The installer merges hooks into the Claude Code user settings and saves a backup. Restart existing Claude Code sessions to load the hooks. Claude Code in a terminal, IDE or Claude Desktop sends the same events when it loads those settings. For a custom configuration directory, pass `CLAUDE_CONFIG_DIR` when installing. Run `--uninstall-hooks` with the same executable to disconnect.
 
-By default, the panel floats above the Dock on the primary display. It stays visible across foreground app changes while a session is active. Amber means input is needed, green means a turn has finished, and running sessions show their activity and time. Scroll to rotate the feed. Click the feed or a completed tab to acknowledge its result. The menu bar icon can keep the panel visible when idle and quit the app.
+By default, the panel floats above the Dock on the primary display. It stays visible across foreground app changes while a session is active. Amber means input is needed. Completed turns show a ten-second countdown, with a neutral pulse in Liquid Glass and a soft green highlight in the other themes. Running sessions show their activity and time. Scroll to rotate the feed. Click the feed or a completed tab to acknowledge its result. The menu bar icon can keep the panel visible when idle and quit the app.
 
 ## Move, resize and change the look
 
 Right-click the panel or click the Neon TSB Agents menu bar icon. The right-click menu follows the panel theme and highlights **Quit** (**Encerrar** in Portuguese) with a power icon. **Edit position and size** opens a preview you can drag to another spot. Choose **Automatic** to size the panel to the session names and visible rows, or **Manual** to drag the right edge, bottom edge, or bottom-right corner. **Opacity** adjusts the theme’s background and frame from 70% to 100% while leaving text and statuses at full strength. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
 
-Use **Theme** to switch live between Neon TSB Agents, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The five entries marked with • are Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. **Liquid Glass** uses the system glass effect on macOS 26 and a translucent gradient on macOS 14 and 15. The default is Neon TSB Agents. [See the macOS theme gallery](MACOS-THEMES.md). TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
+Use **Themes** to switch live between Neon TSB Agents, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. The context menu shows a color sample beside each theme. A checkmark identifies the current theme. Additional options include Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. **Liquid Glass** uses the system glass effect on macOS 26 and a translucent gradient on macOS 14 and 15. Liquid Glass takes its tint from the content behind the window. The default theme is Neon TSB Agents. [See the macOS theme gallery](MACOS-THEMES.md). TaskbarLed stores the selected theme, position, sizing mode, dimensions and opacity in `~/Library/Application Support/TaskbarLed/panel.json`.
 
 ## Automatic local detection
 
