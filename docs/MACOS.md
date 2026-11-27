@@ -90,6 +90,14 @@ The Mac build uses a floating panel. Custom JSON themes, theme-dependent sound s
 
 See also [Windows documentation](../README.md).
 
+## Uninstall
+
+1. If you enabled Claude Code integration, select **Disable Claude Code integration…** in the Neon menu and restart your Claude Code sessions.
+2. Select **Quit** from the Neon menu.
+3. In Finder, open **Applications** and move **Neon TSB Agents.app** to the Trash. macOS may ask for administrator authorization if you used the `.pkg` installer.
+
+Preferences remain in `~/Library/Application Support/TaskbarLed`. The public 0.5.1 build appears as **Neon Task Bar.app**.
+
 ## Publish a Mac release
 
 Run the Mac test projects and the build script on an Apple Silicon Mac. Create a GitHub release for a new `macos-vX.Y.Z` tag on the tested commit and attach the tested architecture-specific ZIPs. Update the download links in both READMEs and this guide to the new tag. Verify the public link downloads the same ZIP as the local build. For distribution with Gatekeeper verification, sign with Developer ID and notarize before uploading.

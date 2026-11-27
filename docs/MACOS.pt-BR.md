@@ -51,3 +51,11 @@ app="/Applications/Neon Task Bar.app"
 Reinicie as sessões abertas do Claude Code para carregar a configuração. Se mover ou renomear o app, execute o comando de novo com o caminho atualizado. Para desativar a integração, use `--uninstall-hooks` no mesmo executável.
 
 Na versão atual da branch, clique com o botão direito no painel para abrir **Temas**, **Editar posição e tamanho…** ou **Encerrar**. [Galeria de temas](MACOS-THEMES.md) · [Guia técnico em inglês](MACOS.md)
+
+## Desinstalar
+
+1. Se você ativou a integração com o Claude Code, abra o menu do Neon e selecione **Desativar integração com Claude Code…**. Depois reinicie as sessões do Claude Code.
+2. Escolha **Encerrar** no menu do Neon.
+3. No Finder, abra **Aplicativos** e mova **Neon TSB Agents.app** para o Lixo. O macOS pode pedir a autorização de um administrador se o app foi instalado pelo `.pkg`.
+
+As preferências ficam em `~/Library/Application Support/TaskbarLed` e são preservadas. A versão pública 0.5.1 aparece como **Neon Task Bar.app**.
