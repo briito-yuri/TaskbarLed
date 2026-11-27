@@ -17,8 +17,8 @@ public class CodexSessionsTests
             {"type":"event_msg","payload":{"type":"task_complete"}}
             """;
         var now = DateTimeOffset.UtcNow;
-        var running = CodexSessions.Parse(header, start, now, now);
-        var completed = CodexSessions.Parse(header, start + "\n" + end, now, now);
+        var running = CodexSessions.Parse(header, start, now);
+        var completed = CodexSessions.Parse(header, start + "\n" + end, now);
         Assert.NotNull(running);
         Assert.Equal("codex:aa97e19d-7a2f-4ded-a816-1270782ea101", running.ParentId);
         Assert.Equal("Ada", running.DisplayName);

@@ -26,8 +26,7 @@ internal sealed class CodexSessions
                 _cache.Remove(old);
             }
 
-            return [.. files.Select(file => Read(file, now)).OfType<Session>()
-                .Where(session => session.Status != SessionStatus.Completed || session.LastUpdated >= now.AddMinutes(-30))
+            return [.. files.Select(Read).OfType<Session>()
                 .DistinctBy(session => session.Id)];
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -36,7 +35,7 @@ internal sealed class CodexSessions
         }
     }
 
-    private Session? Read(FileInfo file, DateTimeOffset now)
+    private Session? Read(FileInfo file)
     {
         var modified = file.LastWriteTimeUtc;
         var length = file.Length;
@@ -63,7 +62,7 @@ internal sealed class CodexSessions
 
             var tail = new char[192 * 1024];
             var tailCount = reader.ReadBlock(tail);
-            var session = Parse(first, new string(tail, 0, tailCount), modified, now);
+            var session = Parse(first, new string(tail, 0, tailCount), modified);
             _cache[file.FullName] = (modified, length, session);
             return session;
         }
@@ -73,7 +72,7 @@ internal sealed class CodexSessions
         }
     }
 
-    internal static Session? Parse(string header, string tail, DateTimeOffset modified, DateTimeOffset now)
+    internal static Session? Parse(string header, string tail, DateTimeOffset modified)
     {
         using var meta = JsonDocument.Parse(header);
         if (Text(meta.RootElement, "type") != "session_meta" || !Guid.TryParse(Text(Field(meta.RootElement, "payload"), "id"), out var id))
@@ -109,7 +108,7 @@ internal sealed class CodexSessions
                 {
                     "task_started" or "turn_started" => SessionStatus.Running,
                     "task_complete" or "turn_complete" => SessionStatus.Completed,
-                    "turn_aborted" => SessionStatus.Idle,
+                    "turn_aborted" or "shutdown_complete" => SessionStatus.Idle,
                     _ => (SessionStatus?)null,
                 };
                 if (next is null)
@@ -131,7 +130,7 @@ internal sealed class CodexSessions
             }
         }
 
-        if (state is null or SessionStatus.Idle || (state == SessionStatus.Completed && updated < now.AddMinutes(-30)))
+        if (state is null or SessionStatus.Idle)
         {
             return null;
         }
@@ -139,6 +138,7 @@ internal sealed class CodexSessions
         return Session.Create($"codex:{id:D}", "codex", updated) with
         {
             Status = state.Value,
+            ConversationId = id,
             Title = child ? name ?? $"Codex {id.ToString("N")[..8]}" : "Codex",
             ProjectName = project,
             ParentId = child ? $"codex:{parent:D}" : null,

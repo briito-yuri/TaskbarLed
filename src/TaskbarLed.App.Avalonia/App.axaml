@@ -19,6 +19,12 @@
     <SolidColorBrush x:Key="Led.AttentionBrush" Color="#FFB02E" />
     <SolidColorBrush x:Key="Led.DoneBrush" Color="#33FF66" />
     <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#0B2A0E" />
+    <SolidColorBrush x:Key="Led.SessionTitleBrush" Color="#33FF66" />
+    <SolidColorBrush x:Key="Led.SessionRunningBrush" Color="#33FF66" />
+    <SolidColorBrush x:Key="Led.SessionHeaderBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="Led.SessionRailBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="Led.SessionTreeBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="Led.SessionChildBrush" Color="Transparent" />
     <SolidColorBrush x:Key="Led.EditBrush" Color="#D97757" />
     <SolidColorBrush x:Key="Led.AccentBrush" Color="Transparent" />
     <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />

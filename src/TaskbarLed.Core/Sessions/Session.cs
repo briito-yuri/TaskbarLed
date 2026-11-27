@@ -30,6 +30,10 @@ public sealed record Session(
 
     public string? EngineName { get; init; }
 
+    public Guid? ConversationId { get; init; }
+
+    public int? ProcessId { get; init; }
+
     /// <summary>Best label to identify the session on a tiny display.</summary>
     public string DisplayName =>
         !string.IsNullOrWhiteSpace(Title) ? Title

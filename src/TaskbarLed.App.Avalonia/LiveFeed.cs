@@ -27,13 +27,14 @@ internal sealed class LiveFeed(CultureInfo culture)
 
     internal PanelFrame Compose(DateTimeOffset now, IReadOnlyList<Session> antigravity)
     {
-        var external = Volatile.Read(ref _octo).Concat(antigravity).Concat(Volatile.Read(ref _codex));
+        var external = MergeExternal(Volatile.Read(ref _octo), antigravity, Volatile.Read(ref _codex));
         var sessions = _store.Snapshot().Concat(external.Where(s =>
-            s.Status != SessionStatus.Completed || !_seenExternal.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))
+            s.Status != SessionStatus.Completed ||
+            (s.LastUpdated >= now.AddMinutes(-30) &&
+             (!_seenExternal.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))))
             .ToArray();
         var detected = Volatile.Read(ref _detected);
-        var (text, ids) = SessionLines(sessions);
-        var frame = _composer.Compose(sessions, now) with { ActiveSubagents = text, SessionLineIds = ids };
+        var frame = _composer.Compose(sessions, now) with { SessionRows = SessionRows(sessions) };
         if (detected.Length == 0)
         {
             return frame;
@@ -53,13 +54,44 @@ internal sealed class LiveFeed(CultureInfo culture)
         };
     }
 
-    private (string Text, IReadOnlyList<string?> Ids) SessionLines(Session[] sessions)
+    internal static IEnumerable<Session> MergeExternal(IReadOnlyList<Session> octo, IReadOnlyList<Session> antigravity,
+        IReadOnlyList<Session> codex)
+    {
+        var namedAntigravity = antigravity.Where(s => s.ConversationId.HasValue).ToDictionary(s => s.ConversationId!.Value);
+        var codexById = codex.Where(s => s.ConversationId.HasValue).ToDictionary(s => s.ConversationId!.Value);
+        var duplicates = new HashSet<Guid>();
+        foreach (var session in octo)
+        {
+            if (session.ConversationId is { } id && session.EngineName == "Antigravity" && namedAntigravity.ContainsKey(id))
+            {
+                continue;
+            }
+
+            if (session.ConversationId is { } codexId && session.EngineName == "Codex" && codexById.TryGetValue(codexId, out var native))
+            {
+                if (duplicates.Add(codexId))
+                {
+                    yield return native with { Title = session.Title, EngineName = session.EngineName };
+                }
+            }
+            else
+            {
+                yield return session;
+            }
+        }
+
+        foreach (var session in antigravity.Concat(codex).Where(s => !s.ConversationId.HasValue || !duplicates.Contains(s.ConversationId.Value)))
+        {
+            yield return session;
+        }
+    }
+
+    private List<SessionDisplayRow> SessionRows(Session[] sessions)
     {
         var known = sessions.DistinctBy(s => s.Id).ToDictionary(s => s.Id, StringComparer.Ordinal);
         var groups = sessions.Where(s => s.Status != SessionStatus.Idle)
             .GroupBy(s => s.ParentId ?? s.Id, StringComparer.Ordinal);
-        var lines = new List<string>();
-        var ids = new List<string?>();
+        var rows = new List<SessionDisplayRow>();
         foreach (var group in groups)
         {
             var parent = known.GetValueOrDefault(group.Key);
@@ -75,34 +107,23 @@ internal sealed class LiveFeed(CultureInfo culture)
             if (string.IsNullOrWhiteSpace(title) || string.Equals(title, engine, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(title, "Octo · " + engine, StringComparison.OrdinalIgnoreCase))
             {
-                title = parent?.ProjectName ?? first.ProjectName ?? (_pt ? "Sessão sem nome" : "Unnamed session");
+                var project = parent?.ProjectName ?? first.ProjectName;
+                var home = Path.GetFileName(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+                var suffix = group.Key[(group.Key.LastIndexOf(':') + 1)..];
+                title = string.IsNullOrWhiteSpace(project) || string.Equals(project, home, StringComparison.OrdinalIgnoreCase)
+                    ? $"{(_pt ? "Sessão" : "Session")} {suffix[..Math.Min(8, suffix.Length)]}"
+                    : project;
             }
 
-            var status = parent is { Status: not SessionStatus.Idle } ? $"  {Glyph(parent.Status)}" : "";
-            if (lines.Count > 0)
-            {
-                lines.Add(string.Empty);
-                ids.Add(null);
-            }
-
-            lines.Add($"{engine} → {SingleLine(title)}{status}");
-            ids.Add(parent?.Id);
+            rows.Add(new SessionDisplayRow(parent?.Id, $"{engine} → {SingleLine(title)}", parent?.Status ?? SessionStatus.Idle, true));
             foreach (var child in group.Where(s => s.ParentId is not null))
             {
-                lines.Add($"    {Glyph(child.Status)}  {(_pt ? "Subagente" : "Subagent")} {SingleLine(child.DisplayName)}");
-                ids.Add(child.Id);
+                rows.Add(new SessionDisplayRow(child.Id, $"{(_pt ? "Subagente" : "Subagent")} {SingleLine(child.DisplayName)}", child.Status, false));
             }
         }
 
-        return (string.Join('\n', lines), ids);
+        return rows;
     }
-
-    private static string Glyph(SessionStatus status) => status switch
-    {
-        SessionStatus.Completed => "✓",
-        SessionStatus.AwaitingInput => "!",
-        _ => "▸",
-    };
 
     private static string EngineName(Session session) => session.SourceId switch
     {
@@ -137,7 +158,11 @@ internal sealed class LiveFeed(CultureInfo culture)
                 var sessions = Array.Exists(detected, tool => tool == "Octo")
                     ? await OctoSessions.ScanAsync(octo, cancellationToken).ConfigureAwait(false)
                     : [];
-                Volatile.Write(ref _octo, sessions);
+                var linked = await Task.WhenAll(sessions.Select(async session =>
+                    session is { EngineName: "Codex", ConversationId: null, ProcessId: { } pid }
+                        ? session with { ConversationId = await CodexProcessSessions.FindAsync(pid, cancellationToken).ConfigureAwait(false) }
+                        : session)).ConfigureAwait(false);
+                Volatile.Write(ref _octo, linked);
                 var antigravity = Array.Exists(detected, tool => tool == "Antigravity")
                     ? await AntigravitySessions.ScanAsync(geminiHome, cancellationToken).ConfigureAwait(false)
                     : [];

@@ -32,6 +32,37 @@
       </Style.Animations>
     </Style>
 
+    <Style Selector="Border.session-row">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="Border.session-row.header">
+      <Setter Property="Background" Value="{DynamicResource Led.SessionHeaderBrush}" />
+    </Style>
+    <Style Selector="TextBlock.session-label">
+      <Setter Property="Foreground" Value="{DynamicResource Led.ForegroundBrush}" />
+    </Style>
+    <Style Selector="Border.session-row.header TextBlock.session-label">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource Led.SessionTitleBrush}" />
+    </Style>
+    <Style Selector="Border.session-row.child">
+      <Setter Property="Background" Value="{DynamicResource Led.SessionChildBrush}" />
+    </Style>
+    <Style Selector="Border.session-row.child TextBlock.session-label">
+      <Setter Property="Margin" Value="9,0,8,0" />
+    </Style>
+    <Style Selector="TextBlock.session-status">
+      <Setter Property="Foreground" Value="{DynamicResource Led.SessionRunningBrush}" />
+    </Style>
+    <Style Selector="TextBlock.session-status.waiting">
+      <Setter Property="Foreground" Value="{DynamicResource Led.AttentionBrush}" />
+    </Style>
+    <Style Selector="TextBlock.session-status.done">
+      <Setter Property="Foreground" Value="{DynamicResource Led.DoneBrush}" />
+    </Style>
+
     <Style Selector="Border.tab">
       <Setter Property="Margin" Value="0,0,3,0" />
       <Setter Property="Padding" Value="3,0" />
@@ -133,13 +164,29 @@
       <TextBlock Grid.Row="1" Grid.Column="1" IsVisible="{Binding !HasSubagents}" Text="{Binding ElapsedText}" VerticalAlignment="Center" Margin="10,0,0,0"
                  FontFamily="{DynamicResource Led.FontFamily}" FontSize="12" FontWeight="SemiBold"
                  Foreground="{DynamicResource Led.ForegroundBrush}" />
-      <Border Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding HasSubagents}"
-              ToolTip.Tip="{Binding ActiveSubagents}" Padding="3,2,0,0">
-        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-          <TextBlock x:Name="SessionList" Text="{Binding ActiveSubagents}" FontSize="12" LineHeight="19" FontFamily="{DynamicResource Led.FontFamily}"
-                     Foreground="{DynamicResource Led.ForegroundBrush}" TextWrapping="NoWrap" />
-        </ScrollViewer>
-      </Border>
+      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding HasSubagents}"
+                    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding SessionRows}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:SessionDisplayRowViewModel">
+              <Border Classes="session-row" Classes.header="{Binding IsHeader}" Classes.child="{Binding IsChild}">
+                <Grid ColumnDefinitions="6,Auto,*,Auto" Margin="2,0,6,0">
+                  <Border Grid.Column="0" IsVisible="{Binding IsHeader}" Width="3" Margin="0,3,2,3"
+                          Background="{DynamicResource Led.SessionRailBrush}" CornerRadius="1" />
+                  <Border Grid.Column="1" IsVisible="{Binding IsChild}" Width="1" Margin="6,0,0,0"
+                          Background="{DynamicResource Led.SessionTreeBrush}" />
+                  <TextBlock Grid.Column="2" Classes="session-label" Text="{Binding Label}" ToolTip.Tip="{Binding Label}"
+                             FontFamily="{DynamicResource Led.FontFamily}"
+                             VerticalAlignment="Center" FontSize="12" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Grid.Column="3" Classes="session-status" Classes.waiting="{Binding IsWaiting}" Classes.done="{Binding IsDone}"
+                             Text="{Binding Status}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5"
+                             VerticalAlignment="Center" Margin="6,0,1,0" />
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
     </Grid>
 
     <Border Background="{DynamicResource Led.DotGridBrush}" CornerRadius="4" IsHitTestVisible="False" />

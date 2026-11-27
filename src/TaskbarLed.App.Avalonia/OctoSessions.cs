@@ -75,7 +75,14 @@ internal static class OctoSessions
             }
 
             using var status = await ReadFrameAsync(stream, 65, token).ConfigureAwait(false);
-            return status is null ? null : Parse(agent.RootElement, status.RootElement);
+            var session = status is null ? null : Parse(agent.RootElement, status.RootElement);
+            if (session is null || session.ProcessId is not null)
+            {
+                return session;
+            }
+
+            var childPid = Number(runtime.RootElement, "child_pid");
+            return childPid is > 0 and <= int.MaxValue ? session with { ProcessId = (int)childPid } : session;
         }
         catch (Exception ex) when (ex is SocketException or IOException or UnauthorizedAccessException or JsonException)
         {
@@ -97,9 +104,8 @@ internal static class OctoSessions
             _ => SessionStatus.Idle,
         };
         var id = Number(agent, "id");
-        var kind = status.ValueKind == JsonValueKind.Object && status.TryGetProperty("nested", out var nested)
-            ? Text(nested, "kind") ?? Text(agent, "kind")
-            : Text(agent, "kind");
+        var nested = status.ValueKind == JsonValueKind.Object && status.TryGetProperty("nested", out var child) ? child : default;
+        var kind = Text(nested, "kind") ?? Text(agent, "kind");
         if (state == SessionStatus.Idle || id is not (> 0 and <= uint.MaxValue) || kind is null or "terminal"
             || Timestamp(status, "state_since_ms") is not { } at)
         {
@@ -127,6 +133,9 @@ internal static class OctoSessions
             state == SessionStatus.Completed ? at : null, null, null, at)
         {
             EngineName = label,
+            ConversationId = Guid.TryParse(Text(nested, "conversation_id") ?? Text(agent, "conversation_id"), out var conversation)
+                ? conversation : null,
+            ProcessId = Number(nested, "pid") is > 0 and <= int.MaxValue and var pid ? (int)pid : null,
             ParentId = Number(agent, "parent") is > 0 and <= uint.MaxValue and var parent
                 ? string.Create(CultureInfo.InvariantCulture, $"octo:{parent}") : null,
         };

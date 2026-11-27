@@ -22,6 +22,9 @@ public class AntigravitySessionsTests
         var feed = new LiveFeed(CultureInfo.GetCultureInfo("pt-BR"));
         var frame = feed.Compose(DateTimeOffset.UtcNow, sessions);
         Assert.True(frame.HasActivity);
-        Assert.Equal("Antigravity → German project\n    ▸  Subagente Vocabulary\n    ▸  Subagente Grammar", frame.ActiveSubagents);
+        Assert.Collection(frame.SessionRows,
+            header => { Assert.True(header.IsHeader); Assert.Equal("Antigravity → German project", header.Label); },
+            child => { Assert.False(child.IsHeader); Assert.Equal("Subagente Vocabulary", child.Label); },
+            child => { Assert.False(child.IsHeader); Assert.Equal("Subagente Grammar", child.Label); });
     }
 }

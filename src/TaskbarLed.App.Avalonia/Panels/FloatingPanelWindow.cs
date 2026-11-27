@@ -115,23 +115,16 @@ internal sealed class FloatingPanelWindow : Window
 
         if (point.Properties.IsLeftButtonPressed)
         {
-            if (_frame is { SessionLineIds.Count: > 0 } frame)
+            var context = (e.Source as Control)?.DataContext;
+            if (context is SessionDisplayRowViewModel { SessionId: { } sessionId })
             {
-                var list = _panel.FindControl<TextBlock>("SessionList");
-                if (list is not null && e.Source == list)
-                {
-                    var line = (int)Math.Floor(e.GetPosition(list).Y / list.LineHeight);
-                    if (line >= 0 && line < frame.SessionLineIds.Count && frame.SessionLineIds[line] is { } id)
-                    {
-                        _acknowledge?.Invoke(id);
-                    }
-                }
+                _acknowledge?.Invoke(sessionId);
             }
-            else
+            else if (_frame is { SessionRows.Count: 0 })
             {
-                var channel = (e.Source as Control)?.DataContext as ChannelViewModel;
-                _acknowledge?.Invoke(channel?.SessionId ?? _frame?.SelectedSessionId);
+                _acknowledge?.Invoke((context as ChannelViewModel)?.SessionId ?? _frame.SelectedSessionId);
             }
+
             Render();
         }
     }
@@ -365,8 +358,7 @@ internal sealed class FloatingPanelWindow : Window
             return;
         }
 
-        var lines = string.IsNullOrEmpty(_frame.ActiveSubagents) ? 0 : 1 + _frame.ActiveSubagents.Count(ch => ch == '\n');
-        var height = Math.Max(PanelHeight, 12 + (Math.Min(lines, 9) * 19));
+        var height = Math.Max(PanelHeight, 12 + (Math.Min(_frame.SessionRows.Count, 9) * 24));
         if (height != _panelHeight)
         {
             _panelHeight = height;

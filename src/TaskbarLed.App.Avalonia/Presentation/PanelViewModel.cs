@@ -37,6 +37,23 @@ public sealed partial class ChannelViewModel : ObservableObject
     };
 }
 
+public sealed record SessionDisplayRowViewModel(SessionDisplayRow Row, bool Portuguese)
+{
+    public string Label => Row.Label;
+    public string? SessionId => Row.SessionId;
+    public bool IsHeader => Row.IsHeader;
+    public bool IsChild => !Row.IsHeader;
+    public bool IsWaiting => Row.Status == SessionStatus.AwaitingInput;
+    public bool IsDone => Row.Status == SessionStatus.Completed;
+    public string Status => Row.Status switch
+    {
+        SessionStatus.Running => Portuguese ? "▸ Rodando" : "▸ Running",
+        SessionStatus.AwaitingInput => Portuguese ? "! Aguardando" : "! Waiting",
+        SessionStatus.Completed => Portuguese ? "✓ Concluído" : "✓ Done",
+        _ => "",
+    };
+}
+
 /// <summary>
 /// State bound by the floating panel. Same contract as the WPF <c>PanelViewModel</c> (minus edit mode);
 /// both apply a Core <see cref="PanelFrame"/>, so the composer stays the single source of truth.
@@ -53,9 +70,9 @@ public sealed partial class PanelViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSubagents))]
-    public partial string ActiveSubagents { get; set; } = string.Empty;
+    public partial IReadOnlyList<SessionDisplayRowViewModel> SessionRows { get; set; } = [];
 
-    public bool HasSubagents => ActiveSubagents.Length != 0;
+    public bool HasSubagents => SessionRows.Count != 0;
 
     [ObservableProperty]
     public partial string Feed { get; set; } = string.Empty;
@@ -92,7 +109,10 @@ public sealed partial class PanelViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(frame);
         _frame = frame;
 
-        ActiveSubagents = frame.ActiveSubagents;
+        if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows))
+        {
+            SessionRows = [.. frame.SessionRows.Select(row => new SessionDisplayRowViewModel(row, _culture.TwoLetterISOLanguageName == "pt"))];
+        }
         Feed = Cased(frame.Feed);
         ElapsedText = frame.ElapsedText;
         SelectedStatus = frame.SelectedStatus;

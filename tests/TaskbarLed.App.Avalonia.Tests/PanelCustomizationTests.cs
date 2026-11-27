@@ -15,7 +15,7 @@ namespace TaskbarLed.App.Avalonia.Tests;
 public class PanelCustomizationTests
 {
     [AvaloniaFact]
-    public void All_Windows_themes_apply_to_the_same_panel()
+    public void All_themes_apply_to_the_same_panel()
     {
         var model = Model();
         var app = Application.Current!;
@@ -28,7 +28,11 @@ public class PanelCustomizationTests
             Assert.IsAssignableFrom<IBrush>(app.Resources["Led.DotGridBrush"]);
         }
 
-        Assert.Equal(7, backgrounds.Count);
+        Assert.Equal(11, backgrounds.Count);
+        Assert.Equal("AmberTree", PanelThemes.Apply(app, model, "AmberTree").Id);
+        Assert.Equal(Color.Parse("#48483B"), Assert.IsType<SolidColorBrush>(app.Resources["Led.SessionTreeBrush"]).Color);
+        Assert.Equal("AmberRail", PanelThemes.Apply(app, model, "AmberRail").Id);
+        Assert.Equal(Color.Parse("#B88953"), Assert.IsType<SolidColorBrush>(app.Resources["Led.SessionRailBrush"]).Color);
         Assert.Equal("ClaudeCode", PanelThemes.Apply(app, model, "unknown").Id);
         Assert.Equal("✻", app.Resources["Led.FeedPrefix"]);
     }

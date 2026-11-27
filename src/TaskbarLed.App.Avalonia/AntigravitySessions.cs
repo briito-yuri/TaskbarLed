@@ -117,6 +117,7 @@ internal static class AntigravitySessions
             {
                 Title = label,
                 ProjectName = parentName,
+                ConversationId = id,
                 ParentId = child ? $"antigravity:{parent:D}" : null,
                 Status = completed ? SessionStatus.Completed : SessionStatus.Running,
                 PromptEndedAt = completed ? modified : null,
