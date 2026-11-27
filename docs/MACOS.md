@@ -4,7 +4,9 @@ The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 1
 
 ## Install
 
-[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.2/TaskbarLed-osx-arm64.zip). Unzip it, move `Neon Task Bar.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip). Unzip it, move `Neon Task Bar.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+
+The download above is the latest public build. The themed context menu and alphabetic session routes are in the 0.5.2 draft.
 
 The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
 
