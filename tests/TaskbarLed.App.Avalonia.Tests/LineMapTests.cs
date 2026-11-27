@@ -19,29 +19,38 @@ public class LineMapTests
     {
         var model = new PanelViewModel(CultureInfo.GetCultureInfo("pt-BR"));
         PanelThemes.Apply(Application.Current!, model, "LineMap");
-        model.Apply(PanelFrame.Empty("") with
+        var time = DateTimeOffset.UtcNow;
+        var feed = new LiveFeed(CultureInfo.GetCultureInfo("pt-BR"));
+        var sessions = Enumerable.Range(0, 7).SelectMany(index =>
         {
-            SessionRows =
-            [
-                new("codex", "Codex → Referências do curso", SessionStatus.Running, true) { Engine = "Codex" },
-                new("c-child", "Subagente Pesquisador", SessionStatus.Running, false) { Engine = "Codex", StationName = "Pesquisador" },
-                new("c-review", "Subagente Revisor", SessionStatus.AwaitingInput, false)
-                    { Engine = "Codex", StationName = "Revisor", LastStation = true },
-                new("agy", "Antigravity → Alemão", SessionStatus.Idle, true) { Engine = "Antigravity" },
-                new("a-child", "Subagente Gramática", SessionStatus.Running, false)
-                    { Engine = "Antigravity", StationName = "Gramática", LastStation = true },
-                new("b", "Byte → Documentação", SessionStatus.Running, true) { Engine = "Byte", LastStation = true },
-                new("z", "Zeta → Revisão", SessionStatus.Running, true) { Engine = "Zeta", LastStation = true },
-            ],
-        });
-        var window = new Window { Width = 510, Height = 185, Content = new PanelView { DataContext = model } };
+            var parent = $"route-{index}";
+            return new[]
+            {
+                Session.Create(parent, "codex", time) with { Title = $"Sessão {index + 1}", Status = SessionStatus.Running },
+                Session.Create($"worker-{index}", "codex", time) with
+                {
+                    Title = "Pesquisador",
+                    ParentId = parent,
+                    Status = SessionStatus.Running,
+                },
+            };
+        }).ToArray();
+        var initial = feed.Compose(time, sessions);
+        model.Apply(initial);
+        var shuffled = feed.Compose(time, sessions.Reverse().ToArray());
+        foreach (var row in initial.SessionRows.Where(row => row.IsHeader))
+        {
+            Assert.Equal(row.RouteLetter, Assert.Single(shuffled.SessionRows, other => other.SessionId == row.SessionId).RouteLetter);
+        }
+
+        var window = new Window { Width = 510, Height = 380, Content = new PanelView { DataContext = model } };
         window.Show();
         try
         {
-            Assert.Equal(["C", "A", "B", "Z"], model.SessionRows.Where(row => row.IsHeader).Select(row => row.LineLetter));
+            Assert.Equal(["A", "B", "C", "D", "E", "F", "G"], model.SessionRows.Where(row => row.IsHeader).Select(row => row.LineLetter));
             Assert.Same(model.SessionRows[0].LineBrush, model.SessionRows[1].LineBrush);
             Assert.Equal("Pesquisador", model.SessionRows[1].StationLabel);
-            Assert.False(model.SessionRows[2].ConnectToNext);
+            Assert.False(model.SessionRows[1].ConnectToNext);
             using var frame = window.CaptureRenderedFrame();
             Assert.NotNull(frame);
             var folder = Environment.GetEnvironmentVariable("TASKBARLED_SCREENSHOTS") ?? Path.Combine(AppContext.BaseDirectory, "screenshots");

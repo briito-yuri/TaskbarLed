@@ -72,6 +72,7 @@ internal static class PanelThemes
         if (MacPalettes.TryGetValue(theme.Id, out var palette))
         {
             ApplyPalette(app, palette);
+            ApplyMenuPalette(app);
             return theme;
         }
 
@@ -123,6 +124,7 @@ internal static class PanelThemes
 
         app.Resources["Led.PanelRadius"] = new CornerRadius(4);
         app.Resources["Led.FrameThickness"] = new Thickness(1);
+        ApplyMenuPalette(app);
         return theme;
     }
 
@@ -156,6 +158,60 @@ internal static class PanelThemes
         app.Resources["Led.GlowOpacity"] = 0.0;
         app.Resources["Led.FeedPrefix"] = string.Empty;
         app.Resources["Led.FontFamily"] = new FontFamily(colors.Font);
+    }
+
+    private static void ApplyMenuPalette(Application app)
+    {
+        Color Read(string key) => ((ISolidColorBrush)app.Resources["Led." + key]!).Color;
+        void Brush(string key, Color color) => app.Resources[key] = new SolidColorBrush(color);
+
+        var translucent = Read("BackgroundBrush");
+        var background = Blend(Color.Parse("#192321"), translucent, translucent.A / 255.0);
+        var foreground = Read("ForegroundBrush");
+        var accent = Read("EditBrush");
+        if (Contrast(accent, background) < 4.5)
+        {
+            accent = foreground;
+        }
+
+        var border = Blend(background, foreground, 0.25);
+        var highlight = Blend(background, accent, 0.15);
+        var pressed = Blend(background, accent, 0.23);
+        if (Contrast(foreground, pressed) < 4.5)
+        {
+            foreground = Contrast(Colors.Black, background) > Contrast(Colors.White, background) ? Colors.Black : Colors.White;
+        }
+
+        Brush("MenuFlyoutPresenterBackground", background);
+        Brush("MenuFlyoutPresenterBorderBrush", border);
+        Brush("MenuFlyoutItemForeground", foreground);
+        Brush("MenuFlyoutItemForegroundPointerOver", foreground);
+        Brush("MenuFlyoutItemForegroundPressed", foreground);
+        Brush("MenuFlyoutItemForegroundDisabled", accent);
+        Brush("MenuFlyoutSubItemChevron", foreground);
+        Brush("MenuFlyoutItemBackgroundPointerOver", highlight);
+        Brush("MenuFlyoutItemBackgroundPressed", pressed);
+        Brush("Led.MenuQuitBrush", highlight);
+        Brush("Led.MenuAccentBrush", accent);
+    }
+
+    private static Color Blend(Color baseColor, Color over, double opacity) => Color.FromRgb(
+        (byte)Math.Round(baseColor.R + (over.R - baseColor.R) * opacity),
+        (byte)Math.Round(baseColor.G + (over.G - baseColor.G) * opacity),
+        (byte)Math.Round(baseColor.B + (over.B - baseColor.B) * opacity));
+
+    private static double Contrast(Color a, Color b)
+    {
+        static double Linear(byte channel)
+        {
+            var value = channel / 255.0;
+            return value <= 0.04045 ? value / 12.92 : Math.Pow((value + 0.055) / 1.055, 2.4);
+        }
+
+        static double Luminance(Color color) => 0.2126 * Linear(color.R) + 0.7152 * Linear(color.G) + 0.0722 * Linear(color.B);
+        var first = Luminance(a);
+        var second = Luminance(b);
+        return (Math.Max(first, second) + 0.05) / (Math.Min(first, second) + 0.05);
     }
 
     private static IBrush BuildDotGrid(XElement value)

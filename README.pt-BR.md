@@ -11,7 +11,7 @@
 
 [English](README.md) · **Português**
 
-[![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
+[![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.2/TaskbarLed-osx-arm64.zip)
 
 Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova Neon Task Bar.app para Aplicativos e abra. O runtime já vem incluído.
 

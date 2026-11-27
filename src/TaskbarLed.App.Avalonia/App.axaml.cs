@@ -103,8 +103,8 @@ public sealed partial class App : Application
             Task.Run(() => feed.DetectProcessesAsync(cancellation.Token)));
 
         var menu = new NativeMenu();
-        var panelMenu = new ContextMenu();
-        panelMenu.Items.Add(new MenuItem { Header = DisplayName, IsEnabled = false });
+        var panelMenu = new ContextMenu { Classes = { "neon-panel-menu" } };
+        panelMenu.Items.Add(new MenuItem { Header = DisplayName, IsEnabled = false, Classes = { "neon-menu-heading" } });
         panelMenu.Items.Add(new Separator());
         panel.ContextMenu = panelMenu;
         var nativeThemes = new NativeMenu();
@@ -187,7 +187,7 @@ public sealed partial class App : Application
         menu.Items.Add(native);
 
         panelMenu.Items.Add(new Separator());
-        var context = new MenuItem { Header = label };
+        var context = new MenuItem { Header = label, Classes = { "neon-menu-quit" } };
         context.Click += (_, _) => ScheduleShutdown();
         panelMenu.Items.Add(context);
     }

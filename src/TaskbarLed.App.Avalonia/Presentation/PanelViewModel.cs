@@ -63,18 +63,18 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
         ? StationMarker + (uppercase ? StationLabel.ToUpperInvariant() : StationLabel) : Label;
     public bool ConnectToNext => !Row.LastStation;
     public string StationLabel => Row.StationName ?? Row.Label;
-    public string LineLetter => string.IsNullOrWhiteSpace(Row.Engine) ? "?" : StringInfo.GetNextTextElement(Row.Engine).ToUpperInvariant();
+    public string LineLetter => Row.RouteLetter ?? "?";
     public IBrush LineBrush => TransitColors.TryGetValue(LineLetter, out var brush) ? brush : TransitFallback;
 
     private static readonly Dictionary<string, IBrush> TransitColors = new(StringComparer.Ordinal)
     {
-        ["A"] = new SolidColorBrush(Color.Parse("#A74232")),
-        ["B"] = new SolidColorBrush(Color.Parse("#365B93")),
+        ["A"] = new SolidColorBrush(Color.Parse("#A63831")),
+        ["B"] = new SolidColorBrush(Color.Parse("#23558B")),
         ["C"] = new SolidColorBrush(Color.Parse("#146B74")),
-        ["G"] = new SolidColorBrush(Color.Parse("#77572B")),
-        ["K"] = new SolidColorBrush(Color.Parse("#6A4B7D")),
-        ["Q"] = new SolidColorBrush(Color.Parse("#326343")),
-        ["Z"] = new SolidColorBrush(Color.Parse("#664292")),
+        ["D"] = new SolidColorBrush(Color.Parse("#326343")),
+        ["E"] = new SolidColorBrush(Color.Parse("#835789")),
+        ["F"] = new SolidColorBrush(Color.Parse("#935013")),
+        ["G"] = new SolidColorBrush(Color.Parse("#534372")),
     };
 
     private static readonly IBrush TransitFallback = new SolidColorBrush(Color.Parse("#465D6B"));
@@ -118,7 +118,7 @@ public sealed partial class PanelViewModel : ObservableObject
     public ObservableCollection<ChannelViewModel> Channels { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasSubagents), nameof(ShowSessionList), nameof(ShowClearList))]
+    [NotifyPropertyChangedFor(nameof(HasSubagents), nameof(ShowSessionList), nameof(ShowClearList), nameof(ShowLineMap))]
     public partial IReadOnlyList<SessionDisplayRowViewModel> SessionRows { get; set; } = [];
 
     public bool HasSubagents => SessionRows.Count != 0;
@@ -150,12 +150,13 @@ public sealed partial class PanelViewModel : ObservableObject
     public partial bool Uppercase { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsClearList), nameof(IsLcd), nameof(ShowSessionList), nameof(ShowClearList))]
+    [NotifyPropertyChangedFor(nameof(IsClearList), nameof(IsLcd), nameof(ShowSessionList), nameof(ShowClearList), nameof(ShowLineMap))]
     public partial string ThemeId { get; set; } = "ClaudeCode";
 
     public bool IsClearList => ThemeId == "ClearList";
     public bool ShowSessionList => HasSubagents && !IsClearList;
     public bool ShowClearList => HasSubagents && IsClearList;
+    public bool ShowLineMap => HasSubagents && ThemeId == "LineMap";
     public bool IsLcd => ThemeId == "OliveLcd";
 
     [ObservableProperty]

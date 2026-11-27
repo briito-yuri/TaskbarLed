@@ -9,6 +9,38 @@
 
   <Application.Styles>
     <FluentTheme />
+    <Style Selector="ContextMenu.neon-panel-menu">
+      <Setter Property="Background" Value="{DynamicResource MenuFlyoutPresenterBackground}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutPresenterBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Padding" Value="5" />
+      <Setter Property="MinWidth" Value="214" />
+      <Setter Property="CornerRadius" Value="{DynamicResource Led.PanelRadius}" />
+      <Setter Property="FontFamily" Value="{DynamicResource Led.FontFamily}" />
+    </Style>
+    <Style Selector="MenuItem.neon-menu-heading">
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <Style Selector="MenuItem.neon-menu-heading /template/ ContentPresenter#PART_HeaderPresenter">
+      <Setter Property="Foreground" Value="{DynamicResource Led.MenuAccentBrush}" />
+    </Style>
+    <Style Selector="MenuItem.neon-menu-quit">
+      <Setter Property="Background" Value="{DynamicResource Led.MenuQuitBrush}" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="HeaderTemplate">
+        <DataTemplate x:DataType="x:String">
+          <Grid ColumnDefinitions="*,Auto" MinWidth="160">
+            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+            <Path Grid.Column="1" Width="14" Height="14" Margin="16,0,0,0"
+                  Stroke="{DynamicResource Led.MenuAccentBrush}" StrokeThickness="1.4"
+                  Stretch="Uniform" VerticalAlignment="Center"
+                  Data="M 8,1 L 8,7 M 4,3 A 6,6 0 1 0 12,3" />
+          </Grid>
+        </DataTemplate>
+      </Setter>
+    </Style>
   </Application.Styles>
 
   <Application.Resources>

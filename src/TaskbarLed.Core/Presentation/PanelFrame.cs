@@ -13,6 +13,7 @@ public sealed record SessionDisplayRow(string? SessionId, string Label, SessionS
 {
     public string? Engine { get; init; }
     public string? Heading { get; init; }
+    public string? RouteLetter { get; init; }
     public string? StationName { get; init; }
     public bool LastStation { get; init; }
 }

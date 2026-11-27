@@ -21,6 +21,7 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
     private readonly CodexSessions _codexReader = new();
     private readonly bool _pt = culture.TwoLetterISOLanguageName == "pt";
     private readonly CompletionAlerts _completions = new();
+    private readonly Dictionary<string, int> _routes = new(StringComparer.Ordinal);
 
     public PanelFrame Compose(DateTimeOffset now) =>
         Compose(now, Volatile.Read(ref _antigravity));
@@ -91,11 +92,33 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
     {
         var known = sessions.DistinctBy(s => s.Id).ToDictionary(s => s.Id, StringComparer.Ordinal);
         var groups = sessions.Where(s => s.Status != SessionStatus.Idle)
-            .GroupBy(s => s.ParentId ?? s.Id, StringComparer.Ordinal)
-            .OrderByDescending(group => group.Any(s => s.Status == SessionStatus.Completed));
-        var rows = new List<SessionDisplayRow>();
+            .GroupBy(s => s.ParentId ?? s.Id, StringComparer.Ordinal).ToArray();
+        var active = groups.Select(group => group.Key).ToHashSet(StringComparer.Ordinal);
+        foreach (var expired in _routes.Keys.Where(key => !active.Contains(key)).ToArray())
+        {
+            _routes.Remove(expired);
+        }
+
+        var used = _routes.Values.ToHashSet();
+        var next = 0;
         foreach (var group in groups)
         {
+            if (!_routes.ContainsKey(group.Key))
+            {
+                while (!used.Add(next))
+                {
+                    next++;
+                }
+
+                _routes[group.Key] = next;
+            }
+        }
+
+        var rows = new List<SessionDisplayRow>();
+        foreach (var group in groups.OrderByDescending(group => group.Any(s => s.Status == SessionStatus.Completed))
+            .ThenBy(group => _routes[group.Key]))
+        {
+            var route = RouteLabel(_routes[group.Key]);
             var parent = known.GetValueOrDefault(group.Key);
             var first = group.First();
             var engine = parent?.EngineName ?? first.EngineName ?? EngineName(parent ?? first);
@@ -122,6 +145,7 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                 _completions.SecondsRemaining(parent?.Id, now), HasStatus: parent is not null)
             {
                 Engine = engine,
+                RouteLetter = route,
                 Heading = SingleLine(title),
                 LastStation = children.Length == 0,
             });
@@ -133,6 +157,7 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                     _completions.SecondsRemaining(child.Id, now))
                 {
                     Engine = engine,
+                    RouteLetter = route,
                     StationName = name,
                     LastStation = i == children.Length - 1,
                 });
@@ -140,6 +165,19 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
         }
 
         return rows;
+    }
+
+    private static string RouteLabel(int index)
+    {
+        var label = string.Empty;
+        do
+        {
+            label = (char)('A' + (index % 26)) + label;
+            index = (index / 26) - 1;
+        }
+        while (index >= 0);
+
+        return label;
     }
 
     private static string EngineName(Session session) => session.SourceId switch

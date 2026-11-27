@@ -381,7 +381,7 @@ internal sealed class FloatingPanelWindow : Window
 
         var sessionHeight = _viewModel.IsClearList
             ? _viewModel.SessionGroups.Sum(group => 37 + (group.HasChildren ? 6 + (int)Math.Ceiling(group.Children.Count / 3.0) * 35 : 0))
-            : (_viewModel.IsLcd ? 24 : 12) + (_frame.SessionRows.Count * 24);
+            : (_viewModel.IsLcd ? 24 : 12) + (_frame.SessionRows.Count * 24) + (_viewModel.ShowLineMap ? 29 : 0);
         var height = Math.Clamp(sessionHeight, PanelHeight, 228);
         if (height != _panelHeight)
         {

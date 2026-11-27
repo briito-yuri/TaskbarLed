@@ -151,6 +151,11 @@
             BorderBrush="{DynamicResource Led.BorderBrush}" />
 
     <Grid Classes="panel-content" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto">
+      <Border Grid.ColumnSpan="2" IsVisible="{Binding ShowLineMap}" Background="#243B4D"
+              Height="26" Margin="0,0,0,3" CornerRadius="4,4,0,0">
+        <TextBlock Text="Neon Task Bar" Foreground="White" FontSize="12" FontWeight="SemiBold"
+                   Margin="10,0,0,0" VerticalAlignment="Center" />
+      </Border>
       <ItemsControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Channels}" IsVisible="{Binding !HasSubagents}" ClipToBounds="True">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
@@ -235,6 +240,8 @@
                     </Border>
                   </Grid>
                   <Grid ColumnDefinitions="29,*,Auto" Margin="5,0,8,0" IsVisible="{Binding IsLineMap}">
+                    <Border Grid.ColumnSpan="3" Height="1" Background="#E0E6E2" IsVisible="{Binding Row.LastStation}"
+                            VerticalAlignment="Bottom" IsHitTestVisible="False" />
                     <Grid Grid.Column="0" RowDefinitions="*,*">
                       <Border Grid.Row="0" Width="2" IsVisible="{Binding IsChild}"
                               Background="{Binding LineBrush}" HorizontalAlignment="Center" />

@@ -37,16 +37,16 @@ public class ThemeGalleryTests
             SessionRows =
             [
                 new("codex", "Codex → Referências do curso", SessionStatus.Running, true)
-                    { Engine = "Codex", Heading = "Referências do curso" },
+                    { Engine = "Codex", RouteLetter = "A", Heading = "Referências do curso" },
                 new("research", "Subagente Pesquisador", SessionStatus.Running, false)
-                    { Engine = "Codex", StationName = "Pesquisador" },
+                    { Engine = "Codex", RouteLetter = "A", StationName = "Pesquisador" },
                 new("review", "Subagente Revisor", SessionStatus.Completed, false, 8)
-                    { Engine = "Codex", StationName = "Revisor", LastStation = true },
-                new("agy", "Antigravity → Alemão", SessionStatus.Idle, true) { Engine = "Antigravity", Heading = "Alemão" },
+                    { Engine = "Codex", RouteLetter = "A", StationName = "Revisor", LastStation = true },
+                new("agy", "Antigravity → Alemão", SessionStatus.Idle, true) { Engine = "Antigravity", RouteLetter = "B", Heading = "Alemão" },
                 new("vocabulary", "Subagente Vocabulário", SessionStatus.Running, false)
-                    { Engine = "Antigravity", StationName = "Vocabulário" },
+                    { Engine = "Antigravity", RouteLetter = "B", StationName = "Vocabulário" },
                 new("grammar", "Subagente Gramática", SessionStatus.AwaitingInput, false)
-                    { Engine = "Antigravity", StationName = "Gramática", LastStation = true },
+                    { Engine = "Antigravity", RouteLetter = "B", StationName = "Gramática", LastStation = true },
             ],
         });
         window.Show();
