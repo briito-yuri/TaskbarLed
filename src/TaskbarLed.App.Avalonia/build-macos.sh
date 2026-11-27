@@ -66,7 +66,7 @@ cat > "$stage/Distribution.xml" <<DIST
     <volume-check><allowed-os-versions><os-version min="14.0"/></allowed-os-versions></volume-check>
     <choices-outline><line choice="neon"/></choices-outline>
     <choice id="neon" visible="false"><pkg-ref id="io.github.briito-yuri.taskbarled.installer"/></choice>
-    <pkg-ref id="io.github.briito-yuri.taskbarled.installer">NeonAgents.pkg</pkg-ref>
+    <pkg-ref id="io.github.briito-yuri.taskbarled.installer">#NeonAgents.pkg</pkg-ref>
 </installer-gui-script>
 DIST
 productbuild --distribution "$stage/Distribution.xml" --package-path "$stage" "$stage/TaskbarLed-$rid.pkg"
