@@ -27,7 +27,9 @@ Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando
 
 **Instalação no Mac.** Baixe o ZIP acima, extraia, mova o Neon Task Bar.app para Aplicativos e abra. O runtime .NET já vem incluído. O painel mostra agentes ativos e seus subagentes, inclusive quando o agente principal do Antigravity está ocioso. Veja no [guia do macOS](docs/MACOS.md) como abrir pela primeira vez, ligar os hooks, consultar as integrações e publicar um build.
 
-[Veja as capturas dos 16 temas no macOS](docs/MACOS-THEMES.md).
+![Neon TSB Agents no tema Liquid Glass](docs/images/macos-themes/LiquidGlass.png)
+
+[Veja as capturas dos 17 temas no macOS](docs/MACOS-THEMES.md).
 
 ## Como ele fica
 

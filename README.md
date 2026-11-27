@@ -27,7 +27,9 @@ You send Claude a long prompt, switch to another app, and then keep coming back 
 
 **Install on Mac.** Download the ZIP above, extract it, move Neon Task Bar.app to Applications, and open it. The .NET runtime is bundled. The panel shows active agents and their subagents, including Antigravity workers when their parent is idle. See the [macOS guide](docs/MACOS.md) for first launch, hooks, supported sources and publishing a Mac build.
 
-[See screenshots of all 16 macOS themes](docs/MACOS-THEMES.md).
+![Neon TSB Agents with the Liquid Glass theme](docs/images/macos-themes/LiquidGlass.png)
+
+[See screenshots of all 17 macOS themes](docs/MACOS-THEMES.md).
 
 ## What it looks like
 
