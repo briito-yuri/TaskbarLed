@@ -18,7 +18,9 @@ internal static class AntigravitySessions
         WHERE c.killed = 0 AND
               (c.status IN ('CASCADE_RUN_STATUS_RUNNING', 'CASCADE_RUN_STATUS_BUSY')
                OR (c.status = 'CASCADE_RUN_STATUS_IDLE' AND
-                   c.last_modified_time >= strftime('%Y-%m-%d %H:%M:%S', 'now', '-30 minutes'))
+                   (c.last_modified_time >= strftime('%Y-%m-%d %H:%M:%S', 'now', '-30 minutes')
+                    OR (c.parent_conversation_id <> '' AND c.last_modified_time < '0002'
+                        AND p.last_modified_time >= strftime('%Y-%m-%d %H:%M:%S', 'now', '-30 minutes'))))
                OR c.conversation_id IN (SELECT parent_conversation_id FROM conversation_summaries
                    WHERE killed = 0 AND parent_conversation_id <> ''
                      AND status IN ('CASCADE_RUN_STATUS_RUNNING', 'CASCADE_RUN_STATUS_BUSY')))
@@ -45,56 +47,53 @@ internal static class AntigravitySessions
         timeout.CancelAfter(TimeSpan.FromSeconds(1));
         try
         {
-            var options = new ProcessStartInfo("/usr/bin/sqlite3")
+            var (exitCode, json) = await ReadIndexAsync(db, timeout.Token).ConfigureAwait(false);
+            if (exitCode == 14 && !File.Exists(db + "-wal"))
             {
-                ArgumentList = { "-batch", "-init", "/dev/null", "-readonly", "-json", db, Query },
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-            };
-            using var sqlite = Process.Start(options);
-            if (sqlite is null)
+                // Apple's SQLite opens a WAL database read-only only when the sidecars already exist.
+                // With no WAL the checkpointed main file can be read without creating either sidecar.
+                (exitCode, json) = await ReadIndexAsync(new Uri(db).AbsoluteUri + "?immutable=1",
+                    timeout.Token).ConfigureAwait(false);
+            }
+
+            if (exitCode != 0)
             {
                 return [];
             }
 
-            try
+            var sessions = Parse(json);
+            var stateDirectory = Path.GetDirectoryName(db)!;
+            var presence = Path.Combine(stateDirectory, "presence");
+            var activeStreams = sessions.Any(session => session.ParentId is not null && session.Status == SessionStatus.Idle)
+                ? AntigravityStreams.Read(Path.Combine(stateDirectory, "log")) : [];
+            var attached = sessions.Where(session => session.ParentId is null && session.ConversationId.HasValue)
+                .Where(session => AntigravityPresence.IsAttached(Path.Combine(presence, $"{session.ConversationId:D}.lock")))
+                .Select(session => session.Id).ToHashSet(StringComparer.Ordinal);
+            for (var i = 0; i < sessions.Length; i++)
             {
-                var read = sqlite.StandardOutput.ReadToEndAsync(timeout.Token);
-                var errors = sqlite.StandardError.ReadToEndAsync(timeout.Token);
-                await Task.WhenAll(read, errors, sqlite.WaitForExitAsync(timeout.Token)).ConfigureAwait(false);
-                if (sqlite.ExitCode != 0)
+                var worker = sessions[i];
+                if (worker is { Status: SessionStatus.Idle, ConversationId: { } id, ParentId: { } parent }
+                    && activeStreams.Contains(id) && attached.Contains(parent))
                 {
-                    return [];
+                    sessions[i] = worker with { Status = SessionStatus.Running };
                 }
-
-                var sessions = Parse(await read.ConfigureAwait(false));
-                var activeParents = sessions.Where(s => s.Status == SessionStatus.Running && s.ParentId is not null)
-                    .Select(s => s.ParentId!).ToHashSet(StringComparer.Ordinal);
-                var presence = Path.Combine(Path.GetDirectoryName(db)!, "presence");
-                var cutoff = DateTimeOffset.UtcNow.AddSeconds(-20);
-                for (var i = 0; i < sessions.Length; i++)
-                {
-                    var session = sessions[i];
-                    if (session is { Status: SessionStatus.Running, ParentId: null, ConversationId: { } id }
-                        && session.LastUpdated < cutoff && !activeParents.Contains(session.Id)
-                        && AntigravityPresence.WasReleased(Path.Combine(presence, $"{id:D}.lock")))
-                    {
-                        sessions[i] = session with { Status = SessionStatus.Idle };
-                    }
-                }
-
-                return sessions;
             }
-            catch (OperationCanceledException)
+
+            var activeParents = sessions.Where(s => s.Status == SessionStatus.Running && s.ParentId is not null)
+                .Select(s => s.ParentId!).ToHashSet(StringComparer.Ordinal);
+            var cutoff = DateTimeOffset.UtcNow.AddSeconds(-20);
+            for (var i = 0; i < sessions.Length; i++)
             {
-                if (!sqlite.HasExited)
+                var session = sessions[i];
+                if (session is { Status: SessionStatus.Running, ParentId: null, ConversationId: { } id }
+                    && session.LastUpdated < cutoff && !activeParents.Contains(session.Id)
+                    && AntigravityPresence.WasReleased(Path.Combine(presence, $"{id:D}.lock")))
                 {
-                    sqlite.Kill();
+                    sessions[i] = session with { Status = SessionStatus.Idle };
                 }
-
-                throw;
             }
+
+            return sessions;
         }
         catch (Exception ex) when (ex is JsonException or Win32Exception or IOException or InvalidOperationException)
         {
@@ -103,6 +102,39 @@ internal static class AntigravitySessions
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             return [];
+        }
+    }
+
+    private static async Task<(int ExitCode, string Json)> ReadIndexAsync(string db, CancellationToken cancellationToken)
+    {
+        var options = new ProcessStartInfo("/usr/bin/sqlite3")
+        {
+            ArgumentList = { "-batch", "-init", "/dev/null", "-readonly", "-json", db, Query },
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+        };
+        using var sqlite = Process.Start(options);
+        if (sqlite is null)
+        {
+            return (-1, string.Empty);
+        }
+
+        try
+        {
+            var read = sqlite.StandardOutput.ReadToEndAsync(cancellationToken);
+            var errors = sqlite.StandardError.ReadToEndAsync(cancellationToken);
+            await Task.WhenAll(read, errors, sqlite.WaitForExitAsync(cancellationToken)).ConfigureAwait(false);
+            return (sqlite.ExitCode, await read.ConfigureAwait(false));
+        }
+        catch (OperationCanceledException)
+        {
+            if (!sqlite.HasExited)
+            {
+                sqlite.Kill();
+            }
+
+            throw;
         }
     }
 
@@ -129,6 +161,11 @@ internal static class AntigravitySessions
             }
 
             var child = Guid.TryParse(Text(row, "parent"), out var parent);
+            if (!child && modified == DateTimeOffset.MinValue)
+            {
+                continue;
+            }
+
             var agent = Clean(Text(row, "agent"));
             var title = Clean(Text(row, "title"));
             var parentName = Clean(Text(row, "parent_title"));
@@ -150,7 +187,7 @@ internal static class AntigravitySessions
                 ProjectName = parentName,
                 ConversationId = id,
                 ParentId = child ? $"antigravity:{parent:D}" : null,
-                Status = status.Value,
+                Status = modified == DateTimeOffset.MinValue ? SessionStatus.Idle : status.Value,
             });
         }
 

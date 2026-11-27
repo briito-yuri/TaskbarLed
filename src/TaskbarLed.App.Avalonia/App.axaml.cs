@@ -100,7 +100,8 @@ public sealed partial class App : Application
         var cancellation = new CancellationTokenSource();
         var readers = Task.WhenAll(
             Task.Run(() => feed.ReadAsync(cancellation.Token)),
-            Task.Run(() => feed.DetectProcessesAsync(cancellation.Token)));
+            Task.Run(() => feed.DetectProcessesAsync(cancellation.Token)),
+            Task.Run(() => feed.DetectAntigravityAsync(cancellation.Token)));
 
         var menu = new NativeMenu();
         var panelMenu = new ContextMenu { Classes = { "neon-panel-menu" } };

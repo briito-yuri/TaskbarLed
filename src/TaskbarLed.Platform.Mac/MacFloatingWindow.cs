@@ -50,6 +50,7 @@ public static class MacFloatingWindow
         }
 
         MacNative.SendDouble(glass, MacNative.sel_registerName("setCornerRadius:"), 16);
+        MacNative.SendNUInt(glass, MacNative.sel_registerName("setStyle:"), 1); // NSGlassEffectViewStyleClear
         // Fill the window using the NSView autoresizing mask and the current window content rectangle.
         MacNative.SendNUInt(glass, MacNative.sel_registerName("setAutoresizingMask:"), 18);
         MacNative.SendRect(glass, MacNative.sel_registerName("setFrame:"), new MacNative.CGRect { Width = width, Height = height });

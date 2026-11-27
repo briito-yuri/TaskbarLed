@@ -197,14 +197,12 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
         var rules = Path.Combine(IpcEndpoints.DataDirectory, "agents.json");
         var octo = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library",
             "Application Support", "Octo", "agents");
-        var geminiHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gemini");
         var codexHome = Environment.GetEnvironmentVariable("CODEX_HOME");
         if (string.IsNullOrWhiteSpace(codexHome))
         {
             codexHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".codex");
         }
 
-        var observedAntigravity = new HashSet<string>(StringComparer.Ordinal);
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
         do
         {
@@ -218,32 +216,31 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                     session is { EngineName: "Codex", ConversationId: null, ProcessId: { } pid }
                         ? session with { ConversationId = await CodexProcessSessions.FindAsync(pid, cancellationToken).ConfigureAwait(false) }
                         : session)).ConfigureAwait(false);
-                var antigravity = Array.Exists(detected, tool => tool == "Antigravity")
-                    ? await AntigravitySessions.ScanAsync(geminiHome, cancellationToken).ConfigureAwait(false)
-                    : [];
-                var known = new List<Session>(antigravity.Length);
-                foreach (var session in antigravity)
-                {
-                    if (session.Status == SessionStatus.Running)
-                    {
-                        observedAntigravity.Add(session.Id);
-                        known.Add(session);
-                    }
-                    else if (observedAntigravity.Remove(session.Id))
-                    {
-                        known.Add(session with { Status = SessionStatus.Completed, PromptEndedAt = session.LastUpdated });
-                    }
-                    else
-                    {
-                        known.Add(session);
-                    }
-                }
-
-                observedAntigravity.IntersectWith(antigravity.Select(s => s.Id));
-                Volatile.Write(ref _antigravity, [.. known]);
                 var codex = detected.Contains("Codex") || linked.Any(s => s.EngineName == "Codex")
                     ? _codexReader.Scan(codexHome, DateTimeOffset.UtcNow) : [];
                 Volatile.Write(ref _codexFeed, new(linked, codex));
+            }
+        }
+        while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
+    }
+
+    public async Task DetectAntigravityAsync(CancellationToken cancellationToken)
+    {
+        var home = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gemini");
+        var activity = new AntigravityActivity();
+        using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(500));
+        do
+        {
+            if (Volatile.Read(ref _detected).Contains("Antigravity"))
+            {
+                var started = DateTimeOffset.UtcNow;
+                var sessions = await AntigravitySessions.ScanAsync(home, cancellationToken).ConfigureAwait(false);
+                Volatile.Write(ref _antigravity, activity.Update(sessions, started, DateTimeOffset.UtcNow));
+            }
+            else
+            {
+                activity = new AntigravityActivity();
+                Volatile.Write(ref _antigravity, []);
             }
         }
         while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));

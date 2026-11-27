@@ -22,8 +22,8 @@ internal static class PanelThemes
 
     private static readonly Dictionary<string, Palette> MacPalettes = new(StringComparer.Ordinal)
     {
-        ["LiquidGlass"] = new("#E6F5FAFF", "#EAFDFFFF", "#162B3D", "#455C70", "#145664", "#853C15",
-            "#315D49", "#102638", "#5EE4F5FF", "Transparent", "#7894A8", Child: "#24FFFFFF",
+        ["LiquidGlass"] = new("#E6F5FAFF", "#C7FDFFFF", "#102638", "#455C70", "#145664", "#853C15",
+            "#315D49", "#102638", "#96F1F8FF", "Transparent", "#7894A8", Child: "#92F1F8FF",
             Font: "Helvetica Neue", Divider: "#34718AA0", Radius: 16, Padding: new Thickness(8, 3)),
         ["Matrix"] = new("#07130C", "#30523A", "#C2EDCE", "#A1BAA7", "#95E9A6", "#FFD38D",
             "#ACDFC0", "#DBF6DF", "#102519", "Transparent", "#41644B", Divider: "#233B2B"),
@@ -88,8 +88,8 @@ internal static class PanelThemes
                     EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
                     GradientStops =
                     {
-                        new GradientStop(Color.Parse("#EEF9FCFF"), 0),
-                        new GradientStop(Color.Parse("#CFE3F2FB"), 1),
+                        new GradientStop(Color.Parse("#50F9FCFF"), 0),
+                        new GradientStop(Color.Parse("#20E3F2FB"), 1),
                     },
                 };
             }
