@@ -11,6 +11,13 @@
 
 [English](README.md) · **Português**
 
+**Instaladores para macOS (.pkg) · prévia**
+
+[![Apple Silicon installer](https://img.shields.io/badge/Apple%20Silicon-.pkg-286C63?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-arm64.pkg)
+[![Intel installer](https://img.shields.io/badge/Intel-.pkg-415687?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-c951755/TaskbarLed-osx-x64.pkg)
+
+[Como instalar](INSTALAR-MACOS.md)
+
 [![Baixar para Mac](https://img.shields.io/badge/Baixar%20para%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
 
 Apple Silicon (M1 em diante), macOS 14 ou posterior. Extraia o ZIP, mova Neon Task Bar.app para Aplicativos e abra. O runtime já vem incluído.
