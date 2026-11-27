@@ -1,10 +1,10 @@
-# Temas do Neon TSB Agents no macOS
+# Temas do TaskbarLed no macOS
 
-Capturas dos 17 temas do painel renderizadas pelo Neon TSB Agents com duas sessões e quatro subagentes. Escolha um tema no menu **Temas** da barra.
+Capturas dos 17 temas do painel renderizadas pelo TaskbarLed com duas sessões e quatro subagentes. Escolha um tema no menu **Temas** da barra.
 
 [Instalação no Mac](MACOS.pt-BR.md) · [Voltar ao README](../README.pt-BR.md)
 
-## Temas criados para o macOS
+## Temas compartilhados
 
 | Mapa de Linhas | Liquid Glass |
 | --- | --- |
@@ -30,15 +30,15 @@ A captura da galeria mostra o gradiente do painel. No macOS 26, o vidro nativo d
 
 ### Editor de posição, tamanho e opacidade
 
-![Editor do Neon TSB Agents no macOS 26 com Liquid Glass, modo Manual e opacidade em 81%](images/macos-themes/LiquidGlassEditor.png)
+![Editor do TaskbarLed no macOS 26 com Liquid Glass, modo Manual e opacidade em 81%](images/macos-themes/LiquidGlassEditor.png)
 
 Captura do app empacotado no macOS 26.5.2. A linha concluída usa dados de teste.
 
 ## Outros temas incluídos
 
-| Neon TSB Agents | Modern Terminal |
+| Claude Code | Modern Terminal |
 | --- | --- |
-| [![Neon TSB Agents](images/macos-themes/ClaudeCode.png)](images/macos-themes/ClaudeCode.png) | [![Modern Terminal](images/macos-themes/ModernTerminal.png)](images/macos-themes/ModernTerminal.png) |
+| [![Claude Code](images/macos-themes/ClaudeCode.png)](images/macos-themes/ClaudeCode.png) | [![Modern Terminal](images/macos-themes/ModernTerminal.png)](images/macos-themes/ModernTerminal.png) |
 
 | Matrix | Mono |
 | --- | --- |

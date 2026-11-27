@@ -1,13 +1,22 @@
 using System.Globalization;
 using System.Text.Json;
 using TaskbarLed.Core.Sessions;
+using TaskbarLed.Core.Sources;
 
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Sources.Codex;
 
 /// <summary>Reads turn boundaries and parent links from the local Codex session logs.</summary>
-internal sealed class CodexSessions
+public sealed class CodexSessions(string home = "") : ISessionScanner
 {
     private readonly Dictionary<string, (DateTime Modified, long Length, Session? Session)> _cache = new(StringComparer.Ordinal);
+
+    public string SourceId => "codex";
+
+    public ValueTask<IReadOnlyList<Session>> ScanAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.FromResult<IReadOnlyList<Session>>(Scan(home, DateTimeOffset.UtcNow));
+    }
 
     public Session[] Scan(string home, DateTimeOffset now)
     {

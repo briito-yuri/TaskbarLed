@@ -116,6 +116,10 @@ dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\Task
 
 O TaskbarLed pede permissão antes de se conectar ao Claude Code. Ele adiciona hooks ao `~/.claude/settings.json`, mantém seus hooks e configurações atuais e salva um backup ao lado do arquivo. Ele também passa a iniciar com o Windows. Os dois podem ser desligados pelo menu.
 
+## macOS (prévia)
+
+A prévia sem assinatura ou notarização exige macOS 14 ou posterior e oferece versões para Apple Silicon e Intel. O painel flutuante acima do Dock mostra sessões e subagentes. [Guia do macOS](docs/MACOS.pt-BR.md) · [Galeria de temas](docs/MACOS-THEMES.md)
+
 ## Como usar
 
 | Para… | Faça isso |
@@ -160,12 +164,6 @@ O desenho completo está em [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), em ing
 - O limite do plano (janela de 5h e semanal) ainda não aparece: o app desktop não repassa esse dado aos hooks.
 - O texto da resposta atualiza a cada mensagem, não palavra por palavra.
 - O modo **Na barra de tarefas** espera a barra embaixo, que é o padrão do Windows 11. Com a barra em ocultação automática, o painel flutua acima da borda da tela.
-
-## Versão para macOS
-
-A versão para macOS roda como um painel flutuante acima do Dock no macOS 14 ou posterior. Há instaladores nativos separados para Apple Silicon (M1 em diante) e Intel. A prévia do instalador usa o nome **Neon TSB Agents** no macOS.
-
-[Downloads e instalação no Mac](INSTALAR-MACOS.md) · [Guia do macOS](docs/MACOS.pt-BR.md) · [Galeria de temas do macOS](docs/MACOS-THEMES.md)
 
 ## Próximos passos
 

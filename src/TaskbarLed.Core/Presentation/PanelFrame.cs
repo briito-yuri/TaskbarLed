@@ -9,6 +9,7 @@ namespace TaskbarLed.Core.Presentation;
 /// <param name="IsSelected">The feed is showing this session.</param>
 public sealed record ChannelState(string SessionId, string Label, SessionStatus Status, bool IsSelected);
 
+/// <summary>A session header or child row with its display state and route information.</summary>
 public sealed record SessionDisplayRow(string? SessionId, string Label, SessionStatus Status, bool IsHeader, int SecondsRemaining = 0, bool HasStatus = true)
 {
     public string? Engine { get; init; }
@@ -37,6 +38,7 @@ public sealed record PanelFrame(
     bool NeedsAttention,
     bool HasActivity)
 {
+    /// <summary>Session and worker rows in display order.</summary>
     public IReadOnlyList<SessionDisplayRow> SessionRows { get; init; } = [];
 
     public static PanelFrame Empty(string feed) =>

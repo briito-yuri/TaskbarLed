@@ -2,10 +2,10 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Platform.Mac;
 
 /// <summary>Identifies local agent processes by executable name, without reading their arguments.</summary>
-internal static class AgentProcesses
+public static class AgentProcesses
 {
     private static readonly Dictionary<string, string> BuiltIn = new(StringComparer.OrdinalIgnoreCase)
     {

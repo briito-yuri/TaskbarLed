@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#FBFCF9" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#D3D8CE" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#313B34" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#536860" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#A74232" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#416A51" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#FBFCF9" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.AccentBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionTitleBrush" Color="#232924" />
+  <SolidColorBrush x:Key="Led.SessionRunningBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.SessionHeaderStatusBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.SessionNodeBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.SessionHeaderBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionRailBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.SessionTreeBrush" Color="#146B74" />
+  <SolidColorBrush x:Key="Led.SessionChildBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionStatusBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionDividerBrush" Color="Transparent" />
+  <Color x:Key="Led.GlowColor">Transparent</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0</sys:Double>
+  <x:Static x:Key="Led.FeedPrefix" Member="sys:String.Empty" />
+  <FontFamily x:Key="Led.FontFamily">Helvetica Neue, Consolas, Courier New</FontFamily>
+  <sys:Double x:Key="Led.PanelRadius">8</sys:Double>
+  <SolidColorBrush x:Key="Led.BrandHeaderBrush" Color="#243B4D" />
+  <SolidColorBrush x:Key="Led.RouteDividerBrush" Color="#E0E6E2" />
+</ResourceDictionary>

@@ -47,3 +47,43 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: gh release create "$env:TAG" TaskbarLed-win-x64.zip TaskbarLed-win-x64.zip.sha256 --title "TaskbarLed $env:TAG" --generate-notes
+
+  release-macos:
+    needs: release
+    runs-on: macos-latest
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Test and package
+        shell: bash
+        run: |
+          [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          export TASKBARLED_VERSION="${TAG#v}"
+          for project in tests/*.Tests; do
+            dotnet test "$project" -c Release
+          done
+          for rid in osx-arm64 osx-x64; do
+            src/TaskbarLed.App.Avalonia/build-macos.sh "$rid"
+          done
+
+      - name: Upload Mac installers and checksums
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          files=()
+          for rid in osx-arm64 osx-x64; do
+            dir="artifacts/TaskbarLed-$rid"
+            for ext in zip pkg; do
+              name="TaskbarLed-$rid.$ext"
+              (cd "$dir" && shasum -a 256 "$name" > "$name.sha256")
+              files+=("$dir/$name" "$dir/$name.sha256")
+            done
+          done
+          gh release upload "$TAG" "${files[@]}"

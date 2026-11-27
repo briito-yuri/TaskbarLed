@@ -116,6 +116,10 @@ dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\Task
 
 TaskbarLed asks before connecting to Claude Code. It adds its hooks to `~/.claude/settings.json`, keeps your existing hooks and settings, and saves a backup next to the file. It also starts with Windows. Both can be turned off from the menu.
 
+## macOS (preview)
+
+The unsigned preview requires macOS 14 or later and supports Apple Silicon and Intel. It shows agent sessions and subagents in a floating panel above the Dock. [macOS guide](docs/MACOS.md) · [Theme gallery](docs/MACOS-THEMES.md)
+
 ## Using it
 
 | To… | Do this |
@@ -160,12 +164,6 @@ Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design.
 - Plan limits (5-hour and weekly) are not shown yet: the desktop app does not pass them to hooks.
 - The reply text updates once per message, not token by token.
 - **On the taskbar** placement expects a bottom taskbar (the Windows 11 default). With an auto-hidden taskbar, the panel floats above the screen edge instead.
-
-## macOS edition
-
-The macOS edition runs as a floating panel above the Dock on macOS 14 or later. It has separate native installers for Apple Silicon (M1 or later) and Intel. The current installer preview uses the name **Neon TSB Agents** on macOS.
-
-[macOS downloads and installation](INSTALAR-MACOS.md) · [macOS guide](docs/MACOS.md) · [macOS theme gallery](docs/MACOS-THEMES.md)
 
 ## Roadmap
 

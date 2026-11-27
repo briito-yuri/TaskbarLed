@@ -5,16 +5,19 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
 using TaskbarLed.Core.Sessions;
+using TaskbarLed.Core.Sources;
 
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Sources.Octo;
 
 /// <summary>Reads the status message from Octo's local holder protocol v1 without attaching to the terminal.</summary>
-internal static class OctoSessions
+public sealed class OctoSessions(string agents) : ISessionScanner
 {
     private const string Source = "octo";
     private const int Protocol = 1;
 
-    public static async Task<Session[]> ScanAsync(string agents, CancellationToken cancellationToken)
+    public string SourceId => Source;
+
+    public async ValueTask<IReadOnlyList<Session>> ScanAsync(CancellationToken cancellationToken)
     {
         try
         {

@@ -19,6 +19,10 @@ On macOS, the Octo integration uses authenticated loopback TCP to read session s
 | Hook events from Claude Code: prompt titles, tool names and inputs, the last reply | To show what each session is doing |
 | The end of each session's transcript (`.jsonl` under `~/.claude`) | The chat's title, and to notice a prompt you interrupted |
 | Titles and positions of windows on screen | To know whether Claude or VS Code is in sight |
+| Octo `runtime.json` and `agent.json` (including the holder token) | Read local session state. The token is used for the loopback handshake only. |
+| Antigravity conversation index and recent stream boundaries | Identify active workers and link them to their parent session |
+| Recent Codex session records | Read turn state and link subagents to their parent |
+| macOS process list from `/bin/ps` | Detect known agent executables |
 | JSON theme files in `%APPDATA%\TaskbarLed\themes` | Your own themes |
 
 | It writes | Why |
@@ -27,6 +31,7 @@ On macOS, the Octo integration uses authenticated loopback TCP to read session s
 | `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` | Start with Windows; can be turned off in the menu |
 | `%APPDATA%\TaskbarLed` | Settings and themes |
 | `%LOCALAPPDATA%\TaskbarLed` | Log and spool (see below) |
+| `~/Library/Application Support/TaskbarLed` | macOS panel preferences and per-user hook spool |
 
 **Events at rest.** While the panel is closed, the hook saves events in `%LOCALAPPDATA%\TaskbarLed\spool` so the panel can catch up when it starts. These files hold the same content Claude Code already keeps in its transcripts, including commands and file contents passed to tools. At most 500 are kept; they are deleted when the panel next starts. The log holds errors and theme problems, never event contents.
 
@@ -46,5 +51,7 @@ On macOS, the Octo integration uses authenticated loopback TCP to read session s
   ```powershell
   Get-FileHash TaskbarLed-win-x64.zip -Algorithm SHA256
   ```
+
+The macOS preview `.pkg` is unsigned and unnotarized. Check its published SHA-256 before installing.
 
 Do not run TaskbarLed as administrator: it does not need it.

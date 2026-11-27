@@ -4,6 +4,7 @@
 -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:app="using:TaskbarLed.App.Avalonia"
              xmlns:vm="using:TaskbarLed.App.Avalonia.Presentation"
              xmlns:panels="using:TaskbarLed.App.Avalonia.Panels"
              x:Class="TaskbarLed.App.Avalonia.Panels.PanelView"
@@ -46,7 +47,7 @@
       <Setter Property="CornerRadius" Value="0" />
     </Style>
     <Style Selector="TextBlock.editorial-engine">
-      <Setter Property="Foreground" Value="#9A332C" />
+      <Setter Property="Foreground" Value="{DynamicResource Led.SessionRailBrush}" />
     </Style>
 
     <Style Selector="Border.session-row">
@@ -83,10 +84,10 @@
       <Setter Property="Foreground" Value="{DynamicResource Led.AttentionBrush}" />
     </Style>
     <Style Selector="Border.cobalt.header TextBlock.session-status">
-      <Setter Property="Foreground" Value="#E8F0FF" />
+      <Setter Property="Foreground" Value="{DynamicResource Led.SessionHeaderStatusBrush}" />
     </Style>
     <Style Selector="Border.cobalt.header TextBlock.session-status.waiting">
-      <Setter Property="Foreground" Value="#FFE3A7" />
+      <Setter Property="Foreground" Value="{DynamicResource Led.SessionHeaderWaitingBrush}" />
     </Style>
     <Style Selector="Border.session-completion">
       <Setter Property="IsVisible" Value="False" />
@@ -158,14 +159,14 @@
 
       <Grid Name="PanelContent" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
         <Grid Grid.ColumnSpan="2" Height="26" Margin="0,0,0,3">
-          <Border IsVisible="{Binding ShowLineMap}" Background="#243B4D" CornerRadius="4,4,0,0" />
+          <Border IsVisible="{Binding ShowLineMap}" Background="{DynamicResource Led.BrandHeaderBrush}" CornerRadius="4,4,0,0" />
           <Border HorizontalAlignment="Center" VerticalAlignment="Center" Padding="7,2"
                   CornerRadius="8" Background="{DynamicResource Led.BrandBackdropBrush}">
           <StackPanel Orientation="Horizontal" Spacing="6">
-            <Image Source="/Assets/NeonMark.png" Width="17" Height="17" VerticalAlignment="Center" />
-            <TextBlock Text="Neon TSB Agents" VerticalAlignment="Center" IsVisible="{Binding !ShowLineMap}"
+            <Image Source="/Assets/TaskbarLedMark.png" Width="17" Height="17" VerticalAlignment="Center" />
+            <TextBlock Text="{x:Static app:App.DisplayName}" VerticalAlignment="Center" IsVisible="{Binding !ShowLineMap}"
                        Foreground="{DynamicResource Led.ForegroundBrush}" FontSize="12" FontWeight="SemiBold" />
-            <TextBlock Text="Neon TSB Agents" VerticalAlignment="Center" IsVisible="{Binding ShowLineMap}"
+            <TextBlock Text="{x:Static app:App.DisplayName}" VerticalAlignment="Center" IsVisible="{Binding ShowLineMap}"
                        Foreground="White" FontSize="12" FontWeight="SemiBold" />
           </StackPanel>
           </Border>
@@ -254,7 +255,7 @@
                       </Border>
                     </Grid>
                     <Grid ColumnDefinitions="29,*,Auto" Margin="5,0,8,0" IsVisible="{Binding IsLineMap}">
-                      <Border Grid.ColumnSpan="3" Height="1" Background="#E0E6E2" IsVisible="{Binding Row.LastStation}"
+                      <Border Grid.ColumnSpan="3" Height="1" Background="{DynamicResource Led.RouteDividerBrush}" IsVisible="{Binding Row.LastStation}"
                               VerticalAlignment="Bottom" IsHitTestVisible="False" />
                       <Grid Grid.Column="0" RowDefinitions="*,*">
                         <Border Grid.Row="0" Width="2" IsVisible="{Binding IsChild}"

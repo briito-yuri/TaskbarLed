@@ -1,4 +1,4 @@
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Sources.Antigravity;
 
 /// <summary>Reads worker stream boundaries from recent CLI logs.</summary>
 internal static class AntigravityStreams

@@ -18,6 +18,9 @@
   Led.DotGridBrush         overlay that turns the feed into LED dots; a Transparent SolidColorBrush for none
   Led.FeedPrefix           glyph drawn before the feed line, like a prompt or spinner; empty for none
   Led.AccentBrush          color of that glyph (it pulses while the session runs)
+  Optional panel resources: Led.Session*Brush, Led.CompletionBrush, Led.CompletionTint,
+  Led.BrandBackdropBrush, Led.BrandHeaderBrush, Led.RouteDividerBrush, Led.PanelSurfaceBrush (gradient), Led.PanelPadding (Thickness),
+  Led.PanelRadius and Led.FrameThickness (sys:Double). Used by the floating panel.
 -->
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

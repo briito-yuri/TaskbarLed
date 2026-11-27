@@ -1,6 +1,6 @@
 using TaskbarLed.Core.Sessions;
 
-namespace TaskbarLed.App.Avalonia.Tests;
+namespace TaskbarLed.Sources.Codex.Tests;
 
 public class CodexSessionsTests
 {
@@ -45,5 +45,16 @@ public class CodexSessionsTests
         {
             home.Delete(recursive: true);
         }
+    }
+    [Fact]
+    public void Process_links_only_one_distinct_rollout()
+    {
+        const string id = "01a2199c-59d0-71b1-bb79-58586fd61df3";
+        const string path = "n/tmp/rollout-2026-11-26T17-46-46-" + id + ".jsonl";
+        Assert.Equal(Guid.Parse(id), CodexProcessSessions.FindConversation(path + "\n" + path));
+        Assert.Null(CodexProcessSessions.FindConversation(path + "\n" + path.Replace("fd61df3", "fd61df4", StringComparison.Ordinal)));
+        var child = path.Replace("fd61df3", "fd61df4", StringComparison.Ordinal);
+        Assert.Equal(Guid.Parse(id), CodexProcessSessions.FindConversation(path + "\n" + child,
+            filename => filename == child[1..]));
     }
 }

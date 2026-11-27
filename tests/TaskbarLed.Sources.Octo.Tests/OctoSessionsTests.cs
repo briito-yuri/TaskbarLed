@@ -1,7 +1,7 @@
 using System.Text.Json;
 using TaskbarLed.Core.Sessions;
 
-namespace TaskbarLed.App.Avalonia.Tests;
+namespace TaskbarLed.Sources.Octo.Tests;
 
 public class OctoSessionsTests
 {

@@ -49,14 +49,11 @@ jobs:
 
       - name: Test
         run: |
-          for project in \
-            tests/TaskbarLed.Core.Tests \
-            tests/TaskbarLed.Sources.ClaudeCode.Tests \
-            tests/TaskbarLed.Platform.Mac.Tests \
-            tests/TaskbarLed.App.Avalonia.Tests; do
+          for project in tests/*.Tests; do
             dotnet test "$project" -c Release
           done
 
+      # Packaging publishes both the app and hook for each architecture.
       - name: Package app (Apple Silicon)
         run: src/TaskbarLed.App.Avalonia/build-macos.sh
 

@@ -3,6 +3,7 @@ namespace TaskbarLed.Core.Ipc;
 /// <summary>Where the hook and the panel meet. Shared by both sides so they can never drift apart.</summary>
 public static class IpcEndpoints
 {
+    /// <summary>Oversized events are intentionally dropped to bound hook memory and spool usage.</summary>
     public const int MaxPayloadBytes = 2 * 1024 * 1024;
 
     /// <summary>Named pipe for live events, scoped per Windows user.</summary>

@@ -3,17 +3,17 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Sources.Codex;
 
-internal static class CodexProcessSessions
+public static class CodexProcessSessions
 {
-    public static async Task<Guid?> FindAsync(int pid, CancellationToken cancellationToken)
+    public static async Task<Guid?> FindAsync(string processInspector, int pid, CancellationToken cancellationToken)
     {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromMilliseconds(700));
         try
         {
-            var options = new ProcessStartInfo("/usr/sbin/lsof")
+            var options = new ProcessStartInfo(processInspector)
             {
                 ArgumentList = { "-nP", "-a", "-p", pid.ToString(CultureInfo.InvariantCulture), "-Fn" },
                 RedirectStandardOutput = true,

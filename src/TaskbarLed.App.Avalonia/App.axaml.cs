@@ -14,7 +14,7 @@ namespace TaskbarLed.App.Avalonia;
 
 public sealed partial class App : Application
 {
-    internal const string DisplayName = "Neon TSB Agents";
+    public const string DisplayName = "TaskbarLed";
 
     public override void Initialize()
     {
@@ -61,6 +61,7 @@ public sealed partial class App : Application
 
         var feed = new LiveFeed(culture, CompletionSound.Play);
         var pt = culture.TwoLetterISOLanguageName == "pt";
+        var strings = MacUiStrings.For(pt);
         var preferences = PanelPreferences.Load();
         var currentTheme = PanelThemes.Apply(this, viewModel, preferences.Theme);
         var panel = new FloatingPanelWindow(viewModel, () => feed.Compose(DateTimeOffset.Now), feed.Acknowledge, feed.Skip, portuguese: pt);
@@ -86,7 +87,7 @@ public sealed partial class App : Application
                         Spacing = 12,
                         Children =
                         {
-                            new TextBlock { Text = pt ? "Não foi possível salvar as preferências." : "Could not save panel preferences.",
+                            new TextBlock { Text = strings.SaveFailed,
                                 TextWrapping = TextWrapping.Wrap },
                             close,
                         },
@@ -104,12 +105,12 @@ public sealed partial class App : Application
             Task.Run(() => feed.DetectAntigravityAsync(cancellation.Token)));
 
         var menu = new NativeMenu();
-        var panelMenu = new ContextMenu { Classes = { "neon-panel-menu" } };
-        panelMenu.Items.Add(new MenuItem { Header = DisplayName, IsEnabled = false, Classes = { "neon-menu-heading" } });
+        var panelMenu = new ContextMenu { Classes = { "taskbarled-panel-menu" } };
+        panelMenu.Items.Add(new MenuItem { Header = DisplayName, IsEnabled = false, Classes = { "taskbarled-menu-heading" } });
         panelMenu.Items.Add(new Separator());
         panel.ContextMenu = panelMenu;
         var nativeThemes = new NativeMenu();
-        var contextThemes = new MenuItem { Header = pt ? "Temas" : "Themes" };
+        var contextThemes = new MenuItem { Header = strings.Themes };
         var checks = new List<(PanelThemes.Theme Theme, NativeMenuItem Native, MenuItem Context)>();
         foreach (var theme in PanelThemes.All)
         {
@@ -147,17 +148,17 @@ public sealed partial class App : Application
             panelMenu.Items.Add(context);
         }
 
-        AddAction(pt ? "Editar posição e tamanho…" : "Edit position and size…", panel.BeginEdit);
-        AddAction(pt ? "Voltar para acima do Dock" : "Reset position above Dock", panel.ResetPosition);
-        AddAction(pt ? "Ativar integração com Claude Code…" : "Enable Claude Code integration…",
+        AddAction(strings.EditPlacement, panel.BeginEdit);
+        AddAction(strings.ResetPlacement, panel.ResetPosition);
+        AddAction(strings.EnableIntegration,
             () => ConfigureHooks(pt, install: true));
-        AddAction(pt ? "Desativar integração com Claude Code…" : "Disable Claude Code integration…",
+        AddAction(strings.DisableIntegration,
             () => ConfigureHooks(pt, install: false));
-        menu.Items.Add(new NativeMenuItem(pt ? "Temas" : "Themes") { Menu = nativeThemes });
+        menu.Items.Add(new NativeMenuItem(strings.Themes) { Menu = nativeThemes });
         panelMenu.Items.Add(contextThemes);
         UpdateChecks();
 
-        var toggle = new NativeMenuItem(pt ? "Mostrar painel sem atividade" : "Show panel when idle") { ToggleType = MenuItemToggleType.CheckBox };
+        var toggle = new NativeMenuItem(strings.ShowWhenIdle) { ToggleType = MenuItemToggleType.CheckBox };
         toggle.Click += (_, _) =>
         {
             panel.KeepVisible = !panel.KeepVisible;
@@ -184,14 +185,14 @@ public sealed partial class App : Application
     {
         var error = Program.ChangeHooks(install);
         var message = error is not null
-            ? (portuguese ? "Não foi possível atualizar a integração do Claude Code." : "Could not update Claude Code integration.")
+            ? (MacUiStrings.For(portuguese).IntegrationFailed)
                 + Environment.NewLine + error
             : install
                 ? (portuguese ? "Integração ativada. Reinicie as sessões abertas do Claude Code."
                     : "Integration enabled. Restart your open Claude Code sessions.")
                 : (portuguese ? "Integração desativada. Reinicie as sessões abertas do Claude Code."
                     : "Integration disabled. Restart your open Claude Code sessions.");
-        var done = new Button { Content = portuguese ? "Fechar" : "Close" };
+        var done = new Button { Content = MacUiStrings.For(portuguese).Close };
         var dialog = new Window
         {
             Title = DisplayName,
@@ -219,7 +220,7 @@ public sealed partial class App : Application
         {
             Header = theme.Name,
             ToggleType = MenuItemToggleType.CheckBox,
-            Classes = { "neon-theme-option" },
+            Classes = { "taskbarled-theme-option" },
             HeaderTemplate = new global::Avalonia.Controls.Templates.FuncDataTemplate<string>((name, _) =>
             {
                 var swatch = new Border
@@ -248,7 +249,7 @@ public sealed partial class App : Application
 
     internal static void AddQuitItems(NativeMenu menu, ContextMenu panelMenu, bool portuguese, Action shutdown)
     {
-        var label = portuguese ? "Encerrar" : "Quit";
+        var label = MacUiStrings.For(portuguese).Quit;
         void ScheduleShutdown() => global::Avalonia.Threading.Dispatcher.UIThread.Post(shutdown,
             global::Avalonia.Threading.DispatcherPriority.Background);
 
@@ -258,14 +259,14 @@ public sealed partial class App : Application
         menu.Items.Add(native);
 
         panelMenu.Items.Add(new Separator());
-        var context = new MenuItem { Header = label, Classes = { "neon-menu-quit" } };
+        var context = new MenuItem { Header = label, Classes = { "taskbarled-menu-quit" } };
         context.Click += (_, _) => ScheduleShutdown();
         panelMenu.Items.Add(context);
     }
 
     private static WindowIcon CreateTrayIcon()
     {
-        using var mark = AssetLoader.Open(new Uri("avares://TaskbarLed/Assets/NeonMark.png"));
+        using var mark = AssetLoader.Open(new Uri("avares://TaskbarLed/Assets/TaskbarLedMark.png"));
         return new WindowIcon(mark);
     }
 }

@@ -1,7 +1,6 @@
-using System.Globalization;
 using TaskbarLed.Core.Sessions;
 
-namespace TaskbarLed.App.Avalonia.Tests;
+namespace TaskbarLed.Sources.Antigravity.Tests;
 
 public class AntigravitySessionsTests
 {
@@ -21,13 +20,8 @@ public class AntigravitySessionsTests
         Assert.Equal(3, sessions.Length);
         Assert.Equal(2, sessions.Count(s => s.Status == SessionStatus.Running));
 
-        var feed = new LiveFeed(CultureInfo.GetCultureInfo("pt-BR"));
-        var frame = feed.Compose(DateTimeOffset.UtcNow, sessions);
-        Assert.True(frame.HasActivity);
-        Assert.Collection(frame.SessionRows,
-            header => { Assert.True(header.IsHeader); Assert.Equal(SessionStatus.Idle, header.Status); Assert.Equal("Antigravity → German project", header.Label); },
-            child => { Assert.False(child.IsHeader); Assert.Equal("Subagente Vocabulary", child.Label); },
-            child => { Assert.False(child.IsHeader); Assert.Equal("Subagente Grammar", child.Label); });
+        Assert.All(sessions.Where(session => session.Status == SessionStatus.Running),
+            session => Assert.Equal(sessions[0].Id, session.ParentId));
     }
 
     [Fact]
@@ -93,7 +87,7 @@ public class AntigravitySessionsTests
             Assert.Equal(0, sqlite.ExitCode);
             File.Delete(db + "-wal");
             File.Delete(db + "-shm");
-            var session = Assert.Single(await AntigravitySessions.ScanAsync(home.FullName, CancellationToken.None));
+            var session = Assert.Single(await new AntigravitySessions(home.FullName, "/usr/bin/sqlite3").ScanAsync(CancellationToken.None));
             Assert.Equal("Alemão", session.Title);
             Assert.Equal(SessionStatus.Running, session.Status);
             Assert.False(File.Exists(db + "-wal"));

@@ -1,6 +1,6 @@
 using TaskbarLed.Core.Sessions;
 
-namespace TaskbarLed.App.Avalonia.Tests;
+namespace TaskbarLed.Sources.Octo.Tests;
 
 public class SessionDeduplicationTests
 {
@@ -13,7 +13,7 @@ public class SessionDeduplicationTests
         var codex = Session.Create("codex:1", "codex", now) with { ConversationId = id, Status = SessionStatus.Running };
         var another = Session.Create("codex:2", "codex", now) with { ConversationId = Guid.NewGuid(), Status = SessionStatus.Running };
 
-        var rows = LiveFeed.MergeExternal([octo], [], [codex, another]).ToArray();
+        var rows = OctoSessionReconciler.Reconcile([octo], [], [codex, another]).ToArray();
         Assert.Equal(2, rows.Length);
         Assert.Equal("codex:1", rows[0].Id);
         Assert.Equal("Octo title", rows[0].Title);
@@ -21,15 +21,4 @@ public class SessionDeduplicationTests
         Assert.Equal(another, rows[1]);
     }
 
-    [Fact]
-    public void Process_links_only_one_distinct_rollout()
-    {
-        const string id = "01a2199c-59d0-71b1-bb79-58586fd61df3";
-        const string path = "n/tmp/rollout-2026-11-26T17-46-46-" + id + ".jsonl";
-        Assert.Equal(Guid.Parse(id), CodexProcessSessions.FindConversation(path + "\n" + path));
-        Assert.Null(CodexProcessSessions.FindConversation(path + "\n" + path.Replace("fd61df3", "fd61df4", StringComparison.Ordinal)));
-        var child = path.Replace("fd61df3", "fd61df4", StringComparison.Ordinal);
-        Assert.Equal(Guid.Parse(id), CodexProcessSessions.FindConversation(path + "\n" + child,
-            filename => filename == child[1..]));
-    }
 }

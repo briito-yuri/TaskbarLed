@@ -1,115 +1,51 @@
-# Neon TSB Agents on macOS
+# TaskbarLed on macOS
 
-[Português do Brasil](MACOS.pt-BR.md)
+[Português do Brasil](MACOS.pt-BR.md) · [Theme gallery](MACOS-THEMES.md)
 
-Neon TSB Agents can be built for Apple Silicon (M1 and newer) or Intel in two separate ZIPs. Both require macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
+## Requirements
+
+The macOS preview requires macOS 14 or later. Apple Silicon (arm64, M1 or newer) was tested natively on an M2 with macOS 26.5.2. Intel (x64) was built for Intel and tested through Rosetta on that M2. Physical Intel hardware and other macOS versions still need direct verification.
 
 ## Install
 
-[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip). Unzip it, move `Neon Task Bar.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+When macOS packages are published, get the appropriate `.pkg` from the [upstream releases](https://github.com/llorenzojorge/TaskbarLed/releases). Select the arm64 package for an Apple chip or x64 for Intel. Open the package and follow the installer. Open **TaskbarLed.app** in Applications. For a ZIP build, extract it and move the app to Applications first. Each package includes the .NET runtime.
 
-The download above is the latest public release. To try the branch’s current build with Liquid Glass and Intel support, follow the build instructions below. The 0.5.2 release is a draft.
+The preview is unsigned and not notarized. If macOS says Apple cannot verify the installer, compare its SHA-256 with the release checksum. After trying to open the package, use **System Settings → Privacy & Security → Open Anyway**. You can also inspect the source at the release tag and build it locally. [Apple instructions](https://support.apple.com/en-us/102445)
 
-The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
+## Build from source
 
-## Build and connect Claude Code
-
-From the repository root, with the .NET SDK from `global.json` and Apple's command-line tools:
+Install the .NET SDK from `global.json` and Apple's command-line tools. From the repository root, run the command for your Mac:
 
 ```sh
 src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64
 src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
 ```
 
-Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces a ZIP and a macOS installer package under `artifacts/TaskbarLed-<rid>/`. Open `TaskbarLed-<rid>.pkg` and follow the prompts to install in Applications, or extract the ZIP and move the app to Applications yourself. Both include the runtime. The development installer needs Developer ID Installer signing and notarization for seamless public distribution.
+The script creates a `.pkg` and a `.zip` in `artifacts/TaskbarLed-<rid>/`. Quit any earlier copy before installing an update.
 
-Installer preview from the `macos-port` commit `9fb170f`. [Apple Silicon .pkg](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-arm64.pkg) · [Intel .pkg](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-installer-9fb170f/TaskbarLed-osx-x64.pkg)
+## Use the panel
 
-```sh
-app="/Applications/Neon TSB Agents.app"
-"$app/Contents/MacOS/TaskbarLed" --install-hooks
-open "$app"
-```
+TaskbarLed floats above the Dock. Activity opens the panel. The menu bar icon can keep it visible when idle. Right-click for **Themes**, **Edit position and size** or **Quit**. Choose automatic sizing or drag the right edge, bottom edge or corner in manual mode. Opacity affects the theme surface while text remains legible. Completed sessions are shown for ten seconds. Line Map keeps each route letter stable while its session is visible. Liquid Glass uses the native material on macOS 26; earlier versions use a translucent surface.
 
-To enable or disable Claude Code hooks without a terminal, use the corresponding integration option in the app menu. If you are replacing an earlier Mac build, quit the old app first. Run the hook installer again after moving the new app so Claude Code uses the new path.
+## Connect agents
 
-The installer merges hooks into the Claude Code user settings and saves a backup. Restart existing Claude Code sessions to load the hooks. Claude Code in a terminal, IDE or Claude Desktop sends the same events when it loads those settings. For a custom configuration directory, pass `CLAUDE_CONFIG_DIR` when installing. Run `--uninstall-hooks` with the same executable to disconnect.
+The panel reads local Octo, Codex and Antigravity activity. Subagents are shown below their parent even when it is idle. The local executable probe can identify a running tool without reporting individual sessions. Add a custom process name and display label in `~/Library/Application Support/TaskbarLed/agents.json`.
 
-By default, the panel floats above the Dock on the primary display. It stays visible across foreground app changes while a session is active. Amber means input is needed. Completed turns show a ten-second countdown, with a neutral pulse in Liquid Glass and a soft green highlight in the other themes. Running sessions show their activity and time. Scroll to rotate the feed. Click the feed or a completed tab to acknowledge its result. The menu bar icon can keep the panel visible when idle and quit the app.
+For Claude Code, select **Enable Claude Code integration…** in the app menu and restart your Claude Code sessions. The app preserves existing settings and hooks.
 
-## Move, resize and change the look
-
-Right-click the panel or click the Neon TSB Agents menu bar icon. The right-click menu follows the panel theme and highlights **Quit** (**Encerrar** in Portuguese) with a power icon. **Edit position and size** opens a preview you can drag to another spot. Choose **Automatic** to size the panel to the session names and visible rows, or **Manual** to drag the right edge, bottom edge, or bottom-right corner. **Opacity** adjusts the theme’s background and frame from 70% to 100% while leaving text and statuses at full strength. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
-
-Use **Themes** to switch live between Neon TSB Agents, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. The context menu shows a color sample beside each theme. A checkmark identifies the current theme. Additional options include Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. **Liquid Glass** uses the system glass effect on macOS 26 and a translucent gradient on macOS 14 and 15. Liquid Glass takes its tint from the content behind the window. The default theme is Neon TSB Agents. [See the macOS theme gallery](MACOS-THEMES.md). TaskbarLed stores the selected theme, position, sizing mode, dimensions and opacity in `~/Library/Application Support/TaskbarLed/panel.json`.
-
-## Automatic local detection
-
-TaskbarLed detects known executables for the signed-in user, including Octo, Antigravity (`agy`), Claude, Codex, Cursor, OpenCode, Gemini CLI, Ollama and LM Studio. It checks about every two seconds, groups multiple processes for the same tool, and shows detected tools even without hooks. A detected process can be idle or running in the background. Hooks add per-session activity, requests for input and results.
-
-To recognize a custom tool or orchestrator, add its executable filename and display name to `~/Library/Application Support/TaskbarLed/agents.json`. Changes apply on the next scan. For example:
-
-```json
-{
-  "my-ai-runner": "My AI Runner"
-}
-```
-
-The scan reads executable names, so applications hosted under generic processes like a browser or an interpreter, and tools on another machine, may need a local event adapter.
-
-## Octo
-
-When Octo is running, TaskbarLed reads its local session status and shows working, paused for input and completed turns, including Antigravity sessions. Support uses Octo holder protocol v1, verified with Octo 0.2.52. The panel shows the engine Octo reports. For example, it displays Antigravity for a Gemini model running inside Antigravity.
-
-## Active agents and subagents
-
-The panel groups active sessions by tool and conversation. Each subagent appears indented on its own line below the session. Scroll or hover to read the entire list. In Mapa de Linhas, each session receives a route letter in order, independent of its provider, and keeps that letter until it leaves the panel. `▸` means working, `!` means input is needed, and `✓` marks a reported completion. A new completion plays a short sound and blinks pastel green while its ten-second countdown runs, then clears automatically. Click it to dismiss early. Old completed records do not replay.
-
-- **Antigravity** reads the local conversation index in read-only mode. It reports the parent and workers separately, so an idle parent stays labeled Idle when its children are still working. When an observed running conversation transitions to idle, the panel shows the ten-second completion alert first. It reads titles, agent names, parent links and status as available in the index.
-- **Octo** includes child sessions with a parent link and uses the engine's reported turn status. This also works with Qwen or Kimi sessions Octo tracks.
-- **Codex** reads recent local rollout records for parent links and turn starts, completions and cancellations. When Octo exposes the same Codex conversation, the panel uses the Octo name on a single row. Codex scans up to 128 recently modified logs under `CODEX_HOME/sessions` (default `~/.codex/sessions`).
-- **Claude Code** uses `SubagentStart` and `SubagentStop`. Run `--install-hooks` again and restart existing Claude Code sessions to load the added events.
-- **Other tools or remote workers** can send local events using the bridge below. Pass `parent_session_id` with the parent's ID, and use the same `agent` value as the parent. A process without session telemetry appears as detected and supplies no subagent progress.
-
-## Connect an orchestrator
-
-Claude Code processes launched by an orchestrator are covered when they run on the Mac and load the installed hooks. For other agents, send one JSON object on stdin to `TaskbarLed.Hook agent` on the Mac. Emit events from the orchestrator's lifecycle callbacks, using a stable agent name and a distinct session ID per concurrent job. Use `started` for a new turn, `running` for progress or to resume after waiting, `waiting` for input, `done` for a result, and `ended` to remove a session. `title` and `message` are optional display text. Supply the same title on subsequent events if you want to keep a custom label.
+Other orchestrators can forward events to the included hook. Run the bridge on the Mac, including when it relays events from a remote worker. Each invocation reads one JSON object from stdin:
 
 ```sh
-hook="$app/Contents/MacOS/TaskbarLed.Hook"
+hook="/Applications/TaskbarLed.app/Contents/MacOS/TaskbarLed.Hook"
 printf '%s\n' '{"agent":"pipeline","session_id":"job-42","status":"started","title":"Build"}' | "$hook" agent
-printf '%s\n' '{"agent":"pipeline","session_id":"job-42","status":"waiting","title":"Build","message":"Approval required"}' | "$hook" agent
-printf '%s\n' '{"agent":"pipeline","session_id":"job-42","status":"done","title":"Build","message":"Tests passed"}' | "$hook" agent
 ```
 
-Cloud jobs and tools with no local hooks need an orchestrator or adapter on the Mac to relay their events. The panel cannot infer their state from an open browser tab or process name. The bridge writes events to a per-user spool and the panel consumes them locally. The hook drops input larger than 2 MiB or events received once the queue reaches 500 files.
-
-## Differences from Windows
-
-The Mac build uses a floating panel. Custom JSON themes, theme-dependent sound selection, fullscreen edge alerts, automatic foreground-window matching, click-to-open, and login startup controls are unavailable in this build. The floating window requests visibility across Spaces, but fullscreen behavior depends on macOS and the foreground app. The build is ad hoc signed for local use. Distribution outside this Mac may require Developer ID signing and notarization.
-
-See also [Windows documentation](../README.md).
+Use a stable `agent` and a unique `session_id` for each concurrent job. Supported statuses are `started`, `running`, `waiting`, `done` and `ended`. The optional `title` and `message` fields control the text. Set `parent_session_id` to group a subagent under a parent with the same `agent`. Input over 2 MiB is dropped.
 
 ## Uninstall
 
-1. If you enabled Claude Code integration, select **Disable Claude Code integration…** in the Neon menu and restart your Claude Code sessions.
-2. Select **Quit** from the Neon menu.
-3. In Finder, open **Applications** and move **Neon TSB Agents.app** to the Trash. macOS may ask for administrator authorization if you used the `.pkg` installer.
+Disable Claude Code integration from the menu if enabled, then choose **Quit**. Move the app from Applications to the Trash in Finder. The installer may require administrator authorization to remove it. Preferences remain under `~/Library/Application Support/TaskbarLed`.
 
-Preferences remain in `~/Library/Application Support/TaskbarLed`. The public 0.5.1 build appears as **Neon Task Bar.app**.
+## Release
 
-## Publish a Mac release
-
-Run the Mac tests and verify each installer before publishing it. For public distribution, import both Developer ID identities with their private keys into the build Mac’s keychain. Configure a `notarytool` keychain profile with credentials from the same Apple Developer team. Set all three variables before building:
-
-```sh
-export NEON_MAC_APP_IDENTITY='Developer ID Application: Your Name (TEAMID)'
-export NEON_MAC_INSTALLER_IDENTITY='Developer ID Installer: Your Name (TEAMID)'
-export NEON_MAC_NOTARY_PROFILE='your-keychain-profile'
-src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64
-src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
-```
-
-The script signs the native files and app with Hardened Runtime, signs the `.pkg`, waits for Apple to accept notarization, attaches and validates the ticket, and runs `pkgutil --check-signature` and `spctl --assess --type install`. It copies the artifacts to the output directory after those checks pass. Publish the stapled `.pkg` files and check their public SHA-256 hashes. The ZIP produced by this flow contains the signed app. Notarization and stapling in this flow apply to the `.pkg`.
-
-Leave all three variables unset for local ad hoc builds. Keep private keys and notarization credentials in the keychain. [Apple Developer ID](https://developer.apple.com/developer-id/) · [Apple notarization guide](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)
+The macOS job builds a `.pkg` and `.zip` for each architecture and uploads them with SHA-256 files to the same `vX.Y.Z` release as Windows.

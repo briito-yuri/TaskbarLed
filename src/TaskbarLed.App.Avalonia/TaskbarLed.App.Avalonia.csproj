@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets/NeonMark.png" />
+    <AvaloniaResource Include="Assets/TaskbarLedMark.png" />
     <EmbeddedResource Include="../TaskbarLed.App/Themes/*.xaml" LogicalName="PanelThemes.%(Filename)%(Extension)" />
   </ItemGroup>
 
@@ -29,6 +29,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TaskbarLed.Sources.ClaudeCode\TaskbarLed.Sources.ClaudeCode.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Octo/TaskbarLed.Sources.Octo.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Codex/TaskbarLed.Sources.Codex.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Antigravity/TaskbarLed.Sources.Antigravity.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Generic/TaskbarLed.Sources.Generic.csproj" />
     <ProjectReference Include="..\TaskbarLed.Core\TaskbarLed.Core.csproj" />
     <ProjectReference Include="..\TaskbarLed.Platform.Mac\TaskbarLed.Platform.Mac.csproj" />
   </ItemGroup>

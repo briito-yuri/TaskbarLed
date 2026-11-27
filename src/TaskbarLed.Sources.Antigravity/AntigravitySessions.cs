@@ -3,11 +3,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using TaskbarLed.Core.Sessions;
+using TaskbarLed.Core.Sources;
 
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Sources.Antigravity;
 
 /// <summary>Reads activity and parent links from the local CLI and desktop conversation indexes.</summary>
-internal static class AntigravitySessions
+public sealed class AntigravitySessions(string geminiHome, string sqlitePath,
+    Func<string, bool>? attachedProbe = null, Func<string, bool>? releasedProbe = null) : ISessionScanner
 {
     private const string Query = """
         SELECT c.conversation_id AS id, substr(c.title,1,80) AS title,
@@ -27,16 +29,24 @@ internal static class AntigravitySessions
         ORDER BY c.last_modified_time DESC, c.conversation_id;
         """;
 
-    public static async Task<Session[]> ScanAsync(string geminiHome, CancellationToken cancellationToken)
+    private AntigravityActivity _activity = new();
+
+    public string SourceId => "antigravity";
+
+    public void Reset() => _activity = new AntigravityActivity();
+
+    public async ValueTask<IReadOnlyList<Session>> ScanAsync(CancellationToken cancellationToken)
     {
+        var started = DateTimeOffset.UtcNow;
         var rows = await Task.WhenAll(
             ReadAsync(Path.Combine(geminiHome, "antigravity-cli", "conversation_summaries.db"), cancellationToken),
             ReadAsync(Path.Combine(geminiHome, "antigravity", "conversation_summaries.db"), cancellationToken),
             ReadAsync(Path.Combine(geminiHome, "antigravity-ide", "conversation_summaries.db"), cancellationToken)).ConfigureAwait(false);
-        return [.. rows.SelectMany(row => row).OrderByDescending(s => s.LastUpdated).DistinctBy(s => s.Id)];
+        var sessions = rows.SelectMany(row => row).OrderByDescending(s => s.LastUpdated).DistinctBy(s => s.Id).ToArray();
+        return _activity.Update(sessions, started, DateTimeOffset.UtcNow);
     }
 
-    private static async Task<Session[]> ReadAsync(string db, CancellationToken cancellationToken)
+    private async Task<Session[]> ReadAsync(string db, CancellationToken cancellationToken)
     {
         if (!File.Exists(db))
         {
@@ -67,7 +77,7 @@ internal static class AntigravitySessions
             var activeStreams = sessions.Any(session => session.ParentId is not null && session.Status == SessionStatus.Idle)
                 ? AntigravityStreams.Read(Path.Combine(stateDirectory, "log")) : [];
             var attached = sessions.Where(session => session.ParentId is null && session.ConversationId.HasValue)
-                .Where(session => AntigravityPresence.IsAttached(Path.Combine(presence, $"{session.ConversationId:D}.lock")))
+                .Where(session => attachedProbe?.Invoke(Path.Combine(presence, $"{session.ConversationId:D}.lock")) == true)
                 .Select(session => session.Id).ToHashSet(StringComparer.Ordinal);
             for (var i = 0; i < sessions.Length; i++)
             {
@@ -87,7 +97,7 @@ internal static class AntigravitySessions
                 var session = sessions[i];
                 if (session is { Status: SessionStatus.Running, ParentId: null, ConversationId: { } id }
                     && session.LastUpdated < cutoff && !activeParents.Contains(session.Id)
-                    && AntigravityPresence.WasReleased(Path.Combine(presence, $"{id:D}.lock")))
+                    && releasedProbe?.Invoke(Path.Combine(presence, $"{id:D}.lock")) == true)
                 {
                     sessions[i] = session with { Status = SessionStatus.Idle };
                 }
@@ -105,9 +115,9 @@ internal static class AntigravitySessions
         }
     }
 
-    private static async Task<(int ExitCode, string Json)> ReadIndexAsync(string db, CancellationToken cancellationToken)
+    private async Task<(int ExitCode, string Json)> ReadIndexAsync(string db, CancellationToken cancellationToken)
     {
-        var options = new ProcessStartInfo("/usr/bin/sqlite3")
+        var options = new ProcessStartInfo(sqlitePath)
         {
             ArgumentList = { "-batch", "-init", "/dev/null", "-readonly", "-json", db, Query },
             RedirectStandardOutput = true,

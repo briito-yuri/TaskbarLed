@@ -44,7 +44,7 @@ internal sealed class FloatingPanelWindow : Window
     private nint _nativeGlass;
     private double _glassOpacity;
     private readonly PanelView _panel;
-    private readonly bool _pt;
+    private readonly MacUiStrings _strings;
     private PixelPoint? _beforeEdit;
     private (PixelPoint Pointer, PixelPoint Window, double Width, double Height, bool ResizeWidth, bool ResizeHeight)? _drag;
     private PanelPreferences _preferences;
@@ -61,7 +61,7 @@ internal sealed class FloatingPanelWindow : Window
         _acknowledge = acknowledge;
         _skip = skip;
         KeepVisible = keepVisible;
-        _pt = portuguese;
+        _strings = MacUiStrings.For(portuguese);
         _preferences = new PanelPreferences();
 
         Title = App.DisplayName;
@@ -190,8 +190,8 @@ internal sealed class FloatingPanelWindow : Window
 
         _beforeEdit = Position;
         _automaticEdit = _preferences.UsesAutomaticSize();
-        var save = EditButton(_pt ? "Salvar" : "Save", primary: true);
-        var cancel = EditButton(_pt ? "Cancelar" : "Cancel", primary: false);
+        var save = EditButton(_strings.Save, primary: true);
+        var cancel = EditButton(_strings.Cancel, primary: false);
         save.Click += (_, _) => EndEdit(save: true);
         cancel.Click += (_, _) => EndEdit(save: false);
 
@@ -201,11 +201,11 @@ internal sealed class FloatingPanelWindow : Window
         var grips = new Grid { Children = { right, bottom, corner }, IsVisible = !_automaticEdit };
         var sizeMode = new ComboBox
         {
-            ItemsSource = _pt ? new[] { "Automático", "Manual" } : new[] { "Automatic", "Manual" },
+            ItemsSource = new[] { _strings.Automatic, _strings.Manual },
             SelectedIndex = _automaticEdit ? 0 : 1,
             Background = new SolidColorBrush(Color.Parse("#E8EDF0")),
             Foreground = new SolidColorBrush(Color.Parse("#202C35")),
-            [global::Avalonia.Automation.AutomationProperties.NameProperty] = _pt ? "Modo de tamanho" : "Size mode",
+            [global::Avalonia.Automation.AutomationProperties.NameProperty] = _strings.SizeMode,
         };
         sizeMode.SelectionChanged += (_, _) =>
         {
@@ -223,7 +223,7 @@ internal sealed class FloatingPanelWindow : Window
             TickFrequency = 1,
             IsSnapToTickEnabled = true,
             MinWidth = 108,
-            [global::Avalonia.Automation.AutomationProperties.NameProperty] = _pt ? "Opacidade" : "Opacity",
+            [global::Avalonia.Automation.AutomationProperties.NameProperty] = _strings.Opacity,
         };
         var opacityRow = new StackPanel
         {
@@ -237,7 +237,7 @@ internal sealed class FloatingPanelWindow : Window
         void PreviewOpacity()
         {
             _viewModel.PanelOpacity = NormalizeOpacity(opacity.Value / 100);
-            opacityLabel.Text = $"{(_pt ? "Opacidade" : "Opacity")} {opacity.Value:F0}%";
+            opacityLabel.Text = $"{(_strings.Opacity)} {opacity.Value:F0}%";
             UpdateNativeGlass();
         }
         opacity.ValueChanged += (_, _) => PreviewOpacity();

@@ -9,7 +9,7 @@
 
   <Application.Styles>
     <FluentTheme />
-    <Style Selector="ContextMenu.neon-panel-menu">
+    <Style Selector="ContextMenu.taskbarled-panel-menu">
       <Setter Property="Background" Value="{DynamicResource MenuFlyoutPresenterBackground}" />
       <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutPresenterBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
@@ -18,19 +18,19 @@
       <Setter Property="CornerRadius" Value="{DynamicResource Led.PanelRadius}" />
       <Setter Property="FontFamily" Value="{DynamicResource Led.FontFamily}" />
     </Style>
-    <Style Selector="MenuItem.neon-theme-option">
+    <Style Selector="MenuItem.taskbarled-theme-option">
       <Setter Property="FontFamily" Value="Helvetica Neue" />
       <Setter Property="FontSize" Value="13" />
       <Setter Property="CornerRadius" Value="5" />
     </Style>
-    <Style Selector="MenuItem.neon-menu-heading">
+    <Style Selector="MenuItem.taskbarled-menu-heading">
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="FontSize" Value="11" />
     </Style>
-    <Style Selector="MenuItem.neon-menu-heading /template/ ContentPresenter#PART_HeaderPresenter">
+    <Style Selector="MenuItem.taskbarled-menu-heading /template/ ContentPresenter#PART_HeaderPresenter">
       <Setter Property="Foreground" Value="{DynamicResource Led.MenuAccentBrush}" />
     </Style>
-    <Style Selector="MenuItem.neon-menu-quit">
+    <Style Selector="MenuItem.taskbarled-menu-quit">
       <Setter Property="Background" Value="{DynamicResource Led.MenuQuitBrush}" />
       <Setter Property="CornerRadius" Value="4" />
       <Setter Property="FontWeight" Value="SemiBold" />

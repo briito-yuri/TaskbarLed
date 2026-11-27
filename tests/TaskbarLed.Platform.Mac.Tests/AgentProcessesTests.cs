@@ -1,4 +1,4 @@
-namespace TaskbarLed.App.Avalonia.Tests;
+namespace TaskbarLed.Platform.Mac.Tests;
 
 public class AgentProcessesTests
 {

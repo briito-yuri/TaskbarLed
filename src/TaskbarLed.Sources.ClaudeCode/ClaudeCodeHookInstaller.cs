@@ -85,7 +85,7 @@ public sealed class ClaudeCodeHookInstaller
                 && _hookExecutablePath.Contains('\\', StringComparison.Ordinal)))
         {
             throw new InvalidOperationException(
-                $"TaskbarLed is in a folder whose name contains a quote, $ or backtick ({_hookExecutablePath}). Move it to a folder without those characters.");
+                $"TaskbarLed is in a folder whose name contains a double quote, $, backtick, line break, or (on macOS) backslash ({_hookExecutablePath}). Move it to a folder without those characters.");
         }
 
         var root = Load() ?? [];

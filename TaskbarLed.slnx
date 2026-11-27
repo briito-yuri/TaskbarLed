@@ -7,11 +7,19 @@
     <Project Path="src/TaskbarLed.Platform.Mac/TaskbarLed.Platform.Mac.csproj" />
     <Project Path="src/TaskbarLed.Platform.Windows/TaskbarLed.Platform.Windows.csproj" />
     <Project Path="src/TaskbarLed.Sources.ClaudeCode/TaskbarLed.Sources.ClaudeCode.csproj" />
+    <Project Path="src/TaskbarLed.Sources.Octo/TaskbarLed.Sources.Octo.csproj" />
+    <Project Path="src/TaskbarLed.Sources.Codex/TaskbarLed.Sources.Codex.csproj" />
+    <Project Path="src/TaskbarLed.Sources.Antigravity/TaskbarLed.Sources.Antigravity.csproj" />
+    <Project Path="src/TaskbarLed.Sources.Generic/TaskbarLed.Sources.Generic.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TaskbarLed.App.Avalonia.Tests/TaskbarLed.App.Avalonia.Tests.csproj" />
     <Project Path="tests/TaskbarLed.Core.Tests/TaskbarLed.Core.Tests.csproj" />
     <Project Path="tests/TaskbarLed.Platform.Mac.Tests/TaskbarLed.Platform.Mac.Tests.csproj" />
     <Project Path="tests/TaskbarLed.Sources.ClaudeCode.Tests/TaskbarLed.Sources.ClaudeCode.Tests.csproj" />
+    <Project Path="tests/TaskbarLed.Sources.Octo.Tests/TaskbarLed.Sources.Octo.Tests.csproj" />
+    <Project Path="tests/TaskbarLed.Sources.Codex.Tests/TaskbarLed.Sources.Codex.Tests.csproj" />
+    <Project Path="tests/TaskbarLed.Sources.Antigravity.Tests/TaskbarLed.Sources.Antigravity.Tests.csproj" />
+    <Project Path="tests/TaskbarLed.Sources.Generic.Tests/TaskbarLed.Sources.Generic.Tests.csproj" />
   </Folder>
 </Solution>

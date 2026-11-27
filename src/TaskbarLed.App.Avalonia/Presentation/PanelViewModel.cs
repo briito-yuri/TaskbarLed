@@ -92,10 +92,10 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
 
     public string Status => !Row.HasStatus ? "" : Row.Status switch
     {
-        SessionStatus.Running => portuguese ? "▸ Rodando" : "▸ Running",
-        SessionStatus.AwaitingInput => portuguese ? "! Aguardando" : "! Waiting",
-        SessionStatus.Completed => $"{(portuguese ? "✓ Concluído" : "✓ Done")}{(SecondsRemaining > 0 ? $" · {SecondsRemaining}s" : "")}",
-        _ => portuguese ? "Ocioso" : "Idle",
+        SessionStatus.Running => MacUiStrings.For(portuguese).Running,
+        SessionStatus.AwaitingInput => MacUiStrings.For(portuguese).Waiting,
+        SessionStatus.Completed => $"{(MacUiStrings.For(portuguese).Done)}{(SecondsRemaining > 0 ? $" · {SecondsRemaining}s" : "")}",
+        _ => MacUiStrings.For(portuguese).Idle,
     };
 }
 

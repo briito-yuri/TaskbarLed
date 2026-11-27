@@ -17,8 +17,8 @@ public class PanelMenuTests
     {
         var model = new Presentation.PanelViewModel(CultureInfo.GetCultureInfo("pt-BR"));
         var app = Application.Current!;
-        var menu = new ContextMenu { Classes = { "neon-panel-menu" } };
-        menu.Items.Add(new MenuItem { Header = App.DisplayName, IsEnabled = false, Classes = { "neon-menu-heading" } });
+        var menu = new ContextMenu { Classes = { "taskbarled-panel-menu" } };
+        menu.Items.Add(new MenuItem { Header = App.DisplayName, IsEnabled = false, Classes = { "taskbarled-menu-heading" } });
         menu.Items.Add(new MenuItem { Header = "Tema" });
         App.AddQuitItems(new NativeMenu(), menu, portuguese: true, () => { });
         var window = new Window { Width = 360, Height = 220, ContextMenu = menu };
@@ -36,7 +36,7 @@ public class PanelMenuTests
             {
                 Directory.CreateDirectory(save);
                 using var frame = popup.CaptureRenderedFrame();
-                frame?.Save(Path.Combine(save, "neon-context-menu.png"), new PngBitmapEncoderOptions());
+                frame?.Save(Path.Combine(save, "taskbarled-context-menu.png"), new PngBitmapEncoderOptions());
             }
 
             PanelThemes.Apply(app, model, "AmberTree");

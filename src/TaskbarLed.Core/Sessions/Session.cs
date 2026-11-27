@@ -26,12 +26,16 @@ public sealed record Session(
     SessionHost Host = SessionHost.Unknown)
 {
     /// <summary>Session that launched this subagent, when the source reports it.</summary>
+    /// <summary>The parent session ID for a worker.</summary>
     public string? ParentId { get; init; }
 
+    /// <summary>The provider name reported by the integration.</summary>
     public string? EngineName { get; init; }
 
+    /// <summary>The provider conversation identifier, when available.</summary>
     public Guid? ConversationId { get; init; }
 
+    /// <summary>The PID reported for the local provider process.</summary>
     public int? ProcessId { get; init; }
 
     /// <summary>Best label to identify the session on a tiny display.</summary>

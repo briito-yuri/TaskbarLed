@@ -1,6 +1,6 @@
 using TaskbarLed.Core.Sessions;
 
-namespace TaskbarLed.App.Avalonia;
+namespace TaskbarLed.Sources.Antigravity;
 
 /// <summary>Tracks observed turns and catches workers that finish between two index reads.</summary>
 internal sealed class AntigravityActivity
