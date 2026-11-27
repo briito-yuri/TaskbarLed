@@ -126,6 +126,7 @@ internal static class OctoSessions
         return new Session(string.Create(CultureInfo.InvariantCulture, $"octo:{id}"), Source, title, null, state, started ?? at,
             state == SessionStatus.Completed ? at : null, null, null, at)
         {
+            EngineName = label,
             ParentId = Number(agent, "parent") is > 0 and <= uint.MaxValue and var parent
                 ? string.Create(CultureInfo.InvariantCulture, $"octo:{parent}") : null,
         };

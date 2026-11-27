@@ -91,8 +91,8 @@
             Background="{DynamicResource Led.BackgroundBrush}"
             BorderBrush="{DynamicResource Led.BorderBrush}" />
 
-    <Grid Margin="6,3,8,2" RowDefinitions="Auto,*,Auto" ColumnDefinitions="*,Auto">
-      <ItemsControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Channels}" ClipToBounds="True">
+    <Grid Margin="6,3,8,2" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto">
+      <ItemsControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Channels}" IsVisible="{Binding !HasSubagents}" ClipToBounds="True">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <panels:TabStripPanel />
@@ -116,7 +116,7 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
 
-      <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="True">
+      <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="True" IsVisible="{Binding !HasSubagents}">
         <TextBlock DockPanel.Dock="Left" Classes.pulse="{Binding FeedIsRunning}" Text="{DynamicResource Led.FeedPrefix}" Foreground="{DynamicResource Led.AccentBrush}"
                    VerticalAlignment="Center" FontSize="14" FontFamily="{DynamicResource Led.FontFamily}" />
         <TextBlock Margin="3,0,0,0" Classes="feed" Classes.attention="{Binding FeedIsAttention}"
@@ -130,14 +130,13 @@
       </DockPanel>
 
       <!-- Prompt timer on the feed's line, so the tabs get the whole top row for chat titles. -->
-      <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ElapsedText}" VerticalAlignment="Center" Margin="10,0,0,0"
+      <TextBlock Grid.Row="1" Grid.Column="1" IsVisible="{Binding !HasSubagents}" Text="{Binding ElapsedText}" VerticalAlignment="Center" Margin="10,0,0,0"
                  FontFamily="{DynamicResource Led.FontFamily}" FontSize="12" FontWeight="SemiBold"
                  Foreground="{DynamicResource Led.ForegroundBrush}" />
       <Border Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding HasSubagents}"
-              BorderThickness="0,1,0,0" BorderBrush="{DynamicResource Led.BorderBrush}"
-              ToolTip.Tip="{Binding ActiveSubagents}" Padding="0,1,0,0">
-        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-          <TextBlock Text="{Binding ActiveSubagents}" FontSize="10.5" FontFamily="{DynamicResource Led.FontFamily}"
+              ToolTip.Tip="{Binding ActiveSubagents}" Padding="3,2,0,0">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+          <TextBlock x:Name="SessionList" Text="{Binding ActiveSubagents}" FontSize="12" LineHeight="19" FontFamily="{DynamicResource Led.FontFamily}"
                      Foreground="{DynamicResource Led.ForegroundBrush}" TextWrapping="NoWrap" />
         </ScrollViewer>
       </Border>

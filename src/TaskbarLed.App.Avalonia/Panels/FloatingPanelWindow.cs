@@ -33,6 +33,7 @@ internal sealed class FloatingPanelWindow : Window
     private readonly Action<string?>? _acknowledge;
     private readonly Action? _skip;
     private PanelFrame? _frame;
+    private double _panelHeight = PanelHeight;
     private readonly PanelView _panel;
     private readonly bool _pt;
     private (PixelPoint Position, double Width)? _beforeEdit;
@@ -102,7 +103,7 @@ internal sealed class FloatingPanelWindow : Window
         var point = e.GetCurrentPoint(this);
         if (_beforeEdit.HasValue)
         {
-            if (point.Properties.IsLeftButtonPressed && point.Position.Y < PanelHeight)
+            if (point.Properties.IsLeftButtonPressed && point.Position.Y < _panelHeight)
             {
                 _drag = (this.PointToScreen(point.Position), Position, Width, point.Position.X >= Width - 18);
                 e.Pointer.Capture(this);
@@ -114,21 +115,36 @@ internal sealed class FloatingPanelWindow : Window
 
         if (point.Properties.IsLeftButtonPressed)
         {
-            var channel = (e.Source as Control)?.DataContext as ChannelViewModel;
-            _acknowledge?.Invoke(channel?.SessionId ?? _frame?.SelectedSessionId);
+            if (_frame is { SessionLineIds.Count: > 0 } frame)
+            {
+                var list = _panel.FindControl<TextBlock>("SessionList");
+                if (list is not null && e.Source == list)
+                {
+                    var line = (int)Math.Floor(e.GetPosition(list).Y / list.LineHeight);
+                    if (line >= 0 && line < frame.SessionLineIds.Count && frame.SessionLineIds[line] is { } id)
+                    {
+                        _acknowledge?.Invoke(id);
+                    }
+                }
+            }
+            else
+            {
+                var channel = (e.Source as Control)?.DataContext as ChannelViewModel;
+                _acknowledge?.Invoke(channel?.SessionId ?? _frame?.SelectedSessionId);
+            }
             Render();
         }
     }
 
     /// <summary>Rectangle for the panel on a screen's work area. Shared with the screenshot test.</summary>
     internal static CorePixelRect Layout(global::Avalonia.PixelRect workArea, double scaling) =>
-        DockLayout(workArea, scaling);
+        DockLayout(workArea, scaling, PanelHeight);
 
-    private static CorePixelRect DockLayout(global::Avalonia.PixelRect workArea, double scaling)
+    private static CorePixelRect DockLayout(global::Avalonia.PixelRect workArea, double scaling, double height)
     {
         var rect = PanelLayout.AboveDock(
             new CorePixelRect(workArea.X, workArea.Y, workArea.Right, workArea.Bottom), scaling, PanelWidth, DockGap);
-        return rect with { Top = Math.Max(workArea.Y, rect.Bottom - (int)Math.Round(PanelHeight * scaling)) };
+        return rect with { Top = Math.Max(workArea.Y, rect.Bottom - (int)Math.Round(height * scaling)) };
     }
 
     public void ConfigurePlacement(PanelPreferences preferences, Action<PanelPreferences> save)
@@ -188,13 +204,13 @@ internal sealed class FloatingPanelWindow : Window
             Margin = new Thickness(4),
             Children = { save, cancel },
         };
-        var editor = new Grid { RowDefinitions = new RowDefinitions { new(new GridLength(PanelHeight)), new(GridLength.Star) }, Children = { preview, footer } };
+        var editor = new Grid { RowDefinitions = new RowDefinitions { new(new GridLength(_panelHeight)), new(GridLength.Star) }, Children = { preview, footer } };
         Grid.SetRow(footer, 1);
         var border = new Border { Child = editor, BorderThickness = new Thickness(1) };
         border.Bind(Border.BackgroundProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.BackgroundBrush"));
         border.Bind(Border.BorderBrushProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.EditBrush"));
         Content = border;
-        Height = PanelHeight + 40;
+        Height = _panelHeight + 40;
         var screen = Screens.ScreenFromPoint(Position) ?? Screens.Primary;
         if (screen is not null)
         {
@@ -271,7 +287,7 @@ internal sealed class FloatingPanelWindow : Window
         var editor = (Grid)((Border)Content!).Child!;
         ((Grid)editor.Children[0]).Children.Remove(_panel);
         Content = _panel;
-        Height = PanelHeight;
+        Height = _panelHeight;
         if (save)
         {
             _preferences = _preferences with { X = Position.X, Y = Position.Y, Width = Width };
@@ -313,7 +329,7 @@ internal sealed class FloatingPanelWindow : Window
             return;
         }
 
-        var rect = Layout(primary.WorkingArea, primary.Scaling);
+        var rect = DockLayout(primary.WorkingArea, primary.Scaling, _panelHeight);
         Width = rect.Width / primary.Scaling;
         Height = rect.Height / primary.Scaling;
         Position = new PixelPoint(rect.Left, rect.Top);
@@ -344,6 +360,22 @@ internal sealed class FloatingPanelWindow : Window
     {
         _frame = _frames();
         _viewModel.Apply(_frame);
+        if (_beforeEdit.HasValue)
+        {
+            return;
+        }
+
+        var lines = string.IsNullOrEmpty(_frame.ActiveSubagents) ? 0 : 1 + _frame.ActiveSubagents.Count(ch => ch == '\n');
+        var height = Math.Max(PanelHeight, 12 + (Math.Min(lines, 9) * 19));
+        if (height != _panelHeight)
+        {
+            _panelHeight = height;
+            Height = height;
+            if (IsVisible)
+            {
+                RestorePlacement();
+            }
+        }
     }
 
     private void Render()

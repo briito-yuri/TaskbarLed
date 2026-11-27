@@ -4,7 +4,7 @@ The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 1
 
 ## Install
 
-[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.2.0/TaskbarLed-osx-arm64.zip). Unzip it, move `TaskbarLed.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.2.1/TaskbarLed-osx-arm64.zip). Unzip it, move `TaskbarLed.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
 
 The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
 
@@ -54,7 +54,7 @@ When Octo is running, TaskbarLed reads its local session status and shows workin
 
 ## Active agents and subagents
 
-The panel shows agent sessions and adds a scrollable row for subagents grouped by their parent conversation. Hover the row to read the entire list. `▸` means working, `!` means input is needed, and `✓` marks a reported completion. Click a completed tab to acknowledge it.
+The panel groups active sessions by tool and conversation. Each subagent appears indented on its own line below the session. Scroll or hover to read the entire list. `▸` means working, `!` means input is needed, and `✓` marks a reported completion. Click a completed session or subagent to acknowledge it.
 
 - **Antigravity** reads the local conversation index in read-only mode. It shows a worker even when the parent is idle and flags a transition to idle after the worker was observed running. It reads titles, agent names, parent links and status as available in the index.
 - **Octo** includes child sessions with a parent link and uses the engine's reported turn status. This also works with Qwen or Kimi sessions Octo tracks.

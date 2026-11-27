@@ -30,6 +30,8 @@ public sealed record PanelFrame(
 {
     public string ActiveSubagents { get; init; } = string.Empty;
 
+    public IReadOnlyList<string?> SessionLineIds { get; init; } = [];
+
     public static PanelFrame Empty(string feed) =>
         new([], feed, string.Empty, SessionStatus.Idle, null, false, false, false);
 }

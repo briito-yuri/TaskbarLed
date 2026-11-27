@@ -28,6 +28,8 @@ public sealed record Session(
     /// <summary>Session that launched this subagent, when the source reports it.</summary>
     public string? ParentId { get; init; }
 
+    public string? EngineName { get; init; }
+
     /// <summary>Best label to identify the session on a tiny display.</summary>
     public string DisplayName =>
         !string.IsNullOrWhiteSpace(Title) ? Title

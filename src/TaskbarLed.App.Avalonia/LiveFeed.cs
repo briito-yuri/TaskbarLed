@@ -32,7 +32,8 @@ internal sealed class LiveFeed(CultureInfo culture)
             s.Status != SessionStatus.Completed || !_seenExternal.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))
             .ToArray();
         var detected = Volatile.Read(ref _detected);
-        var frame = _composer.Compose(sessions, now) with { ActiveSubagents = SubagentLine(sessions) };
+        var (text, ids) = SessionLines(sessions);
+        var frame = _composer.Compose(sessions, now) with { ActiveSubagents = text, SessionLineIds = ids };
         if (detected.Length == 0)
         {
             return frame;
@@ -52,24 +53,67 @@ internal sealed class LiveFeed(CultureInfo culture)
         };
     }
 
-    private string SubagentLine(Session[] sessions)
+    private (string Text, IReadOnlyList<string?> Ids) SessionLines(Session[] sessions)
     {
-        var children = sessions.Where(s => s.ParentId is not null && s.Status != SessionStatus.Idle).ToArray();
-        if (children.Length == 0)
+        var known = sessions.DistinctBy(s => s.Id).ToDictionary(s => s.Id, StringComparer.Ordinal);
+        var groups = sessions.Where(s => s.Status != SessionStatus.Idle)
+            .GroupBy(s => s.ParentId ?? s.Id, StringComparer.Ordinal);
+        var lines = new List<string>();
+        var ids = new List<string?>();
+        foreach (var group in groups)
         {
-            return string.Empty;
+            var parent = known.GetValueOrDefault(group.Key);
+            var first = group.First();
+            var engine = parent?.EngineName ?? first.EngineName ?? EngineName(parent ?? first);
+            var title = parent?.Title;
+            var prefix = engine + " · ";
+            if (title?.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                title = title[prefix.Length..];
+            }
+
+            if (string.IsNullOrWhiteSpace(title) || string.Equals(title, engine, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(title, "Octo · " + engine, StringComparison.OrdinalIgnoreCase))
+            {
+                title = parent?.ProjectName ?? first.ProjectName ?? (_pt ? "Sessão sem nome" : "Unnamed session");
+            }
+
+            var status = parent is { Status: not SessionStatus.Idle } ? $"  {Glyph(parent.Status)}" : "";
+            if (lines.Count > 0)
+            {
+                lines.Add(string.Empty);
+                ids.Add(null);
+            }
+
+            lines.Add($"{engine} → {SingleLine(title)}{status}");
+            ids.Add(parent?.Id);
+            foreach (var child in group.Where(s => s.ParentId is not null))
+            {
+                lines.Add($"    {Glyph(child.Status)}  {(_pt ? "Subagente" : "Subagent")} {SingleLine(child.DisplayName)}");
+                ids.Add(child.Id);
+            }
         }
 
-        var parents = sessions.DistinctBy(s => s.Id).ToDictionary(s => s.Id, s => s.DisplayName, StringComparer.Ordinal);
-        var groups = children.GroupBy(s => s.ParentId!, StringComparer.Ordinal)
-            .Select(group =>
-            {
-                var parent = parents.GetValueOrDefault(group.Key) ?? group.First().ProjectName;
-                var names = string.Join(", ", group.Select(s => (s.Status switch { SessionStatus.AwaitingInput => "! ", SessionStatus.Completed => "✓ ", _ => "▸ " }) + s.DisplayName));
-                return parent is null ? names : $"{parent} › {names}";
-            });
-        return string.Create(culture, $"{(_pt ? "Subagentes" : "Subagents")} ({children.Count(s => s.Status != SessionStatus.Completed)})  ·  {string.Join("  |  ", groups)}");
+        return (string.Join('\n', lines), ids);
     }
+
+    private static string Glyph(SessionStatus status) => status switch
+    {
+        SessionStatus.Completed => "✓",
+        SessionStatus.AwaitingInput => "!",
+        _ => "▸",
+    };
+
+    private static string EngineName(Session session) => session.SourceId switch
+    {
+        "antigravity" => "Antigravity",
+        "codex" => "Codex",
+        "claude-code" => "Claude",
+        "octo" => "Octo",
+        _ => SingleLine(session.SourceId),
+    };
+
+    private static string SingleLine(string text) => string.Join(' ', text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
 
     public async Task DetectProcessesAsync(CancellationToken cancellationToken)
     {
