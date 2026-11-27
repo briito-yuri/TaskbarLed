@@ -36,6 +36,12 @@ Capturas do painel renderizadas pelo Neon TSB Agents com duas sessões e quatro 
 | --- | --- |
 | ![Painel do Neon TSB Agents com o tema Glass](images/macos-themes/Glass.png) | ![Painel do Neon TSB Agents com o tema Paper](images/macos-themes/Paper.png) |
 
+| Liquid Glass |
+| --- |
+| ![Painel do Neon TSB Agents com o tema Liquid Glass](images/macos-themes/LiquidGlass.png) |
+
+A captura de Liquid Glass mostra o gradiente da interface. No macOS 26, o tema acrescenta o material nativo do AppKit sobre o conteúdo atrás da janela.
+
 ## Atualizar as capturas
 
 A partir da raiz do repositório, execute os testes de renderização para recriar as imagens.

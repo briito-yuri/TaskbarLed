@@ -16,10 +16,17 @@ internal static class PanelThemes
     private sealed record Palette(string Background, string Border, string Foreground, string Dim,
         string Running, string Waiting, string Done, string Title, string Header, string Rail, string Tree,
         string Child = "Transparent", string Font = "Menlo", string StatusBackground = "Transparent",
-        string Divider = "Transparent", double Radius = 4, double FrameWidth = 1, string? HeaderStatus = null, string Node = "Transparent");
+        string Divider = "Transparent", double Radius = 4, double FrameWidth = 1, string? HeaderStatus = null, string Node = "Transparent", Thickness? Padding = null);
+
+    private static readonly Thickness DefaultPadding = new(5, 2, 7, 1);
 
     private static readonly Dictionary<string, Palette> MacPalettes = new(StringComparer.Ordinal)
     {
+        ["LiquidGlass"] = new("#E6F5FAFF", "#EAFDFFFF", "#162B3D", "#455C70", "#145664", "#853C15",
+            "#315D49", "#102638", "#5EE4F5FF", "Transparent", "#7894A8", Child: "#24FFFFFF",
+            Font: "Helvetica Neue", Divider: "#34718AA0", Radius: 16, Padding: new Thickness(8, 3)),
+        ["Matrix"] = new("#07130C", "#30523A", "#C2EDCE", "#A1BAA7", "#95E9A6", "#FFD38D",
+            "#ACDFC0", "#DBF6DF", "#102519", "Transparent", "#41644B", Divider: "#233B2B"),
         ["AmberTree"] = new("#1C1D18", "#424237", "#EEEADB", "#A9AA9C", "#DDB06D", "#ECC788",
             "#9CB494", "#E2B171", "Transparent", "Transparent", "#48483B", Radius: 6),
         ["CompactCharcoal"] = new("#242522", "#42443E", "#D3D4C9", "#A1A397", "#D8B57C", "#E8BD79",
@@ -41,17 +48,18 @@ internal static class PanelThemes
             "#416A51", "#232924", "Transparent", "#146B74", "#146B74", Font: "Helvetica Neue", Radius: 8, Node: "#146B74"),
         ["OliveLcd"] = new("#A7B88C", "#292D27", "#243321", "#3E5037", "#243321", "#443E24",
             "#2A4B2C", "#243321", "Transparent", "Transparent", "Transparent", Divider: "#738464",
-            Radius: 13, FrameWidth: 9),
+            Radius: 13, FrameWidth: 9, Padding: new Thickness(7, 6)),
     };
 
     public static IReadOnlyList<Theme> All { get; } =
     [
         new("ClaudeCode", App.DisplayName),
         new("ModernTerminal", "Modern Terminal"),
-        new("Matrix", "Matrix", true),
+        new("Matrix", "Matrix"),
         new("Mono", "Mono", true),
         new("Minimal", "Minimal"),
         new("Glass", "Glass"),
+        new("LiquidGlass", "Liquid Glass"),
         new("Paper", "Paper"),
         new("AmberTree", "Âmbar em árvore"),
         new("CompactCharcoal", "Carvão compacto"),
@@ -72,6 +80,19 @@ internal static class PanelThemes
         if (MacPalettes.TryGetValue(theme.Id, out var palette))
         {
             ApplyPalette(app, palette);
+            if (theme.Id == "LiquidGlass")
+            {
+                app.Resources["Led.PanelSurfaceBrush"] = new LinearGradientBrush
+                {
+                    StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+                    EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+                    GradientStops =
+                    {
+                        new GradientStop(Color.Parse("#EEF9FCFF"), 0),
+                        new GradientStop(Color.Parse("#CFE3F2FB"), 1),
+                    },
+                };
+            }
             ApplyMenuPalette(app);
             return theme;
         }
@@ -114,6 +135,7 @@ internal static class PanelThemes
             }
         }
 
+        app.Resources["Led.PanelSurfaceBrush"] = app.Resources["Led.BackgroundBrush"];
         app.Resources["Led.SessionTitleBrush"] = app.Resources["Led.ForegroundBrush"];
         app.Resources["Led.SessionRunningBrush"] = app.Resources["Led.ForegroundBrush"];
         app.Resources["Led.SessionHeaderStatusBrush"] = app.Resources["Led.ForegroundBrush"];
@@ -124,6 +146,7 @@ internal static class PanelThemes
 
         app.Resources["Led.PanelRadius"] = new CornerRadius(4);
         app.Resources["Led.FrameThickness"] = new Thickness(1);
+        app.Resources["Led.PanelPadding"] = DefaultPadding;
         ApplyMenuPalette(app);
         return theme;
     }
@@ -133,6 +156,7 @@ internal static class PanelThemes
         void Brush(string key, string color) => app.Resources["Led." + key] = new SolidColorBrush(Color.Parse(color));
 
         Brush("BackgroundBrush", colors.Background);
+        app.Resources["Led.PanelSurfaceBrush"] = app.Resources["Led.BackgroundBrush"];
         Brush("BorderBrush", colors.Border);
         Brush("ForegroundBrush", colors.Foreground);
         Brush("DimBrush", colors.Dim);
@@ -153,6 +177,7 @@ internal static class PanelThemes
         Brush("SessionDividerBrush", colors.Divider);
         app.Resources["Led.PanelRadius"] = new CornerRadius(colors.Radius);
         app.Resources["Led.FrameThickness"] = new Thickness(colors.FrameWidth);
+        app.Resources["Led.PanelPadding"] = colors.Padding ?? DefaultPadding;
         app.Resources["Led.DotGridBrush"] = Brushes.Transparent;
         app.Resources["Led.GlowColor"] = Colors.Transparent;
         app.Resources["Led.GlowOpacity"] = 0.0;

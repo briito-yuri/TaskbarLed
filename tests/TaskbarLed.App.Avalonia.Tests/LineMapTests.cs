@@ -96,7 +96,7 @@ public class LineMapTests
 
     private static void CheckButton(StackPanel footer, int index, string expected, string background, string foreground)
     {
-        var surface = Assert.IsType<Border>(Assert.IsType<Button>(footer.Children[index]).Content);
+        var surface = Assert.IsType<Border>(Assert.IsType<Button>(footer.Children[index + 1]).Content);
         var label = Assert.IsType<TextBlock>(surface.Child);
         Assert.Equal(expected, label.Text);
         Assert.Equal(Color.Parse(background), Assert.IsType<SolidColorBrush>(surface.Background).Color);

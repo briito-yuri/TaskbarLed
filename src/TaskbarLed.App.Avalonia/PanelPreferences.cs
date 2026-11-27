@@ -3,8 +3,10 @@ using TaskbarLed.Core.Ipc;
 
 namespace TaskbarLed.App.Avalonia;
 
-internal sealed record PanelPreferences(string Theme = "ClaudeCode", int? X = null, int? Y = null, double Width = 420)
+internal sealed record PanelPreferences(string Theme = "ClaudeCode", int? X = null, int? Y = null, double Width = 420, bool? AutomaticSize = null, double? Height = null, double PanelOpacity = 1)
 {
+    public bool UsesAutomaticSize() => AutomaticSize ?? Width == 420;
+
     private static string SettingsPath => Path.Combine(IpcEndpoints.DataDirectory, "panel.json");
 
     public static PanelPreferences Load()

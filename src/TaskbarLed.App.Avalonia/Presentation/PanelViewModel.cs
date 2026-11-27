@@ -150,6 +150,9 @@ public sealed partial class PanelViewModel : ObservableObject
     public partial bool Uppercase { get; set; }
 
     [ObservableProperty]
+    public partial double PanelOpacity { get; set; } = 1;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsClearList), nameof(IsLcd), nameof(ShowSessionList), nameof(ShowClearList), nameof(ShowLineMap))]
     public partial string ThemeId { get; set; } = "ClaudeCode";
 

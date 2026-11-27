@@ -9,6 +9,7 @@ using Avalonia.Media;
 using TaskbarLed.App.Avalonia.Panels;
 using TaskbarLed.App.Avalonia.Presentation;
 using TaskbarLed.Core.Presentation;
+using TaskbarLed.Core.Sessions;
 
 namespace TaskbarLed.App.Avalonia.Tests;
 
@@ -28,7 +29,7 @@ public class PanelCustomizationTests
             Assert.IsAssignableFrom<IBrush>(app.Resources["Led.DotGridBrush"]);
         }
 
-        Assert.Equal(16, backgrounds.Count);
+        Assert.Equal(17, backgrounds.Count);
         Assert.Equal(5, PanelThemes.All.Count(theme => theme.MenuLabel.StartsWith("• ", StringComparison.Ordinal)));
         Assert.Equal("AmberTree", PanelThemes.Apply(app, model, "AmberTree").Id);
         Assert.Equal(Color.Parse("#48483B"), Assert.IsType<SolidColorBrush>(app.Resources["Led.SessionTreeBrush"]).Color);
@@ -48,24 +49,69 @@ public class PanelCustomizationTests
         try
         {
             panel.BeginEdit();
+            Assert.IsType<ComboBox>(EditorFooter(panel).Children[0]).SelectedIndex = 1;
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            var preview = Assert.IsType<Grid>(EditorGrid(panel).Children[0]);
             Drag(panel, new Point(40, 15), new Point(120, 50));
             Assert.NotEqual(new PixelPoint(200, 200), panel.Position);
-            Drag(panel, new Point(415, 15), new Point(470, 15));
-            Assert.True(panel.Width > FloatingPanelWindow.PanelWidth);
+            var widthBefore = panel.Width;
+            var heightBefore = preview.Bounds.Height;
+            Drag(panel, new Point(widthBefore - 5, heightBefore - 5), new Point(widthBefore + 48, heightBefore + 33));
+            Assert.True(panel.Width > widthBefore);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.True(preview.Bounds.Height > heightBefore);
+            Assert.IsType<Slider>(Assert.IsType<StackPanel>(EditorGrid(panel).Children[2]).Children[1]).Value = 80;
             ClickEditorButton(panel, 0);
             Assert.NotNull(saved);
             Assert.Equal(panel.Position.X, saved.X);
             Assert.Equal(panel.Position.Y, saved.Y);
             Assert.Equal(panel.Width, saved.Width);
+            Assert.True(panel.Height > heightBefore);
+            Assert.False(saved.AutomaticSize);
+            Assert.Equal(panel.Height, saved.Height);
+            Assert.Equal(0.80, saved.PanelOpacity);
 
             var position = panel.Position;
             var width = panel.Width;
             panel.BeginEdit();
             Drag(panel, new Point(40, 15), new Point(95, 55));
             Assert.NotEqual(position, panel.Position);
+            Assert.IsType<Slider>(Assert.IsType<StackPanel>(EditorGrid(panel).Children[2]).Children[1]).Value = 90;
             ClickEditorButton(panel, 1);
+            Assert.Equal(0.80, Assert.IsType<PanelViewModel>(Assert.IsType<PanelView>(panel.Content).DataContext).PanelOpacity);
             Assert.Equal(position, panel.Position);
             Assert.Equal(width, panel.Width);
+        }
+        finally
+        {
+            panel.Close();
+        }
+    }
+
+    [AvaloniaFact]
+    public void Automatic_mode_follows_session_text_and_worker_count()
+    {
+        var model = Model();
+        PanelThemes.Apply(Application.Current!, model, "ClaudeCode");
+        var frame = PanelFrame.Empty("Idle");
+        var panel = new FloatingPanelWindow(model, () => frame, keepVisible: true);
+        panel.Show();
+        try
+        {
+            var initial = panel.ClientSize;
+            frame = frame with
+            {
+                SessionRows =
+                [
+                    new("agent", "Antigravity → Configurar aprendizado de alemão e revisar vocabulário", SessionStatus.Running, true),
+                    new("worker", "Pesquisador", SessionStatus.Running, false),
+                    new("worker2", "Revisor", SessionStatus.Running, false),
+                ],
+            };
+            panel.ConfigurePlacement(new PanelPreferences(AutomaticSize: true), _ => { });
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+            Assert.True(panel.ClientSize.Width > initial.Width);
+            Assert.True(panel.ClientSize.Height > initial.Height);
         }
         finally
         {
@@ -85,9 +131,12 @@ public class PanelCustomizationTests
 
     private static void ClickEditorButton(FloatingPanelWindow panel, int index)
     {
-        var grid = Assert.IsType<Grid>(Assert.IsType<Border>(panel.Content).Child);
-        var footer = Assert.IsType<StackPanel>(grid.Children[1]);
-        var button = Assert.IsType<Button>(footer.Children[index]);
+        var button = Assert.IsType<Button>(EditorFooter(panel).Children[index + 1]);
         button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     }
+    private static Grid EditorGrid(FloatingPanelWindow panel) =>
+        Assert.IsType<Grid>(Assert.IsType<Border>(panel.Content).Child);
+
+    private static StackPanel EditorFooter(FloatingPanelWindow panel) =>
+        Assert.IsType<StackPanel>(EditorGrid(panel).Children[1]);
 }

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
@@ -33,11 +34,19 @@ internal sealed class FloatingPanelWindow : Window
     private readonly Action<string?>? _acknowledge;
     private readonly Action? _skip;
     private PanelFrame? _frame;
+    private const double MinPanelWidth = 300;
+    private const double EditorHeight = 76;
+    private const double MinPanelOpacity = 0.70;
+    private double _panelWidth = PanelWidth;
     private double _panelHeight = PanelHeight;
+    private Grid? _preview;
+    private bool _automaticEdit;
+    private nint _nativeGlass;
+    private double _glassOpacity;
     private readonly PanelView _panel;
     private readonly bool _pt;
-    private (PixelPoint Position, double Width)? _beforeEdit;
-    private (PixelPoint Pointer, PixelPoint Window, double Width, bool Resize)? _drag;
+    private PixelPoint? _beforeEdit;
+    private (PixelPoint Pointer, PixelPoint Window, double Width, double Height, bool ResizeWidth, bool ResizeHeight)? _drag;
     private PanelPreferences _preferences;
     private Action<PanelPreferences>? _savePreferences;
 
@@ -87,11 +96,13 @@ internal sealed class FloatingPanelWindow : Window
             }
         }
 
+        UpdateNativeGlass();
         _frameTimer.Start();
     }
 
     protected override void OnClosed(EventArgs e)
     {
+        _nativeGlass = 0;
         _frameTimer.Stop();
         base.OnClosed(e);
     }
@@ -103,9 +114,11 @@ internal sealed class FloatingPanelWindow : Window
         var point = e.GetCurrentPoint(this);
         if (_beforeEdit.HasValue)
         {
-            if (point.Properties.IsLeftButtonPressed && point.Position.Y < _panelHeight)
+            if (point.Properties.IsLeftButtonPressed && point.Position.Y < _preview!.Bounds.Height)
             {
-                _drag = (this.PointToScreen(point.Position), Position, Width, point.Position.X >= Width - 18);
+                var resizeWidth = !_automaticEdit && point.Position.X >= Width - 15;
+                var resizeHeight = !_automaticEdit && point.Position.Y >= _preview.Bounds.Height - 15;
+                _drag = (this.PointToScreen(point.Position), Position, Width, _preview.Bounds.Height, resizeWidth, resizeHeight);
                 e.Pointer.Capture(this);
                 e.Handled = true;
             }
@@ -133,17 +146,19 @@ internal sealed class FloatingPanelWindow : Window
     internal static CorePixelRect Layout(global::Avalonia.PixelRect workArea, double scaling) =>
         DockLayout(workArea, scaling, PanelHeight);
 
-    private static CorePixelRect DockLayout(global::Avalonia.PixelRect workArea, double scaling, double height)
+    private static CorePixelRect DockLayout(global::Avalonia.PixelRect workArea, double scaling, double height, double width = PanelWidth)
     {
         var rect = PanelLayout.AboveDock(
-            new CorePixelRect(workArea.X, workArea.Y, workArea.Right, workArea.Bottom), scaling, PanelWidth, DockGap);
+            new CorePixelRect(workArea.X, workArea.Y, workArea.Right, workArea.Bottom), scaling, width, DockGap);
         return rect with { Top = Math.Max(workArea.Y, rect.Bottom - (int)Math.Round(height * scaling)) };
     }
 
     public void ConfigurePlacement(PanelPreferences preferences, Action<PanelPreferences> save)
     {
         _preferences = preferences;
+        _viewModel.PanelOpacity = NormalizeOpacity(preferences.PanelOpacity);
         _savePreferences = save;
+        ApplyFrame();
     }
 
     public void SetTheme(string id) => Persist(_preferences with { Theme = id });
@@ -155,7 +170,8 @@ internal sealed class FloatingPanelWindow : Window
             EndEdit(save: false);
         }
 
-        Persist(_preferences with { X = null, Y = null, Width = PanelWidth });
+        Persist(_preferences with { X = null, Y = null, Width = PanelWidth, Height = null, AutomaticSize = true });
+        ApplyFrame();
         RestorePlacement();
     }
 
@@ -172,47 +188,109 @@ internal sealed class FloatingPanelWindow : Window
             RestorePlacement();
         }
 
-        _beforeEdit = (Position, Width);
+        _beforeEdit = Position;
+        _automaticEdit = _preferences.UsesAutomaticSize();
         var save = EditButton(_pt ? "Salvar" : "Save", primary: true);
         var cancel = EditButton(_pt ? "Cancelar" : "Cancel", primary: false);
         save.Click += (_, _) => EndEdit(save: true);
         cancel.Click += (_, _) => EndEdit(save: false);
 
-        var grip = new Border
+        var right = ResizeGrip(StandardCursorType.SizeWestEast, HorizontalAlignment.Right, VerticalAlignment.Stretch);
+        var bottom = ResizeGrip(StandardCursorType.SizeNorthSouth, HorizontalAlignment.Stretch, VerticalAlignment.Bottom);
+        var corner = ResizeGrip(StandardCursorType.BottomRightCorner, HorizontalAlignment.Right, VerticalAlignment.Bottom);
+        var grips = new Grid { Children = { right, bottom, corner }, IsVisible = !_automaticEdit };
+        var sizeMode = new ComboBox
         {
-            Width = 18,
-            Background = Brushes.Transparent,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Cursor = new Cursor(StandardCursorType.SizeWestEast),
-            Child = new TextBlock { Text = "⋮", HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center },
+            ItemsSource = _pt ? new[] { "Automático", "Manual" } : new[] { "Automatic", "Manual" },
+            SelectedIndex = _automaticEdit ? 0 : 1,
+            Background = new SolidColorBrush(Color.Parse("#E8EDF0")),
+            Foreground = new SolidColorBrush(Color.Parse("#202C35")),
+            [global::Avalonia.Automation.AutomationProperties.NameProperty] = _pt ? "Modo de tamanho" : "Size mode",
         };
+        sizeMode.SelectionChanged += (_, _) =>
+        {
+            _automaticEdit = sizeMode.SelectedIndex == 0;
+            grips.IsVisible = !_automaticEdit;
+            ApplyFrame();
+        };
+
+        var opacityLabel = new TextBlock { VerticalAlignment = VerticalAlignment.Center };
+        var opacity = new Slider
+        {
+            Minimum = MinPanelOpacity * 100,
+            Maximum = 100,
+            Value = _viewModel.PanelOpacity * 100,
+            TickFrequency = 1,
+            IsSnapToTickEnabled = true,
+            MinWidth = 108,
+            [global::Avalonia.Automation.AutomationProperties.NameProperty] = _pt ? "Opacidade" : "Opacity",
+        };
+        var opacityRow = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            Spacing = 6,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Children = { opacityLabel, opacity },
+        };
+        opacityLabel.Bind(TextBlock.ForegroundProperty,
+            new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.ForegroundBrush"));
+        void PreviewOpacity()
+        {
+            _viewModel.PanelOpacity = NormalizeOpacity(opacity.Value / 100);
+            opacityLabel.Text = $"{(_pt ? "Opacidade" : "Opacity")} {opacity.Value:F0}%";
+            UpdateNativeGlass();
+        }
+        opacity.ValueChanged += (_, _) => PreviewOpacity();
+        PreviewOpacity();
+
         Content = null;
-        var preview = new Grid { Cursor = new Cursor(StandardCursorType.SizeAll), Children = { _panel, grip } };
+        _preview = new Grid { Cursor = new Cursor(StandardCursorType.SizeAll), Children = { _panel, grips } };
         var footer = new StackPanel
         {
             Orientation = Orientation.Horizontal,
             Spacing = 6,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Margin = new Thickness(4),
-            Children = { save, cancel },
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Children = { sizeMode, save, cancel },
         };
-        var editor = new Grid { RowDefinitions = new RowDefinitions { new(new GridLength(_panelHeight)), new(GridLength.Star) }, Children = { preview, footer } };
+        var controls = new Border { IsHitTestVisible = false };
+        controls.Bind(Border.BackgroundProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.BackgroundBrush"));
+        controls.ZIndex = -1;
+        Grid.SetRow(controls, 1);
+        Grid.SetRowSpan(controls, 2);
+        var editor = new Grid { RowDefinitions = new RowDefinitions("*,40,36"), Children = { _preview, footer, opacityRow, controls } };
         Grid.SetRow(footer, 1);
+        Grid.SetRow(opacityRow, 2);
         var border = new Border { Child = editor, BorderThickness = new Thickness(1) };
-        border.Bind(Border.BackgroundProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.BackgroundBrush"));
         border.Bind(Border.BorderBrushProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.EditBrush"));
         Content = border;
-        Height = _panelHeight + 40;
-        var screen = Screens.ScreenFromPoint(Position) ?? Screens.Primary;
-        if (screen is not null)
-        {
-            var bottom = screen.WorkingArea.Bottom - (int)Math.Ceiling(Height * screen.Scaling);
-            Position = new PixelPoint(Position.X, Constrain(Position.Y, screen.WorkingArea.Y, bottom, snap: false));
-        }
-
+        RestorePlacement();
         Activate();
         save.Focus();
+    }
+
+    private static Border ResizeGrip(StandardCursorType cursor, HorizontalAlignment horizontal, VerticalAlignment vertical)
+    {
+        var grip = new Border
+        {
+            HorizontalAlignment = horizontal,
+            VerticalAlignment = vertical,
+            Width = horizontal == HorizontalAlignment.Right ? 15 : double.NaN,
+            Height = vertical == VerticalAlignment.Bottom ? 15 : double.NaN,
+            Background = Brushes.Transparent,
+            Cursor = new Cursor(cursor),
+            Child = new Border
+            {
+                Width = horizontal == HorizontalAlignment.Right ? 3 : 24,
+                Height = vertical == VerticalAlignment.Bottom ? 3 : 20,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                CornerRadius = new CornerRadius(2),
+            },
+        };
+        ((Border)grip.Child).Bind(Border.BackgroundProperty,
+            new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.EditBrush"));
+        return grip;
     }
 
     private static Button EditButton(string label, bool primary)
@@ -246,16 +324,28 @@ internal sealed class FloatingPanelWindow : Window
 
         var pixel = this.PointToScreen(e.GetPosition(this));
         var dx = pixel.X - drag.Pointer.X;
-        if (drag.Resize)
+        var dy = pixel.Y - drag.Pointer.Y;
+        if (drag.ResizeWidth || drag.ResizeHeight)
         {
             var screen = Screens.ScreenFromPoint(Position) ?? Screens.Primary;
             var scale = screen?.Scaling ?? 1;
-            var max = screen is null ? 2000 : (screen.WorkingArea.Right - Position.X) / scale;
-            Width = Math.Clamp(drag.Width + dx / scale, 200, Math.Max(200, max));
+            if (drag.ResizeWidth)
+            {
+                var max = screen is null ? 2000 : (screen.WorkingArea.Right - Position.X) / scale;
+                _panelWidth = Math.Clamp(drag.Width + dx / scale, MinPanelWidth, Math.Max(MinPanelWidth, max));
+            }
+
+            if (drag.ResizeHeight)
+            {
+                var max = screen is null ? 2000 : (screen.WorkingArea.Bottom - Position.Y) / scale - EditorHeight - 2;
+                _panelHeight = Math.Clamp(drag.Height + dy / scale, MinimumHeight, Math.Max(MinimumHeight, max));
+            }
+
+            RestorePlacement();
         }
         else
         {
-            Position = new PixelPoint(drag.Window.X + dx, drag.Window.Y + pixel.Y - drag.Pointer.Y);
+            Position = new PixelPoint(drag.Window.X + dx, drag.Window.Y + dy);
         }
 
         e.Handled = true;
@@ -298,21 +388,32 @@ internal sealed class FloatingPanelWindow : Window
 
         _beforeEdit = null;
         _drag = null;
-        var editor = (Grid)((Border)Content!).Child!;
-        ((Grid)editor.Children[0]).Children.Remove(_panel);
+        _preview!.Children.Remove(_panel);
+        _preview = null;
         Content = _panel;
-        Height = _panelHeight;
         if (save)
         {
-            _preferences = _preferences with { X = Position.X, Y = Position.Y, Width = Width };
+            _preferences = _preferences with
+            {
+                X = Position.X,
+                Y = Position.Y,
+                Width = _panelWidth,
+                Height = _panelHeight,
+                AutomaticSize = _automaticEdit,
+                PanelOpacity = _viewModel.PanelOpacity,
+            };
             RestorePlacement(snap: true);
-            Persist(_preferences with { X = Position.X, Y = Position.Y, Width = Width });
+            Persist(_preferences with { X = Position.X, Y = Position.Y });
         }
         else
         {
-            Width = before.Width;
-            Position = before.Position;
+            Position = before;
+            _viewModel.PanelOpacity = NormalizeOpacity(_preferences.PanelOpacity);
+            UpdateNativeGlass();
         }
+
+        ApplyFrame();
+        RestorePlacement();
     }
 
     private void Persist(PanelPreferences preferences)
@@ -329,23 +430,24 @@ internal sealed class FloatingPanelWindow : Window
             return;
         }
 
-        if (_preferences is { X: int x, Y: int y })
+        var saved = _beforeEdit.HasValue ? Position
+            : _preferences is { X: int x, Y: int y } ? new PixelPoint(x, y) : (PixelPoint?)null;
+        var screen = saved is { } point ? Screens.ScreenFromPoint(point) ?? primary : primary;
+        var area = screen.WorkingArea;
+        var scale = screen.Scaling;
+        var editorExtra = _beforeEdit.HasValue ? EditorHeight + 2 : 0;
+        Width = Math.Min(_panelWidth, area.Width / scale);
+        Height = Math.Min(_panelHeight + editorExtra, area.Height / scale);
+
+        if (saved is { } position)
         {
-            var saved = new PixelPoint(x, y);
-            var screen = Screens.ScreenFromPoint(saved) ?? primary;
-            var area = screen.WorkingArea;
-            var maxWidth = area.Width / screen.Scaling;
-            var requestedWidth = double.IsFinite(_preferences.Width) ? _preferences.Width : PanelWidth;
-            Width = Math.Clamp(requestedWidth, Math.Min(200, maxWidth), maxWidth);
-            var right = area.Right - (int)Math.Ceiling(Width * screen.Scaling);
-            var bottom = area.Bottom - (int)Math.Ceiling(Height * screen.Scaling);
-            Position = new PixelPoint(Constrain(x, area.X, right, snap), Constrain(y, area.Y, bottom, snap));
+            var right = area.Right - (int)Math.Ceiling(Width * scale);
+            var bottom = area.Bottom - (int)Math.Ceiling(Height * scale);
+            Position = new PixelPoint(Constrain(position.X, area.X, right, snap), Constrain(position.Y, area.Y, bottom, snap));
             return;
         }
 
-        var rect = DockLayout(primary.WorkingArea, primary.Scaling, _panelHeight);
-        Width = rect.Width / primary.Scaling;
-        Height = rect.Height / primary.Scaling;
+        var rect = DockLayout(area, scale, Height, Width);
         Position = new PixelPoint(rect.Left, rect.Top);
     }
 
@@ -370,29 +472,100 @@ internal sealed class FloatingPanelWindow : Window
         }
     }
 
+    private double MinimumHeight => PanelHeight + (_viewModel.IsLcd ? 23 : 0);
+
     private void ApplyFrame()
     {
         _frame = _frames();
         _viewModel.Apply(_frame);
-        if (_beforeEdit.HasValue)
+        UpdateNativeGlass();
+        var editing = _beforeEdit.HasValue;
+        var automatic = editing ? _automaticEdit : _preferences.UsesAutomaticSize();
+        if (editing && !automatic)
         {
             return;
         }
 
+        var width = automatic ? MeasureAutomaticWidth() : ValidSize(_preferences.Width, PanelWidth);
         var sessionHeight = _viewModel.IsClearList
             ? _viewModel.SessionGroups.Sum(group => 37 + (group.HasChildren ? 6 + (int)Math.Ceiling(group.Children.Count / 3.0) * 35 : 0))
-            : (_viewModel.IsLcd ? 24 : 12) + (_frame.SessionRows.Count * 24);
-        var height = Math.Clamp(sessionHeight + 29, PanelHeight, 228);
-        if (height != _panelHeight)
+            : (_viewModel.IsLcd ? 36 : 12) + (_frame.SessionRows.Count * 24);
+        var automaticHeight = Math.Max(MinimumHeight, sessionHeight + 29);
+        var height = automatic ? automaticHeight : ValidSize(_preferences.Height, automaticHeight);
+        width = Math.Max(MinPanelWidth, width);
+        height = Math.Max(MinimumHeight, height);
+        if (width != _panelWidth || height != _panelHeight)
         {
+            _panelWidth = width;
             _panelHeight = height;
-            Height = height;
             if (IsVisible)
             {
                 RestorePlacement();
             }
         }
     }
+
+    private double MeasureAutomaticWidth()
+    {
+        var font = Application.Current?.Resources["Led.FontFamily"] as FontFamily ?? FontFamily.Default;
+        double TextWidth(string text, double size, bool bold = false) => new FormattedText(text, CultureInfo.CurrentCulture,
+            FlowDirection.LeftToRight, new Typeface(font, weight: bold ? FontWeight.SemiBold : FontWeight.Normal),
+            size, Brushes.Black).Width;
+
+        var width = _viewModel.SessionRows.Count == 0
+            ? Math.Max(
+                TextWidth(_viewModel.Feed, 13) + TextWidth(_viewModel.ElapsedText, 12) + 42,
+                _viewModel.Channels.Sum(channel => TextWidth(channel.Label, 11) + 24))
+            : _viewModel.SessionRows.Max(row => row.ShowEditorialHeader
+                ? TextWidth(row.EditorialHeading, 16, true) + TextWidth(row.Status, 12) + 120
+                : TextWidth(row.CompactLabel, 14, row.IsHeader) + TextWidth(row.Status, 12) + 76);
+        if (_viewModel.IsClearList)
+        {
+            width = Math.Max(width, _viewModel.SessionGroups.Select(group =>
+                group.Children.Select(row =>
+                    TextWidth(row.StationLabel, 11, true) + TextWidth(row.Status, 10) + 26).DefaultIfEmpty(0).Max() * 3)
+                .DefaultIfEmpty(0).Max() + 28);
+        }
+
+        return Math.Clamp(Math.Ceiling(width), MinPanelWidth, 900);
+    }
+
+    private void UpdateNativeGlass()
+    {
+        if (!OperatingSystem.IsMacOSVersionAtLeast(26) || !IsVisible)
+        {
+            return;
+        }
+
+        if (_viewModel.ThemeId != "LiquidGlass")
+        {
+            if (_nativeGlass != 0)
+            {
+                MacFloatingWindow.RemoveLiquidGlass(_nativeGlass);
+                _nativeGlass = 0;
+            }
+
+            return;
+        }
+
+        var opacity = _viewModel.PanelOpacity;
+        if (_nativeGlass == 0 && TryGetPlatformHandle() is IMacOSTopLevelPlatformHandle mac)
+        {
+            _nativeGlass = MacFloatingWindow.AddLiquidGlass(mac.NSWindow, ClientSize.Width, ClientSize.Height, opacity);
+        }
+        else if (_nativeGlass != 0 && opacity != _glassOpacity)
+        {
+            MacFloatingWindow.SetGlassOpacity(_nativeGlass, opacity);
+        }
+
+        _glassOpacity = opacity;
+    }
+
+    private static double NormalizeOpacity(double value) =>
+        double.IsFinite(value) ? Math.Clamp(value, MinPanelOpacity, 1) : 1;
+
+    private static double ValidSize(double? value, double fallback) =>
+        value is { } size && double.IsFinite(size) && size > 0 ? size : fallback;
 
     private void Render()
     {

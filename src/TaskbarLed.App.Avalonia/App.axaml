@@ -67,6 +67,8 @@
     <Thickness x:Key="Led.FrameThickness">1</Thickness>
     <SolidColorBrush x:Key="Led.EditBrush" Color="#D97757" />
     <SolidColorBrush x:Key="Led.AccentBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="Led.PanelSurfaceBrush" Color="#F2020A02" />
+    <Thickness x:Key="Led.PanelPadding">5,2,7,1</Thickness>
     <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
     <x:Double x:Key="Led.GlowOpacity">0.75</x:Double>
     <Color x:Key="Led.GlowColor">#33FF66</Color>

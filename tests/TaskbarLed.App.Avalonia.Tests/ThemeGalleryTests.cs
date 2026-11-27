@@ -59,6 +59,15 @@ public class ThemeGalleryTests
                 Assert.NotNull(bitmap);
                 Assert.Equal(6, model.SessionRows.Count);
                 Assert.Equal(2, model.SessionGroups.Count);
+                if (theme.Id == "OliveLcd")
+                {
+                    var content = view.FindControl<Grid>("PanelContent")!;
+                    var frame = view.FindControl<Border>("PanelFrame")!;
+                    Assert.True(content.Bounds.Top > frame.BorderThickness.Top);
+                    Assert.True(content.Bounds.Left > frame.BorderThickness.Left);
+                    Assert.True(content.Bounds.Bottom < frame.Bounds.Height - frame.BorderThickness.Bottom);
+                    Assert.True(content.Bounds.Right < frame.Bounds.Width - frame.BorderThickness.Right);
+                }
                 if (folder is not null)
                 {
                     bitmap.Save(Path.Combine(folder, theme.Id + ".png"), new PngBitmapEncoderOptions());
