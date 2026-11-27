@@ -149,6 +149,10 @@ public sealed partial class App : Application
 
         AddAction(pt ? "Editar posição e tamanho…" : "Edit position and size…", panel.BeginEdit);
         AddAction(pt ? "Voltar para acima do Dock" : "Reset position above Dock", panel.ResetPosition);
+        AddAction(pt ? "Ativar integração com Claude Code…" : "Enable Claude Code integration…",
+            () => ConfigureHooks(pt, install: true));
+        AddAction(pt ? "Desativar integração com Claude Code…" : "Disable Claude Code integration…",
+            () => ConfigureHooks(pt, install: false));
         menu.Items.Add(new NativeMenuItem(pt ? "Temas" : "Themes") { Menu = nativeThemes });
         panelMenu.Items.Add(contextThemes);
         UpdateChecks();
@@ -174,6 +178,38 @@ public sealed partial class App : Application
                 instance.Dispose();
             }, CancellationToken.None, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         };
+    }
+
+    private static void ConfigureHooks(bool portuguese, bool install)
+    {
+        var error = Program.ChangeHooks(install);
+        var message = error is not null
+            ? (portuguese ? "Não foi possível atualizar a integração do Claude Code." : "Could not update Claude Code integration.")
+                + Environment.NewLine + error
+            : install
+                ? (portuguese ? "Integração ativada. Reinicie as sessões abertas do Claude Code."
+                    : "Integration enabled. Restart your open Claude Code sessions.")
+                : (portuguese ? "Integração desativada. Reinicie as sessões abertas do Claude Code."
+                    : "Integration disabled. Restart your open Claude Code sessions.");
+        var done = new Button { Content = portuguese ? "Fechar" : "Close" };
+        var dialog = new Window
+        {
+            Title = DisplayName,
+            Width = 390,
+            SizeToContent = SizeToContent.Height,
+            CanResize = false,
+            Topmost = true,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Content = new StackPanel
+            {
+                Margin = new Thickness(18),
+                Spacing = 14,
+                Children = { new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap }, done },
+            },
+        };
+        done.Click += (_, _) => dialog.Close();
+        dialog.Show();
+        dialog.Activate();
     }
 
     internal static MenuItem CreateThemeMenuItem(PanelThemes.Theme theme)

@@ -10,13 +10,19 @@ internal static class Program
     {
         if (OperatingSystem.IsMacOS() && args is ["--install-hooks" or "--uninstall-hooks"])
         {
-            return ChangeHooks(args[0] == "--install-hooks");
+            if (ChangeHooks(args[0] == "--install-hooks") is { } error)
+            {
+                Console.Error.WriteLine(error);
+                return 1;
+            }
+
+            return 0;
         }
 
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 
-    private static int ChangeHooks(bool install)
+    internal static string? ChangeHooks(bool install)
     {
         var hook = Path.Combine(AppContext.BaseDirectory, "TaskbarLed.Hook");
         var installer = new ClaudeCodeHookInstaller(ClaudeCodeHookInstaller.DefaultSettingsPath, hook,
@@ -37,12 +43,11 @@ internal static class Program
                 installer.Uninstall();
             }
 
-            return 0;
+            return null;
         }
         catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
         {
-            Console.Error.WriteLine(ex.Message);
-            return 1;
+            return ex.Message;
         }
     }
 

@@ -5,12 +5,14 @@ cd "$(dirname "$0")/../.."
 dotnet_cmd="${DOTNET:-dotnet}"
 rid="${1:-osx-arm64}"
 case "$rid" in
-    osx-arm64|osx-x64) ;;
+    osx-arm64) host_arch=arm64 ;;
+    osx-x64) host_arch=x86_64 ;;
     *) printf 'Usage: %s [osx-arm64|osx-x64]\n' "$0" >&2; exit 2 ;;
 esac
 output="$PWD/artifacts/TaskbarLed-$rid"
 stage="$(mktemp -d)"
-app="$stage/Neon TSB Agents.app"
+payload="$stage/payload"
+app="$payload/Neon TSB Agents.app"
 bin="$app/Contents/MacOS"
 trap 'rm -rf "$stage"' EXIT
 
@@ -52,3 +54,21 @@ codesign --force --deep --sign - "$app"
 rm -f "$output/TaskbarLed-$rid.zip"
 ditto -c -k --keepParent "$app" "$output/TaskbarLed-$rid.zip"
 printf '%s\n' "$output/TaskbarLed-$rid.zip"
+pkgbuild --analyze --root "$payload" "$stage/Components.plist"
+plutil -replace 0.BundleIsRelocatable -bool NO "$stage/Components.plist"
+pkgbuild --root "$payload" --component-plist "$stage/Components.plist" --install-location /Applications \
+    --identifier io.github.briito-yuri.taskbarled.installer "$stage/NeonAgents.pkg"
+cat > "$stage/Distribution.xml" <<DIST
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="2">
+    <title>Neon TSB Agents</title>
+    <options customize="never" hostArchitectures="$host_arch"/>
+    <volume-check><allowed-os-versions><os-version min="14.0"/></allowed-os-versions></volume-check>
+    <choices-outline><line choice="neon"/></choices-outline>
+    <choice id="neon" visible="false"><pkg-ref id="io.github.briito-yuri.taskbarled.installer"/></choice>
+    <pkg-ref id="io.github.briito-yuri.taskbarled.installer">NeonAgents.pkg</pkg-ref>
+</installer-gui-script>
+DIST
+productbuild --distribution "$stage/Distribution.xml" --package-path "$stage" "$stage/TaskbarLed-$rid.pkg"
+mv -f "$stage/TaskbarLed-$rid.pkg" "$output/TaskbarLed-$rid.pkg"
+printf '%s\n' "$output/TaskbarLed-$rid.pkg"

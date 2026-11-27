@@ -29,6 +29,8 @@ You send Claude a long prompt, switch to another app, and then keep coming back 
 
 The current macOS branch includes native Apple Silicon and Intel builds, automatic and manual sizing, theme-aware opacity, and adaptive Liquid Glass. See the macOS guide above to build it.
 
+[Installer packages from the macOS branch](docs/MACOS.md#build-and-connect-claude-code).
+
 ### Themes created for macOS
 
 | Line Map | Liquid Glass |

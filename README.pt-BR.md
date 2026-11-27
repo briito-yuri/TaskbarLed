@@ -29,6 +29,8 @@ Você manda um prompt longo para o Claude, vai fazer outra coisa e fica voltando
 
 A branch atual do macOS inclui builds nativos para Apple Silicon e Intel, tamanho automático e manual, controle de opacidade por tema e Liquid Glass adaptável. Veja no guia acima como compilar.
 
+[Instalar pelo assistente do macOS](docs/MACOS.pt-BR.md#instalar-pelo-assistente).
+
 ### Temas criados para macOS
 
 | Mapa de Linhas | Liquid Glass |

@@ -71,9 +71,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: TaskbarLed-osx-arm64
-          path: artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip
+          path: |
+            artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip
+            artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.pkg
 
       - uses: actions/upload-artifact@v4
         with:
           name: TaskbarLed-osx-x64
-          path: artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.zip
+          path: |
+            artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.zip
+            artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.pkg

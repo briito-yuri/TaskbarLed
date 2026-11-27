@@ -21,7 +21,7 @@ src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64
 src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
 ```
 
-Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces `artifacts/TaskbarLed-<rid>/TaskbarLed-<rid>.zip` containing `Neon TSB Agents.app` and the runtime for the selected architecture. Extract the ZIP and move the app to its permanent location before registering hooks.
+Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces a ZIP and a macOS installer package under `artifacts/TaskbarLed-<rid>/`. Open `TaskbarLed-<rid>.pkg` and follow the prompts to install in Applications, or extract the ZIP and move the app to Applications yourself. Both include the runtime. The development installer needs Developer ID Installer signing and notarization for seamless public distribution.
 
 ```sh
 app="/Applications/Neon TSB Agents.app"
@@ -29,7 +29,7 @@ app="/Applications/Neon TSB Agents.app"
 open "$app"
 ```
 
-If you are replacing an earlier Mac build, quit the old app first. Run the hook installer again after moving the new app so Claude Code uses the new path.
+To enable or disable Claude Code hooks without a terminal, use the corresponding integration option in the app menu. If you are replacing an earlier Mac build, quit the old app first. Run the hook installer again after moving the new app so Claude Code uses the new path.
 
 The installer merges hooks into the Claude Code user settings and saves a backup. Restart existing Claude Code sessions to load the hooks. Claude Code in a terminal, IDE or Claude Desktop sends the same events when it loads those settings. For a custom configuration directory, pass `CLAUDE_CONFIG_DIR` when installing. Run `--uninstall-hooks` with the same executable to disconnect.
 

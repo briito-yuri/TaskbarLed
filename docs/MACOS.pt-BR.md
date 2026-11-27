@@ -13,18 +13,26 @@ O download público é a versão **0.5.1**, para Macs com Apple Silicon e macOS 
 
 O ZIP usa assinatura ad hoc. Se o macOS bloquear a abertura, consulte as [instruções da Apple para abrir um app de desenvolvedor que o macOS não consegue verificar](https://support.apple.com/pt-br/102445).
 
+## Instalar pelo assistente
+
+Os builds da branch também geram um instalador `.pkg`. Abra **TaskbarLed-osx-arm64.pkg** em um Mac com chip M ou **TaskbarLed-osx-x64.pkg** em um Mac Intel. Clique em **Continuar** e **Instalar** no assistente do macOS. Depois abra **Neon TSB Agents** em **Aplicativos**. O instalador inclui o app, os hooks e o runtime.
+
+Para ativar o Claude Code sem usar o Terminal, abra o menu do Neon e clique em **Ativar integração com Claude Code…**. Reinicie as sessões do Claude Code para que carreguem a integração. A opção **Desativar integração com Claude Code…** remove os hooks instalados pelo Neon.
+
+Os instaladores da branch estão disponíveis como artefatos do job macOS quando o CI termina. Estes pacotes de desenvolvimento ainda precisam de assinatura Developer ID Installer e notarização para distribuição pública sem a aprovação adicional do macOS.
+
 ## Mac Intel ou versão atual da branch
 
 O pacote público acima é para Apple Silicon. Para usar o app em um **Mac Intel** ou testar a versão atual da branch com os temas mais recentes, gere o ZIP da arquitetura do seu Mac. Ambas as versões exigem macOS 14 ou posterior e incluem o runtime.
 
 Com o SDK .NET indicado em `global.json` e as ferramentas de linha de comando da Apple instalados, abra o Terminal na raiz do repositório e execute o comando correspondente:
 
-| Seu Mac | Comando | ZIP gerado |
+| Seu Mac | Comando | Arquivos gerados |
 | --- | --- | --- |
-| Chip Apple M1 ou posterior | `src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64` | `artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip` |
-| Processador Intel | `src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64` | `artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.zip` |
+| Chip Apple M1 ou posterior | `src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64` | `artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip` e `TaskbarLed-osx-arm64.pkg` |
+| Processador Intel | `src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64` | `artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.zip` e `TaskbarLed-osx-x64.pkg` |
 
-Feche a versão anterior, extraia o ZIP e mova **Neon TSB Agents.app** para **Aplicativos**. Abra o app pelo Finder. O build Apple Silicon roda nativamente em chips da série M.
+Feche a versão anterior e abra o `.pkg` ou extraia o ZIP e mova **Neon TSB Agents.app** para **Aplicativos**. Abra o app pelo Finder. O build Apple Silicon roda nativamente em chips da série M.
 
 ## Ativar a integração com Claude Code
 
