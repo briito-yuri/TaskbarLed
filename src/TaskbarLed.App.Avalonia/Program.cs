@@ -20,7 +20,7 @@ internal static class Program
     {
         var hook = Path.Combine(AppContext.BaseDirectory, "TaskbarLed.Hook");
         var installer = new ClaudeCodeHookInstaller(ClaudeCodeHookInstaller.DefaultSettingsPath, hook,
-            [.. ClaudeCodeHookInstaller.Events, "PermissionRequest", "PostToolUseFailure"]);
+            [.. ClaudeCodeHookInstaller.Events, "PermissionRequest", "PostToolUseFailure", "SubagentStart", "SubagentStop"]);
         try
         {
             if (install)

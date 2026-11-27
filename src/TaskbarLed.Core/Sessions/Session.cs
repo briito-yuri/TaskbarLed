@@ -25,6 +25,9 @@ public sealed record Session(
     DateTimeOffset LastUpdated,
     SessionHost Host = SessionHost.Unknown)
 {
+    /// <summary>Session that launched this subagent, when the source reports it.</summary>
+    public string? ParentId { get; init; }
+
     /// <summary>Best label to identify the session on a tiny display.</summary>
     public string DisplayName =>
         !string.IsNullOrWhiteSpace(Title) ? Title

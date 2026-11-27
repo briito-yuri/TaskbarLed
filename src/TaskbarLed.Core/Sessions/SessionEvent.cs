@@ -48,3 +48,7 @@ public sealed record TitleIdentified(string SessionId, string SourceId, DateTime
 /// <summary>The session was closed and should leave the panel.</summary>
 public sealed record SessionEnded(string SessionId, string SourceId, DateTimeOffset Timestamp)
     : SessionEvent(SessionId, SourceId, Timestamp);
+
+/// <summary>The session is a subagent of another session.</summary>
+public sealed record ParentIdentified(string SessionId, string SourceId, DateTimeOffset Timestamp, string ParentId)
+    : SessionEvent(SessionId, SourceId, Timestamp);

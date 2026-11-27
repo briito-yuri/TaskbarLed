@@ -28,6 +28,8 @@ public sealed record PanelFrame(
     bool NeedsAttention,
     bool HasActivity)
 {
+    public string ActiveSubagents { get; init; } = string.Empty;
+
     public static PanelFrame Empty(string feed) =>
         new([], feed, string.Empty, SessionStatus.Idle, null, false, false, false);
 }

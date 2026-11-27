@@ -52,6 +52,12 @@ public sealed partial class PanelViewModel : ObservableObject
     public ObservableCollection<ChannelViewModel> Channels { get; } = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSubagents))]
+    public partial string ActiveSubagents { get; set; } = string.Empty;
+
+    public bool HasSubagents => ActiveSubagents.Length != 0;
+
+    [ObservableProperty]
     public partial string Feed { get; set; } = string.Empty;
 
     [ObservableProperty]
@@ -86,6 +92,7 @@ public sealed partial class PanelViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(frame);
         _frame = frame;
 
+        ActiveSubagents = frame.ActiveSubagents;
         Feed = Cased(frame.Feed);
         ElapsedText = frame.ElapsedText;
         SelectedStatus = frame.SelectedStatus;

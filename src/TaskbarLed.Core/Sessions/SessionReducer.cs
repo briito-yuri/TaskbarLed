@@ -68,6 +68,8 @@ public static class SessionReducer
                 Activity = null,
             },
 
+            ParentIdentified e => session with { ParentId = e.ParentId },
+
             HostIdentified e => session with { Host = e.Host },
 
             // The conversation's own title beats the folder name, which is meaningless for scratch chats.

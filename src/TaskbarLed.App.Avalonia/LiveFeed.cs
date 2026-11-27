@@ -16,23 +16,30 @@ internal sealed class LiveFeed(CultureInfo culture)
     private readonly string _detectedLabel = culture.TwoLetterISOLanguageName == "pt" ? "Processos detectados" : "Detected processes";
     private string[] _detected = [];
     private Session[] _octo = [];
-    private readonly Dictionary<string, DateTimeOffset> _seenOcto = new(StringComparer.Ordinal);
+    private Session[] _antigravity = [];
+    private Session[] _codex = [];
+    private readonly CodexSessions _codexReader = new();
+    private readonly bool _pt = culture.TwoLetterISOLanguageName == "pt";
+    private readonly Dictionary<string, DateTimeOffset> _seenExternal = new(StringComparer.Ordinal);
 
-    public PanelFrame Compose(DateTimeOffset now)
+    public PanelFrame Compose(DateTimeOffset now) =>
+        Compose(now, Volatile.Read(ref _antigravity));
+
+    internal PanelFrame Compose(DateTimeOffset now, IReadOnlyList<Session> antigravity)
     {
-        var octo = Volatile.Read(ref _octo);
-        var sessions = _store.Snapshot().Concat(octo.Where(s =>
-            s.Status != SessionStatus.Completed || !_seenOcto.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))
+        var external = Volatile.Read(ref _octo).Concat(antigravity).Concat(Volatile.Read(ref _codex));
+        var sessions = _store.Snapshot().Concat(external.Where(s =>
+            s.Status != SessionStatus.Completed || !_seenExternal.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))
             .ToArray();
         var detected = Volatile.Read(ref _detected);
+        var frame = _composer.Compose(sessions, now) with { ActiveSubagents = SubagentLine(sessions) };
         if (detected.Length == 0)
         {
-            return _composer.Compose(sessions, now);
+            return frame;
         }
 
         var presence = detected.Select((name, index) =>
             new ChannelState($"process:{index}:{name}", name, SessionStatus.Idle, false));
-        var frame = _composer.Compose(sessions, now);
         if (frame.HasActivity)
         {
             return frame with { Channels = [.. frame.Channels, .. presence] };
@@ -45,11 +52,38 @@ internal sealed class LiveFeed(CultureInfo culture)
         };
     }
 
+    private string SubagentLine(Session[] sessions)
+    {
+        var children = sessions.Where(s => s.ParentId is not null && s.Status != SessionStatus.Idle).ToArray();
+        if (children.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        var parents = sessions.DistinctBy(s => s.Id).ToDictionary(s => s.Id, s => s.DisplayName, StringComparer.Ordinal);
+        var groups = children.GroupBy(s => s.ParentId!, StringComparer.Ordinal)
+            .Select(group =>
+            {
+                var parent = parents.GetValueOrDefault(group.Key) ?? group.First().ProjectName;
+                var names = string.Join(", ", group.Select(s => (s.Status switch { SessionStatus.AwaitingInput => "! ", SessionStatus.Completed => "✓ ", _ => "▸ " }) + s.DisplayName));
+                return parent is null ? names : $"{parent} › {names}";
+            });
+        return string.Create(culture, $"{(_pt ? "Subagentes" : "Subagents")} ({children.Count(s => s.Status != SessionStatus.Completed)})  ·  {string.Join("  |  ", groups)}");
+    }
+
     public async Task DetectProcessesAsync(CancellationToken cancellationToken)
     {
         var rules = Path.Combine(IpcEndpoints.DataDirectory, "agents.json");
         var octo = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library",
             "Application Support", "Octo", "agents");
+        var geminiHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".gemini");
+        var codexHome = Environment.GetEnvironmentVariable("CODEX_HOME");
+        if (string.IsNullOrWhiteSpace(codexHome))
+        {
+            codexHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".codex");
+        }
+
+        var observedAntigravity = new HashSet<string>(StringComparer.Ordinal);
         using var timer = new PeriodicTimer(TimeSpan.FromSeconds(2));
         do
         {
@@ -60,6 +94,19 @@ internal sealed class LiveFeed(CultureInfo culture)
                     ? await OctoSessions.ScanAsync(octo, cancellationToken).ConfigureAwait(false)
                     : [];
                 Volatile.Write(ref _octo, sessions);
+                var antigravity = Array.Exists(detected, tool => tool == "Antigravity")
+                    ? await AntigravitySessions.ScanAsync(geminiHome, cancellationToken).ConfigureAwait(false)
+                    : [];
+                foreach (var active in antigravity.Where(s => s.Status == SessionStatus.Running))
+                {
+                    observedAntigravity.Add(active.Id);
+                }
+
+                var known = antigravity.Where(s => s.Status != SessionStatus.Completed || observedAntigravity.Contains(s.Id)).ToArray();
+                observedAntigravity.IntersectWith(known.Select(s => s.Id));
+                Volatile.Write(ref _antigravity, known);
+                Volatile.Write(ref _codex, Array.Exists(detected, tool => tool == "Codex")
+                    ? _codexReader.Scan(codexHome, DateTimeOffset.UtcNow) : []);
             }
         }
         while (await timer.WaitForNextTickAsync(cancellationToken).ConfigureAwait(false));
@@ -67,10 +114,11 @@ internal sealed class LiveFeed(CultureInfo culture)
 
     public void Acknowledge(string? sessionId)
     {
-        var completed = Array.Find(Volatile.Read(ref _octo), s => s.Id == sessionId && s.Status == SessionStatus.Completed);
+        var completed = Volatile.Read(ref _octo).Concat(Volatile.Read(ref _antigravity)).Concat(Volatile.Read(ref _codex))
+            .FirstOrDefault(s => s.Id == sessionId && s.Status == SessionStatus.Completed);
         if (completed is not null)
         {
-            _seenOcto[completed.Id] = completed.LastUpdated;
+            _seenExternal[completed.Id] = completed.LastUpdated;
         }
 
         _store.AcknowledgeCompleted(s => s.Id == sessionId);
@@ -129,6 +177,30 @@ internal sealed class LiveFeed(CultureInfo culture)
 
         if (envelope.Source == ClaudeCodeSource.Id)
         {
+            var hook = Text(payload, "hook_event_name");
+            if (hook is "SubagentStart" or "SubagentStop")
+            {
+                if (Text(payload, "agent_id") is { Length: > 0 and <= 256 } agentId)
+                {
+                    var at = envelope.ReceivedAt;
+                    var child = $"claude-subagent:{id.Length}:{id}:{agentId}";
+                    if (hook == "SubagentStart")
+                    {
+                        _store.Apply(new ParentIdentified(child, envelope.Source, at, id));
+                        _store.Apply(new PromptSubmitted(child, envelope.Source, at, Text(payload, "agent_type") ?? agentId, null));
+                    }
+                    else
+                    {
+                        if (_store.Snapshot().Any(s => s.Id == child))
+                        {
+                            _store.Apply(new ResponseCompleted(child, envelope.Source, at, null));
+                        }
+                    }
+                }
+
+                return;
+            }
+
             var events = await _claude.TranslateAsync(payload, envelope.ReceivedAt, envelope.Environment, cancellationToken)
                 .ConfigureAwait(false);
             _store.ApplyRange(events);
@@ -158,6 +230,11 @@ internal sealed class LiveFeed(CultureInfo culture)
                 if (evt is not (SessionEnded or PromptSubmitted))
                 {
                     _store.Apply(new TitleIdentified(session, agent, at, Text(payload, "title") ?? agent));
+                }
+
+                if (evt is not SessionEnded && Text(payload, "parent_session_id") is { Length: > 0 and <= 256 } parent && parent != id)
+                {
+                    _store.Apply(new ParentIdentified(session, agent, at, $"agent:{agent.Length}:{agent}:{parent}"));
                 }
 
                 _store.Apply(evt);

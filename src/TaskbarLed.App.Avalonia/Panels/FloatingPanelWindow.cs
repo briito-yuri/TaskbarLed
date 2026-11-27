@@ -25,6 +25,8 @@ internal sealed class FloatingPanelWindow : Window
     /// <summary>Space between the panel and the Dock, in DIP/points.</summary>
     public const double DockGap = 8;
 
+    public const double PanelHeight = PanelLayout.FloatingHeightDip + 18;
+
     private readonly PanelViewModel _viewModel;
     private readonly Func<PanelFrame> _frames;
     private readonly DispatcherTimer _frameTimer;
@@ -62,7 +64,7 @@ internal sealed class FloatingPanelWindow : Window
         TransparencyLevelHint = [WindowTransparencyLevel.Transparent];
         WindowStartupLocation = WindowStartupLocation.Manual;
         Width = PanelWidth;
-        Height = PanelLayout.FloatingHeightDip;
+        Height = PanelHeight;
         _panel = new PanelView { DataContext = viewModel };
         Content = _panel;
 
@@ -100,7 +102,7 @@ internal sealed class FloatingPanelWindow : Window
         var point = e.GetCurrentPoint(this);
         if (_beforeEdit.HasValue)
         {
-            if (point.Properties.IsLeftButtonPressed && point.Position.Y < PanelLayout.FloatingHeightDip)
+            if (point.Properties.IsLeftButtonPressed && point.Position.Y < PanelHeight)
             {
                 _drag = (this.PointToScreen(point.Position), Position, Width, point.Position.X >= Width - 18);
                 e.Pointer.Capture(this);
@@ -120,8 +122,14 @@ internal sealed class FloatingPanelWindow : Window
 
     /// <summary>Rectangle for the panel on a screen's work area. Shared with the screenshot test.</summary>
     internal static CorePixelRect Layout(global::Avalonia.PixelRect workArea, double scaling) =>
-        PanelLayout.AboveDock(
+        DockLayout(workArea, scaling);
+
+    private static CorePixelRect DockLayout(global::Avalonia.PixelRect workArea, double scaling)
+    {
+        var rect = PanelLayout.AboveDock(
             new CorePixelRect(workArea.X, workArea.Y, workArea.Right, workArea.Bottom), scaling, PanelWidth, DockGap);
+        return rect with { Top = Math.Max(workArea.Y, rect.Bottom - (int)Math.Round(PanelHeight * scaling)) };
+    }
 
     public void ConfigurePlacement(PanelPreferences preferences, Action<PanelPreferences> save)
     {
@@ -180,13 +188,13 @@ internal sealed class FloatingPanelWindow : Window
             Margin = new Thickness(4),
             Children = { save, cancel },
         };
-        var editor = new Grid { RowDefinitions = new RowDefinitions("36,*"), Children = { preview, footer } };
+        var editor = new Grid { RowDefinitions = new RowDefinitions { new(new GridLength(PanelHeight)), new(GridLength.Star) }, Children = { preview, footer } };
         Grid.SetRow(footer, 1);
         var border = new Border { Child = editor, BorderThickness = new Thickness(1) };
         border.Bind(Border.BackgroundProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.BackgroundBrush"));
         border.Bind(Border.BorderBrushProperty, new global::Avalonia.Markup.Xaml.MarkupExtensions.DynamicResourceExtension("Led.EditBrush"));
         Content = border;
-        Height = 76;
+        Height = PanelHeight + 40;
         var screen = Screens.ScreenFromPoint(Position) ?? Screens.Primary;
         if (screen is not null)
         {
@@ -263,7 +271,7 @@ internal sealed class FloatingPanelWindow : Window
         var editor = (Grid)((Border)Content!).Child!;
         ((Grid)editor.Children[0]).Children.Remove(_panel);
         Content = _panel;
-        Height = PanelLayout.FloatingHeightDip;
+        Height = PanelHeight;
         if (save)
         {
             _preferences = _preferences with { X = Position.X, Y = Position.Y, Width = Width };
@@ -325,8 +333,11 @@ internal sealed class FloatingPanelWindow : Window
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         base.OnPointerWheelChanged(e);
-        _skip?.Invoke();
-        Render();
+        if (!e.Handled)
+        {
+            _skip?.Invoke();
+            Render();
+        }
     }
 
     private void ApplyFrame()
