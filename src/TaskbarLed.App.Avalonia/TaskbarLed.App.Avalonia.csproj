@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>TaskbarLed</AssemblyName>
     <RootNamespace>TaskbarLed.App.Avalonia</RootNamespace>
     <Description>Cross-platform TaskbarLed panel (Avalonia): a small floating panel above the macOS Dock.</Description>

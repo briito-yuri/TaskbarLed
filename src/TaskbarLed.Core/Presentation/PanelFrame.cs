@@ -9,7 +9,13 @@ namespace TaskbarLed.Core.Presentation;
 /// <param name="IsSelected">The feed is showing this session.</param>
 public sealed record ChannelState(string SessionId, string Label, SessionStatus Status, bool IsSelected);
 
-public sealed record SessionDisplayRow(string? SessionId, string Label, SessionStatus Status, bool IsHeader, int SecondsRemaining = 0, bool HasStatus = true);
+public sealed record SessionDisplayRow(string? SessionId, string Label, SessionStatus Status, bool IsHeader, int SecondsRemaining = 0, bool HasStatus = true)
+{
+    public string? Engine { get; init; }
+    public string? Heading { get; init; }
+    public string? StationName { get; init; }
+    public bool LastStation { get; init; }
+}
 
 /// <summary>Everything the panel needs to draw one frame. UI-framework agnostic.</summary>
 /// <param name="Channels">One tab per session, in stable order.</param>

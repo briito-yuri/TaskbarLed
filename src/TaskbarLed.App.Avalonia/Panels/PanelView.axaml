@@ -7,7 +7,7 @@
              xmlns:vm="using:TaskbarLed.App.Avalonia.Presentation"
              xmlns:panels="using:TaskbarLed.App.Avalonia.Panels"
              x:Class="TaskbarLed.App.Avalonia.Panels.PanelView"
-             x:DataType="vm:PanelViewModel">
+             x:DataType="vm:PanelViewModel" Classes.lcd="{Binding IsLcd}">
 
   <UserControl.Styles>
     <!-- Hard on/off blink, like a real LED. -->
@@ -30,6 +30,19 @@
           <KeyFrame Cue="100%"><Setter Property="Opacity" Value="1" /></KeyFrame>
         </Animation>
       </Style.Animations>
+    </Style>
+
+    <Style Selector="Grid.panel-content">
+      <Setter Property="Margin" Value="6,3,8,2" />
+    </Style>
+    <Style Selector="UserControl.lcd Grid.panel-content">
+      <Setter Property="Margin" Value="16,12,16,12" />
+    </Style>
+    <Style Selector="Border.session-row.cobalt">
+      <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="TextBlock.editorial-engine">
+      <Setter Property="Foreground" Value="#9A332C" />
     </Style>
 
     <Style Selector="Border.session-row">
@@ -64,6 +77,12 @@
     </Style>
     <Style Selector="TextBlock.session-status.waiting">
       <Setter Property="Foreground" Value="{DynamicResource Led.AttentionBrush}" />
+    </Style>
+    <Style Selector="Border.cobalt.header TextBlock.session-status">
+      <Setter Property="Foreground" Value="#E8F0FF" />
+    </Style>
+    <Style Selector="Border.cobalt.header TextBlock.session-status.waiting">
+      <Setter Property="Foreground" Value="#FFE3A7" />
     </Style>
     <Style Selector="Border.session-completion">
       <Setter Property="IsVisible" Value="False" />
@@ -131,7 +150,7 @@
             Background="{DynamicResource Led.BackgroundBrush}"
             BorderBrush="{DynamicResource Led.BorderBrush}" />
 
-    <Grid Margin="6,3,8,2" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto">
+    <Grid Classes="panel-content" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto">
       <ItemsControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Channels}" IsVisible="{Binding !HasSubagents}" ClipToBounds="True">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
@@ -173,12 +192,12 @@
       <TextBlock Grid.Row="1" Grid.Column="1" IsVisible="{Binding !HasSubagents}" Text="{Binding ElapsedText}" VerticalAlignment="Center" Margin="10,0,0,0"
                  FontFamily="{DynamicResource Led.FontFamily}" FontSize="12" FontWeight="SemiBold"
                  Foreground="{DynamicResource Led.ForegroundBrush}" />
-      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding HasSubagents}"
+      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding ShowSessionList}"
                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding SessionRows}">
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:SessionDisplayRowViewModel">
-              <Border Classes="session-row" Classes.header="{Binding IsHeader}" Classes.child="{Binding IsChild}">
+              <Border Classes="session-row" Classes.header="{Binding IsHeader}" Classes.child="{Binding IsChild}" Classes.cobalt="{Binding IsCobalt}">
                 <Grid>
                   <Border Classes="session-completion" Classes.blink="{Binding IsDone}"
                           Background="{DynamicResource Led.CompletionTint}"
@@ -186,24 +205,109 @@
                           CornerRadius="3" IsHitTestVisible="False" />
                   <Border BorderBrush="{DynamicResource Led.SessionDividerBrush}" BorderThickness="0,0,0,1"
                           IsHitTestVisible="False" />
-                  <Grid ColumnDefinitions="6,Auto,*,Auto" Margin="5,0,8,0">
+                  <Grid ColumnDefinitions="6,Auto,*,Auto" Margin="5,0,8,0" IsVisible="{Binding !IsLineMap}">
                   <Border Grid.Column="0" IsVisible="{Binding IsHeader}" Width="3" Margin="0,3,2,3"
                           Background="{DynamicResource Led.SessionRailBrush}" CornerRadius="1" />
                   <Border Grid.Column="1" IsVisible="{Binding IsChild}" Width="1" Margin="6,0,0,0"
                           Background="{DynamicResource Led.SessionTreeBrush}" />
                   <Ellipse Grid.Column="1" IsVisible="{Binding IsChild}" Width="6" Height="6" Margin="3,0,-2,0"
                            VerticalAlignment="Center" Fill="{DynamicResource Led.SessionNodeBrush}" />
-                  <TextBlock Grid.Column="2" Classes="session-label" Text="{Binding Label}" ToolTip.Tip="{Binding Label}"
-                             FontFamily="{DynamicResource Led.FontFamily}"
+                  <TextBlock Grid.Column="2" Classes="session-label" Text="{Binding CompactLabel}" ToolTip.Tip="{Binding Label}"
+                             IsVisible="{Binding !HasSplitHeader}" FontFamily="{DynamicResource Led.FontFamily}"
                              VerticalAlignment="Center" FontSize="12" TextTrimming="CharacterEllipsis" />
+                    <Grid Grid.Column="2" ColumnDefinitions="Auto,*" IsVisible="{Binding ShowEditorialHeader}">
+                      <TextBlock Classes="editorial-engine" Text="{Binding EngineLabel}" FontFamily="Helvetica Neue"
+                                 FontWeight="Bold" FontSize="9" Width="92" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding EditorialHeading}" Foreground="{DynamicResource Led.SessionTitleBrush}"
+                                 FontFamily="Georgia" FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis"
+                                 VerticalAlignment="Center" />
+                    </Grid>
+                    <Grid Grid.Column="2" ColumnDefinitions="*,Auto" IsVisible="{Binding ShowVioletHeader}">
+                      <TextBlock Text="{Binding Heading}" Foreground="{DynamicResource Led.SessionTitleBrush}"
+                                 FontSize="14" FontWeight="Bold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding EngineLabel}" Foreground="{DynamicResource Led.DimBrush}"
+                                 FontFamily="Menlo" FontSize="9" Margin="8,0,6,0" VerticalAlignment="Center" />
+                    </Grid>
                     <Border Grid.Column="3" Background="{DynamicResource Led.SessionStatusBrush}" CornerRadius="3"
                             VerticalAlignment="Center" Padding="4,1" Margin="2,0,0,0">
                       <TextBlock Classes="session-status" Classes.waiting="{Binding IsWaiting}" Classes.idle="{Binding IsIdle}"
                                  Text="{Binding Status}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5" />
                     </Border>
                   </Grid>
+                  <Grid ColumnDefinitions="29,*,Auto" Margin="5,0,8,0" IsVisible="{Binding IsLineMap}">
+                    <Grid Grid.Column="0" RowDefinitions="*,*">
+                      <Border Grid.Row="0" Width="2" IsVisible="{Binding IsChild}"
+                              Background="{Binding LineBrush}" HorizontalAlignment="Center" />
+                      <Border Grid.Row="1" Width="2" IsVisible="{Binding ConnectToNext}"
+                              Background="{Binding LineBrush}" HorizontalAlignment="Center" />
+                      <Border Grid.RowSpan="2" Width="18" Height="17" CornerRadius="3"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                              IsVisible="{Binding IsHeader}" Background="{Binding LineBrush}">
+                        <TextBlock Text="{Binding LineLetter}" Foreground="White" FontSize="11" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      </Border>
+                      <Grid Grid.RowSpan="2" IsVisible="{Binding IsChild}" VerticalAlignment="Center" Height="12">
+                        <Border Width="9" Height="2" HorizontalAlignment="Center" Margin="12,0,0,0"
+                                VerticalAlignment="Center" Background="{Binding LineBrush}" />
+                        <Ellipse Width="9" Height="9" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                 Fill="{DynamicResource Led.BackgroundBrush}" Stroke="{Binding LineBrush}" StrokeThickness="1.5" />
+                      </Grid>
+                    </Grid>
+                    <TextBlock Grid.Column="1" Classes="session-label" Text="{Binding StationLabel}" ToolTip.Tip="{Binding StationLabel}"
+                               FontFamily="{DynamicResource Led.FontFamily}" FontSize="12" Margin="3,0,6,0"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="2" Classes="session-status" Classes.waiting="{Binding IsWaiting}" Classes.idle="{Binding IsIdle}"
+                               Text="{Binding Status}" FontFamily="{DynamicResource Led.FontFamily}" FontSize="10.5"
+                               VerticalAlignment="Center" Margin="4,0,4,0" />
+                  </Grid>
                 </Grid>
               </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding ShowClearList}"
+                    HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding SessionGroups}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:SessionDisplayGroupViewModel">
+              <StackPanel Margin="6,0,6,4">
+                <Grid ColumnDefinitions="*,Auto" MinHeight="33" DataContext="{Binding Header}"
+                      x:DataType="vm:SessionDisplayRowViewModel">
+                  <Border Grid.ColumnSpan="2" Classes="session-completion" Classes.blink="{Binding IsDone}"
+                          CornerRadius="6" Background="{DynamicResource Led.CompletionTint}" IsHitTestVisible="False" />
+                  <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="8,0,0,0">
+                    <TextBlock Text="{Binding Heading}" Foreground="{DynamicResource Led.SessionTitleBrush}"
+                               FontSize="16" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Row.Engine}" Foreground="{DynamicResource Led.DimBrush}" FontSize="11"
+                               VerticalAlignment="Center" />
+                  </StackPanel>
+                  <TextBlock Grid.Column="1" Classes="session-status" Classes.idle="{Binding IsIdle}"
+                             Classes.waiting="{Binding IsWaiting}" Text="{Binding Status}" FontSize="11"
+                             Margin="6,0,8,0" VerticalAlignment="Center" />
+                </Grid>
+                <Border Height="1" Background="{DynamicResource Led.BorderBrush}" IsVisible="{Binding HasChildren}" />
+                <ItemsControl ItemsSource="{Binding Children}" IsVisible="{Binding HasChildren}" Margin="2,5,2,0">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><UniformGrid Columns="3" /></ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SessionDisplayRowViewModel">
+                      <Border CornerRadius="5" Background="{DynamicResource Led.SessionChildBrush}" Margin="3,1,3,2">
+                        <Grid ColumnDefinitions="*,Auto" MinHeight="32">
+                          <Border Grid.ColumnSpan="2" Classes="session-completion" Classes.blink="{Binding IsDone}"
+                                  CornerRadius="5" Background="{DynamicResource Led.CompletionTint}" IsHitTestVisible="False" />
+                          <TextBlock Text="{Binding StationLabel}" ToolTip.Tip="{Binding StationLabel}" Margin="7,0,3,0"
+                                     Foreground="{DynamicResource Led.ForegroundBrush}" FontSize="11" FontWeight="SemiBold"
+                                     VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                          <TextBlock Grid.Column="1" Classes="session-status" Classes.waiting="{Binding IsWaiting}"
+                                     Text="{Binding Status}" FontSize="10" Margin="2,0,6,0" VerticalAlignment="Center" />
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>

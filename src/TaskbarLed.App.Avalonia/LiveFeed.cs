@@ -117,12 +117,25 @@ internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = nul
                     : project;
             }
 
+            var children = group.Where(s => s.ParentId is not null).ToArray();
             rows.Add(new SessionDisplayRow(parent?.Id, $"{engine} → {SingleLine(title)}", parent?.Status ?? SessionStatus.Idle, true,
-                _completions.SecondsRemaining(parent?.Id, now), HasStatus: parent is not null));
-            foreach (var child in group.Where(s => s.ParentId is not null))
+                _completions.SecondsRemaining(parent?.Id, now), HasStatus: parent is not null)
             {
-                rows.Add(new SessionDisplayRow(child.Id, $"{(_pt ? "Subagente" : "Subagent")} {SingleLine(child.DisplayName)}", child.Status, false,
-                    _completions.SecondsRemaining(child.Id, now)));
+                Engine = engine,
+                Heading = SingleLine(title),
+                LastStation = children.Length == 0,
+            });
+            for (var i = 0; i < children.Length; i++)
+            {
+                var child = children[i];
+                var name = SingleLine(child.DisplayName);
+                rows.Add(new SessionDisplayRow(child.Id, $"{(_pt ? "Subagente" : "Subagent")} {name}", child.Status, false,
+                    _completions.SecondsRemaining(child.Id, now))
+                {
+                    Engine = engine,
+                    StationName = name,
+                    LastStation = i == children.Length - 1,
+                });
             }
         }
 

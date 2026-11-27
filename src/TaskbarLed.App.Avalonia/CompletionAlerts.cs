@@ -2,10 +2,11 @@ using TaskbarLed.Core.Sessions;
 
 namespace TaskbarLed.App.Avalonia;
 
-/// <summary>Keeps a new completion visible for five seconds, regardless of how often its source is polled.</summary>
+/// <summary>Keeps a new completion visible for ten seconds, regardless of how often its source is polled.</summary>
 internal sealed class CompletionAlerts
 {
-    private static readonly TimeSpan Duration = TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan Duration = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan Freshness = TimeSpan.FromSeconds(5);
     private sealed record Notice(Session Session, DateTimeOffset Expires);
     private readonly Dictionary<string, Notice> _notices = new(StringComparer.Ordinal);
 
@@ -32,7 +33,7 @@ internal sealed class CompletionAlerts
             }
 
             var completed = session.PromptEndedAt ?? session.LastUpdated;
-            if (!_notices.ContainsKey(session.Id) && completed > now - Duration && completed <= now)
+            if (!_notices.ContainsKey(session.Id) && completed > now - Freshness && completed <= now)
             {
                 _notices.Add(session.Id, new Notice(session, now + Duration));
                 playSound = true;
@@ -46,7 +47,7 @@ internal sealed class CompletionAlerts
 
         visible.AddRange(_notices.Values.Where(notice => notice.Expires > now).Select(notice => notice.Session));
         foreach (var key in _notices.Where(entry => entry.Value.Expires <= now
-            && (entry.Value.Session.PromptEndedAt ?? entry.Value.Session.LastUpdated) <= now - Duration).Select(entry => entry.Key).ToArray())
+            && (entry.Value.Session.PromptEndedAt ?? entry.Value.Session.LastUpdated) <= now - Freshness).Select(entry => entry.Key).ToArray())
         {
             _notices.Remove(key);
         }
@@ -56,7 +57,7 @@ internal sealed class CompletionAlerts
 
     public int SecondsRemaining(string? id, DateTimeOffset now) =>
         id is not null && _notices.TryGetValue(id, out var notice) && notice.Expires > now
-            ? Math.Clamp((int)Math.Ceiling((notice.Expires - now).TotalSeconds), 0, 5) : 0;
+            ? Math.Clamp((int)Math.Ceiling((notice.Expires - now).TotalSeconds), 0, (int)Duration.TotalSeconds) : 0;
 
     public void Dismiss(string id)
     {

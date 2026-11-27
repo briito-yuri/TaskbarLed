@@ -173,8 +173,8 @@ internal sealed class FloatingPanelWindow : Window
         }
 
         _beforeEdit = (Position, Width);
-        var save = new Button { Content = _pt ? "Salvar" : "Save" };
-        var cancel = new Button { Content = _pt ? "Cancelar" : "Cancel" };
+        var save = EditButton(_pt ? "Salvar" : "Save", primary: true);
+        var cancel = EditButton(_pt ? "Cancelar" : "Cancel", primary: false);
         save.Click += (_, _) => EndEdit(save: true);
         cancel.Click += (_, _) => EndEdit(save: false);
 
@@ -213,6 +213,27 @@ internal sealed class FloatingPanelWindow : Window
 
         Activate();
         save.Focus();
+    }
+
+    private static Button EditButton(string label, bool primary)
+    {
+        var background = new SolidColorBrush(Color.Parse(primary ? "#204C40" : "#E8EDF0"));
+        var foreground = new SolidColorBrush(Color.Parse(primary ? "#FFFFFF" : "#202C35"));
+        return new Button
+        {
+            Background = background,
+            BorderBrush = new SolidColorBrush(Color.Parse(primary ? "#245748" : "#677783")),
+            BorderThickness = new Thickness(1),
+            Padding = new Thickness(0),
+            Content = new Border
+            {
+                Background = background,
+                Padding = new Thickness(9, 4),
+                CornerRadius = new CornerRadius(3),
+                Child = new TextBlock { Text = label, Foreground = foreground, FontWeight = FontWeight.SemiBold },
+            },
+            [global::Avalonia.Automation.AutomationProperties.NameProperty] = label,
+        };
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -358,7 +379,10 @@ internal sealed class FloatingPanelWindow : Window
             return;
         }
 
-        var height = Math.Max(PanelHeight, 12 + (Math.Min(_frame.SessionRows.Count, 9) * 24));
+        var sessionHeight = _viewModel.IsClearList
+            ? _viewModel.SessionGroups.Sum(group => 37 + (group.HasChildren ? 6 + (int)Math.Ceiling(group.Children.Count / 3.0) * 35 : 0))
+            : (_viewModel.IsLcd ? 24 : 12) + (_frame.SessionRows.Count * 24);
+        var height = Math.Clamp(sessionHeight, PanelHeight, 228);
         if (height != _panelHeight)
         {
             _panelHeight = height;

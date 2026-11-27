@@ -63,7 +63,28 @@ internal static class AntigravitySessions
                 var read = sqlite.StandardOutput.ReadToEndAsync(timeout.Token);
                 var errors = sqlite.StandardError.ReadToEndAsync(timeout.Token);
                 await Task.WhenAll(read, errors, sqlite.WaitForExitAsync(timeout.Token)).ConfigureAwait(false);
-                return sqlite.ExitCode == 0 ? Parse(await read.ConfigureAwait(false)) : [];
+                if (sqlite.ExitCode != 0)
+                {
+                    return [];
+                }
+
+                var sessions = Parse(await read.ConfigureAwait(false));
+                var activeParents = sessions.Where(s => s.Status == SessionStatus.Running && s.ParentId is not null)
+                    .Select(s => s.ParentId!).ToHashSet(StringComparer.Ordinal);
+                var presence = Path.Combine(Path.GetDirectoryName(db)!, "presence");
+                var cutoff = DateTimeOffset.UtcNow.AddSeconds(-20);
+                for (var i = 0; i < sessions.Length; i++)
+                {
+                    var session = sessions[i];
+                    if (session is { Status: SessionStatus.Running, ParentId: null, ConversationId: { } id }
+                        && session.LastUpdated < cutoff && !activeParents.Contains(session.Id)
+                        && AntigravityPresence.WasReleased(Path.Combine(presence, $"{id:D}.lock")))
+                    {
+                        sessions[i] = session with { Status = SessionStatus.Idle };
+                    }
+                }
+
+                return sessions;
             }
             catch (OperationCanceledException)
             {

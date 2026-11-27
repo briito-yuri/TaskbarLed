@@ -1,3 +1,4 @@
+using Avalonia.Media;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -37,10 +38,46 @@ public sealed partial class ChannelViewModel : ObservableObject
     };
 }
 
-public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bool portuguese, bool uppercase) : ObservableObject
+public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bool portuguese, bool uppercase, string themeId) : ObservableObject
 {
     public SessionDisplayRow Row { get; } = row with { SecondsRemaining = 0 };
     public string Label => uppercase ? Row.Label.ToUpperInvariant() : Row.Label;
+
+    public bool IsLineMap => themeId == "LineMap";
+    public bool IsEditorial => themeId == "EditorialIndex";
+    public bool IsViolet => themeId == "VioletPhosphor";
+    public bool IsCobalt => themeId == "CobaltWindow";
+    public bool ShowEditorialHeader => IsHeader && IsEditorial;
+    public bool ShowVioletHeader => IsHeader && IsViolet;
+    public bool HasSplitHeader => IsHeader && (IsEditorial || IsViolet);
+    public string EngineLabel => Row.Engine?.ToUpperInvariant() ?? "";
+    public string Heading => Row.Heading ?? Row.Label;
+    public string EditorialHeading => $"→  {Heading}";
+    public string StationMarker => !IsChild ? "" : themeId switch
+    {
+        "CompactCharcoal" or "CobaltWindow" => "↳  ",
+        "AmberTree" or "AmberRail" or "OliveLcd" => Row.Status == SessionStatus.Completed ? "✓  " : "·  ",
+        _ => "",
+    };
+    public string CompactLabel => themeId is "EditorialIndex" or "VioletPhosphor" or "CobaltWindow" or "OliveLcd" or "AmberTree" or "AmberRail" or "CompactCharcoal"
+        ? StationMarker + (uppercase ? StationLabel.ToUpperInvariant() : StationLabel) : Label;
+    public bool ConnectToNext => !Row.LastStation;
+    public string StationLabel => Row.StationName ?? Row.Label;
+    public string LineLetter => string.IsNullOrWhiteSpace(Row.Engine) ? "?" : StringInfo.GetNextTextElement(Row.Engine).ToUpperInvariant();
+    public IBrush LineBrush => TransitColors.TryGetValue(LineLetter, out var brush) ? brush : TransitFallback;
+
+    private static readonly Dictionary<string, IBrush> TransitColors = new(StringComparer.Ordinal)
+    {
+        ["A"] = new SolidColorBrush(Color.Parse("#A74232")),
+        ["B"] = new SolidColorBrush(Color.Parse("#365B93")),
+        ["C"] = new SolidColorBrush(Color.Parse("#146B74")),
+        ["G"] = new SolidColorBrush(Color.Parse("#77572B")),
+        ["K"] = new SolidColorBrush(Color.Parse("#6A4B7D")),
+        ["Q"] = new SolidColorBrush(Color.Parse("#326343")),
+        ["Z"] = new SolidColorBrush(Color.Parse("#664292")),
+    };
+
+    private static readonly IBrush TransitFallback = new SolidColorBrush(Color.Parse("#465D6B"));
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Status))]
@@ -61,6 +98,11 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     };
 }
 
+public sealed record SessionDisplayGroupViewModel(SessionDisplayRowViewModel Header, IReadOnlyList<SessionDisplayRowViewModel> Children)
+{
+    public bool HasChildren => Children.Count > 0;
+}
+
 /// <summary>
 /// State bound by the floating panel. Same contract as the WPF <c>PanelViewModel</c> (minus edit mode);
 /// both apply a Core <see cref="PanelFrame"/>, so the composer stays the single source of truth.
@@ -76,7 +118,7 @@ public sealed partial class PanelViewModel : ObservableObject
     public ObservableCollection<ChannelViewModel> Channels { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasSubagents))]
+    [NotifyPropertyChangedFor(nameof(HasSubagents), nameof(ShowSessionList), nameof(ShowClearList))]
     public partial IReadOnlyList<SessionDisplayRowViewModel> SessionRows { get; set; } = [];
 
     public bool HasSubagents => SessionRows.Count != 0;
@@ -107,6 +149,20 @@ public sealed partial class PanelViewModel : ObservableObject
     [ObservableProperty]
     public partial bool Uppercase { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsClearList), nameof(IsLcd), nameof(ShowSessionList), nameof(ShowClearList))]
+    public partial string ThemeId { get; set; } = "ClaudeCode";
+
+    public bool IsClearList => ThemeId == "ClearList";
+    public bool ShowSessionList => HasSubagents && !IsClearList;
+    public bool ShowClearList => HasSubagents && IsClearList;
+    public bool IsLcd => ThemeId == "OliveLcd";
+
+    [ObservableProperty]
+    public partial IReadOnlyList<SessionDisplayGroupViewModel> SessionGroups { get; set; } = [];
+
+    partial void OnThemeIdChanged(string value) => RefreshTheme();
+
     public bool FeedIsRunning => SelectedStatus == SessionStatus.Running;
 
     public bool FeedIsAttention => SelectedStatus == SessionStatus.AwaitingInput;
@@ -119,7 +175,21 @@ public sealed partial class PanelViewModel : ObservableObject
         if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows.Select(row => row with { SecondsRemaining = 0 })))
         {
             SessionRows = [.. frame.SessionRows.Select(row =>
-                new SessionDisplayRowViewModel(row, _culture.TwoLetterISOLanguageName == "pt", Uppercase))];
+                new SessionDisplayRowViewModel(row, _culture.TwoLetterISOLanguageName == "pt", Uppercase, ThemeId))];
+            var groups = new List<SessionDisplayGroupViewModel>();
+            for (var i = 0; i < SessionRows.Count;)
+            {
+                var header = SessionRows[i++];
+                var children = new List<SessionDisplayRowViewModel>();
+                while (i < SessionRows.Count && !SessionRows[i].IsHeader)
+                {
+                    children.Add(SessionRows[i++]);
+                }
+
+                groups.Add(new SessionDisplayGroupViewModel(header, children));
+            }
+
+            SessionGroups = groups;
         }
         else
         {
@@ -156,11 +226,14 @@ public sealed partial class PanelViewModel : ObservableObject
 
     private string Cased(string text) => Uppercase ? text.ToUpper(_culture) : text;
 
-    partial void OnUppercaseChanged(bool value)
+    partial void OnUppercaseChanged(bool value) => RefreshTheme();
+
+    private void RefreshTheme()
     {
         if (_frame is not null)
         {
             SessionRows = [];
+            SessionGroups = [];
             Apply(_frame);
         }
     }

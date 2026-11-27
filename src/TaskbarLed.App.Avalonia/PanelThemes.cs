@@ -21,13 +21,13 @@ internal static class PanelThemes
     private static readonly Dictionary<string, Palette> MacPalettes = new(StringComparer.Ordinal)
     {
         ["AmberTree"] = new("#1C1D18", "#424237", "#EEEADB", "#A9AA9C", "#DDB06D", "#ECC788",
-            "#9CB494", "#E2B171", "Transparent", "Transparent", "#48483B"),
+            "#9CB494", "#E2B171", "Transparent", "Transparent", "#48483B", Radius: 6),
         ["CompactCharcoal"] = new("#242522", "#42443E", "#D3D4C9", "#A1A397", "#D8B57C", "#E8BD79",
-            "#A3BF9D", "#F0EDE1", "#2E302B", "Transparent", "Transparent"),
+            "#A3BF9D", "#F0EDE1", "#2E302B", "Transparent", "Transparent", Radius: 5),
         ["AmberRail"] = new("#20221F", "#4A4E45", "#DEDFD1", "#A8AD9F", "#E2B076", "#F2CD8F",
-            "#AABE9D", "#F2EFDC", "Transparent", "#B88953", "Transparent"),
+            "#AABE9D", "#F2EFDC", "Transparent", "#B88953", "Transparent", Divider: "#30342E", Radius: 7),
         ["ClearList"] = new("#F8F8F2", "#DAE1DA", "#222D2D", "#526866", "#176B64", "#865511",
-            "#4F6D50", "#222D2D", "Transparent", "Transparent", "Transparent", "#EEEFEB", "Helvetica Neue"),
+            "#4F6D50", "#222D2D", "Transparent", "Transparent", "Transparent", "#EEEFEB", "Helvetica Neue", Radius: 12),
         ["EditorialIndex"] = new("#FFFDF7", "#D8D0C5", "#302823", "#65554F", "#782E29", "#8A461E",
             "#526952", "#36251F", "Transparent", "#9A332C", "Transparent", Font: "Georgia",
             Divider: "#E7DFD4", Radius: 0),
@@ -41,7 +41,7 @@ internal static class PanelThemes
             "#416A51", "#232924", "Transparent", "#146B74", "#146B74", Font: "Helvetica Neue", Radius: 8, Node: "#146B74"),
         ["OliveLcd"] = new("#A7B88C", "#292D27", "#243321", "#3E5037", "#243321", "#443E24",
             "#2A4B2C", "#243321", "Transparent", "Transparent", "Transparent", Divider: "#738464",
-            Radius: 10, FrameWidth: 5),
+            Radius: 13, FrameWidth: 9),
     };
 
     public static IReadOnlyList<Theme> All { get; } =
@@ -68,6 +68,7 @@ internal static class PanelThemes
     {
         var theme = All.FirstOrDefault(t => t.Id == themeId) ?? All[0];
         model.Uppercase = theme.Uppercase;
+        model.ThemeId = theme.Id;
         if (MacPalettes.TryGetValue(theme.Id, out var palette))
         {
             ApplyPalette(app, palette);
