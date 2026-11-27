@@ -8,11 +8,15 @@ namespace TaskbarLed.App.Avalonia;
 
 internal static class PanelThemes
 {
-    internal sealed record Theme(string Id, string Name, bool Uppercase = false);
+    internal sealed record Theme(string Id, string Name, bool Uppercase = false, bool IsNew = false)
+    {
+        public string MenuLabel => IsNew ? $"• {Name}" : Name;
+    }
 
     private sealed record Palette(string Background, string Border, string Foreground, string Dim,
         string Running, string Waiting, string Done, string Title, string Header, string Rail, string Tree,
-        string Child = "Transparent", string Font = "Menlo");
+        string Child = "Transparent", string Font = "Menlo", string StatusBackground = "Transparent",
+        string Divider = "Transparent", double Radius = 4, double FrameWidth = 1, string? HeaderStatus = null, string Node = "Transparent");
 
     private static readonly Dictionary<string, Palette> MacPalettes = new(StringComparer.Ordinal)
     {
@@ -24,6 +28,20 @@ internal static class PanelThemes
             "#AABE9D", "#F2EFDC", "Transparent", "#B88953", "Transparent"),
         ["ClearList"] = new("#F8F8F2", "#DAE1DA", "#222D2D", "#526866", "#176B64", "#865511",
             "#4F6D50", "#222D2D", "Transparent", "Transparent", "Transparent", "#EEEFEB", "Helvetica Neue"),
+        ["EditorialIndex"] = new("#FFFDF7", "#D8D0C5", "#302823", "#65554F", "#782E29", "#8A461E",
+            "#526952", "#36251F", "Transparent", "#9A332C", "Transparent", Font: "Georgia",
+            Divider: "#E7DFD4", Radius: 0),
+        ["CobaltWindow"] = new("#DDE5F2", "#101F58", "#182848", "#3D507F", "#2D46A8", "#81451E",
+            "#285E54", "#FFFDF7", "#253E9D", "Transparent", "Transparent", "#F1F4FC",
+            "Helvetica Neue", Divider: "#CBD6E8", Radius: 2, HeaderStatus: "#E8F0FF"),
+        ["VioletPhosphor"] = new("#161522", "#423A56", "#DDD4EF", "#BEAEDA", "#C9B7FC", "#FFB9C5",
+            "#B9E0D4", "#EBE5FA", "Transparent", "Transparent", "Transparent", Font: "Helvetica Neue",
+            StatusBackground: "#272339", Divider: "#41384E", Radius: 10),
+        ["LineMap"] = new("#FBFCF9", "#D3D8CE", "#313B34", "#536860", "#146B74", "#A74232",
+            "#416A51", "#232924", "Transparent", "#146B74", "#146B74", Font: "Helvetica Neue", Radius: 8, Node: "#146B74"),
+        ["OliveLcd"] = new("#A7B88C", "#292D27", "#243321", "#3E5037", "#243321", "#443E24",
+            "#2A4B2C", "#243321", "Transparent", "Transparent", "Transparent", Divider: "#738464",
+            Radius: 10, FrameWidth: 5),
     };
 
     public static IReadOnlyList<Theme> All { get; } =
@@ -39,6 +57,11 @@ internal static class PanelThemes
         new("CompactCharcoal", "Carvão compacto"),
         new("AmberRail", "Âmbar com régua"),
         new("ClearList", "Lista Clara"),
+        new("EditorialIndex", "Índice Editorial", IsNew: true),
+        new("CobaltWindow", "Janela Cobalto", IsNew: true),
+        new("VioletPhosphor", "Fósforo Violeta", IsNew: true),
+        new("LineMap", "Mapa de Linhas", IsNew: true),
+        new("OliveLcd", "LCD Oliva", Uppercase: true, IsNew: true),
     ];
 
     public static Theme Apply(Application app, PanelViewModel model, string themeId)
@@ -91,11 +114,14 @@ internal static class PanelThemes
 
         app.Resources["Led.SessionTitleBrush"] = app.Resources["Led.ForegroundBrush"];
         app.Resources["Led.SessionRunningBrush"] = app.Resources["Led.ForegroundBrush"];
-        foreach (var key in new[] { "SessionHeaderBrush", "SessionRailBrush", "SessionTreeBrush", "SessionChildBrush" })
+        app.Resources["Led.SessionHeaderStatusBrush"] = app.Resources["Led.ForegroundBrush"];
+        foreach (var key in new[] { "SessionHeaderBrush", "SessionRailBrush", "SessionTreeBrush", "SessionChildBrush", "SessionStatusBrush", "SessionDividerBrush", "SessionNodeBrush" })
         {
             app.Resources["Led." + key] = Brushes.Transparent;
         }
 
+        app.Resources["Led.PanelRadius"] = new CornerRadius(4);
+        app.Resources["Led.FrameThickness"] = new Thickness(1);
         return theme;
     }
 
@@ -114,10 +140,16 @@ internal static class PanelThemes
         Brush("AccentBrush", colors.Running);
         Brush("SessionTitleBrush", colors.Title);
         Brush("SessionRunningBrush", colors.Running);
+        Brush("SessionHeaderStatusBrush", colors.HeaderStatus ?? colors.Running);
+        Brush("SessionNodeBrush", colors.Node);
         Brush("SessionHeaderBrush", colors.Header);
         Brush("SessionRailBrush", colors.Rail);
         Brush("SessionTreeBrush", colors.Tree);
         Brush("SessionChildBrush", colors.Child);
+        Brush("SessionStatusBrush", colors.StatusBackground);
+        Brush("SessionDividerBrush", colors.Divider);
+        app.Resources["Led.PanelRadius"] = new CornerRadius(colors.Radius);
+        app.Resources["Led.FrameThickness"] = new Thickness(colors.FrameWidth);
         app.Resources["Led.DotGridBrush"] = Brushes.Transparent;
         app.Resources["Led.GlowColor"] = Colors.Transparent;
         app.Resources["Led.GlowOpacity"] = 0.0;

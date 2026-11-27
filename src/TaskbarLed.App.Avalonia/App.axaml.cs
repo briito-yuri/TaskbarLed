@@ -57,7 +57,7 @@ public sealed partial class App : Application
             return;
         }
 
-        var feed = new LiveFeed(culture);
+        var feed = new LiveFeed(culture, CompletionSound.Play);
         var pt = culture.TwoLetterISOLanguageName == "pt";
         var preferences = PanelPreferences.Load();
         var currentTheme = PanelThemes.Apply(this, viewModel, preferences.Theme);
@@ -108,8 +108,8 @@ public sealed partial class App : Application
         var checks = new List<(PanelThemes.Theme Theme, NativeMenuItem Native, MenuItem Context)>();
         foreach (var theme in PanelThemes.All)
         {
-            var native = new NativeMenuItem(theme.Name) { ToggleType = MenuItemToggleType.CheckBox };
-            var context = new MenuItem { Header = theme.Name, ToggleType = MenuItemToggleType.CheckBox };
+            var native = new NativeMenuItem(theme.MenuLabel) { ToggleType = MenuItemToggleType.CheckBox };
+            var context = new MenuItem { Header = theme.MenuLabel, ToggleType = MenuItemToggleType.CheckBox };
             native.Click += (_, _) => SelectTheme(theme);
             context.Click += (_, _) => SelectTheme(theme);
             nativeThemes.Items.Add(native);

@@ -37,20 +37,27 @@ public sealed partial class ChannelViewModel : ObservableObject
     };
 }
 
-public sealed record SessionDisplayRowViewModel(SessionDisplayRow Row, bool Portuguese)
+public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bool portuguese, bool uppercase) : ObservableObject
 {
-    public string Label => Row.Label;
+    public SessionDisplayRow Row { get; } = row with { SecondsRemaining = 0 };
+    public string Label => uppercase ? Row.Label.ToUpperInvariant() : Row.Label;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Status))]
+    public partial int SecondsRemaining { get; set; } = row.SecondsRemaining;
     public string? SessionId => Row.SessionId;
     public bool IsHeader => Row.IsHeader;
     public bool IsChild => !Row.IsHeader;
     public bool IsWaiting => Row.Status == SessionStatus.AwaitingInput;
     public bool IsDone => Row.Status == SessionStatus.Completed;
-    public string Status => Row.Status switch
+    public bool IsIdle => Row.Status == SessionStatus.Idle;
+
+    public string Status => !Row.HasStatus ? "" : Row.Status switch
     {
-        SessionStatus.Running => Portuguese ? "▸ Rodando" : "▸ Running",
-        SessionStatus.AwaitingInput => Portuguese ? "! Aguardando" : "! Waiting",
-        SessionStatus.Completed => Portuguese ? "✓ Concluído" : "✓ Done",
-        _ => "",
+        SessionStatus.Running => portuguese ? "▸ Rodando" : "▸ Running",
+        SessionStatus.AwaitingInput => portuguese ? "! Aguardando" : "! Waiting",
+        SessionStatus.Completed => $"{(portuguese ? "✓ Concluído" : "✓ Done")}{(SecondsRemaining > 0 ? $" · {SecondsRemaining}s" : "")}",
+        _ => portuguese ? "Ocioso" : "Idle",
     };
 }
 
@@ -109,14 +116,22 @@ public sealed partial class PanelViewModel : ObservableObject
         ArgumentNullException.ThrowIfNull(frame);
         _frame = frame;
 
-        if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows))
+        if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows.Select(row => row with { SecondsRemaining = 0 })))
         {
-            SessionRows = [.. frame.SessionRows.Select(row => new SessionDisplayRowViewModel(row, _culture.TwoLetterISOLanguageName == "pt"))];
+            SessionRows = [.. frame.SessionRows.Select(row =>
+                new SessionDisplayRowViewModel(row, _culture.TwoLetterISOLanguageName == "pt", Uppercase))];
+        }
+        else
+        {
+            for (var i = 0; i < SessionRows.Count; i++)
+            {
+                SessionRows[i].SecondsRemaining = frame.SessionRows[i].SecondsRemaining;
+            }
         }
         Feed = Cased(frame.Feed);
         ElapsedText = frame.ElapsedText;
         SelectedStatus = frame.SelectedStatus;
-        IsBlinking = frame.HasUnseenCompletion && !frame.NeedsAttention;
+        IsBlinking = frame.HasUnseenCompletion;
         NeedsAttention = frame.NeedsAttention;
         HasActivity = frame.HasActivity;
 
@@ -145,6 +160,7 @@ public sealed partial class PanelViewModel : ObservableObject
     {
         if (_frame is not null)
         {
+            SessionRows = [];
             Apply(_frame);
         }
     }

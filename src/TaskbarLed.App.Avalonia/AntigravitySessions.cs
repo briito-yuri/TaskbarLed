@@ -12,15 +12,16 @@ internal static class AntigravitySessions
     private const string Query = """
         SELECT c.conversation_id AS id, substr(c.title,1,80) AS title,
                substr(c.agent_name,1,80) AS agent, nullif(c.parent_conversation_id,'') AS parent,
-               substr(p.title,1,80) AS parent_title, c.last_modified_time AS modified,
-               CASE WHEN c.status IN ('CASCADE_RUN_STATUS_RUNNING', 'CASCADE_RUN_STATUS_BUSY')
-                         OR c.not_fully_idle <> 0 THEN 1 ELSE 0 END AS active
+               substr(p.title,1,80) AS parent_title, c.last_modified_time AS modified, c.status AS status
         FROM conversation_summaries c
         LEFT JOIN conversation_summaries p ON p.conversation_id = c.parent_conversation_id
         WHERE c.killed = 0 AND
-              (c.status IN ('CASCADE_RUN_STATUS_RUNNING', 'CASCADE_RUN_STATUS_BUSY') OR c.not_fully_idle <> 0
+              (c.status IN ('CASCADE_RUN_STATUS_RUNNING', 'CASCADE_RUN_STATUS_BUSY')
                OR (c.status = 'CASCADE_RUN_STATUS_IDLE' AND
-                   c.last_modified_time >= strftime('%Y-%m-%d %H:%M:%S', 'now', '-30 minutes')))
+                   c.last_modified_time >= strftime('%Y-%m-%d %H:%M:%S', 'now', '-30 minutes'))
+               OR c.conversation_id IN (SELECT parent_conversation_id FROM conversation_summaries
+                   WHERE killed = 0 AND parent_conversation_id <> ''
+                     AND status IN ('CASCADE_RUN_STATUS_RUNNING', 'CASCADE_RUN_STATUS_BUSY')))
         ORDER BY c.last_modified_time DESC, c.conversation_id;
         """;
 
@@ -110,8 +111,17 @@ internal static class AntigravitySessions
             var agent = Clean(Text(row, "agent"));
             var title = Clean(Text(row, "title"));
             var parentName = Clean(Text(row, "parent_title"));
-            var completed = row.TryGetProperty("active", out var active) && active.ValueKind == JsonValueKind.Number
-                && active.TryGetInt32(out var flag) && flag == 0;
+            var status = Text(row, "status") switch
+            {
+                "CASCADE_RUN_STATUS_RUNNING" or "CASCADE_RUN_STATUS_BUSY" => SessionStatus.Running,
+                "CASCADE_RUN_STATUS_IDLE" => SessionStatus.Idle,
+                _ => (SessionStatus?)null,
+            };
+            if (status is null)
+            {
+                continue;
+            }
+
             var label = child ? agent ?? title ?? id.ToString("N")[..8] : title ?? agent ?? "Antigravity";
             sessions.Add(Session.Create($"antigravity:{id:D}", "antigravity", modified) with
             {
@@ -119,8 +129,7 @@ internal static class AntigravitySessions
                 ProjectName = parentName,
                 ConversationId = id,
                 ParentId = child ? $"antigravity:{parent:D}" : null,
-                Status = completed ? SessionStatus.Completed : SessionStatus.Running,
-                PromptEndedAt = completed ? modified : null,
+                Status = status.Value,
             });
         }
 

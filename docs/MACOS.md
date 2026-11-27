@@ -4,7 +4,7 @@ The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 1
 
 ## Install
 
-[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.3.0/TaskbarLed-osx-arm64.zip). Unzip it, move `TaskbarLed.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
+[Download TaskbarLed for Apple Silicon](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.4.0/TaskbarLed-osx-arm64.zip). Unzip it, move `TaskbarLed.app` to Applications, and open it. The app and hook include the runtime. Process detection and Octo integration start when the app opens. Follow the steps below to enable Claude Code hooks as well.
 
 The current release uses ad hoc signing. If macOS blocks the app on first open, see [Apple's instructions for opening an app that macOS cannot check](https://support.apple.com/102445).
 
@@ -32,7 +32,7 @@ By default, the panel floats above the Dock on the primary display. It stays vis
 
 Right-click the panel or click the TaskbarLed menu bar icon. **Edit position and size** opens a preview you can drag to another spot. Drag the grip on the right edge to change the width. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
 
-Use **Theme** to switch live between Claude Code, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The default is Claude Code. TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
+Use **Theme** to switch live between Claude Code, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The five entries marked with • are Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. The default is Claude Code. TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
 
 ## Automatic local detection
 
@@ -54,9 +54,9 @@ When Octo is running, TaskbarLed reads its local session status and shows workin
 
 ## Active agents and subagents
 
-The panel groups active sessions by tool and conversation. Each subagent appears indented on its own line below the session. Scroll or hover to read the entire list. `▸` means working, `!` means input is needed, and `✓` marks a reported completion. Click a completed session or subagent to acknowledge it.
+The panel groups active sessions by tool and conversation. Each subagent appears indented on its own line below the session. Scroll or hover to read the entire list. `▸` means working, `!` means input is needed, and `✓` marks a reported completion. A new completion plays a short sound and blinks pastel green while its five-second countdown runs, then clears automatically. Click it to dismiss early. Old completed records do not replay.
 
-- **Antigravity** reads the local conversation index in read-only mode. It shows a worker even when the parent is idle and flags a transition to idle after the worker was observed running. It reads titles, agent names, parent links and status as available in the index.
+- **Antigravity** reads the local conversation index in read-only mode. It reports the parent and workers separately, so an idle parent stays labeled Idle when its children are still working. When an observed running conversation transitions to idle, the panel shows the five-second completion alert first. It reads titles, agent names, parent links and status as available in the index.
 - **Octo** includes child sessions with a parent link and uses the engine's reported turn status. This also works with Qwen or Kimi sessions Octo tracks.
 - **Codex** reads recent local rollout records for parent links and turn starts, completions and cancellations. When Octo exposes the same Codex conversation, the panel uses the Octo name on a single row. Codex scans up to 128 recently modified logs under `CODEX_HOME/sessions` (default `~/.codex/sessions`).
 - **Claude Code** uses `SubagentStart` and `SubagentStop`. Run `--install-hooks` again and restart existing Claude Code sessions to load the added events.
@@ -77,7 +77,7 @@ Cloud jobs and tools with no local hooks need an orchestrator or adapter on the 
 
 ## Differences from Windows
 
-The Mac build uses a floating panel. Custom JSON themes, sounds, fullscreen edge alerts, automatic foreground-window matching, click-to-open, and login startup controls are unavailable in this build. The floating window requests visibility across Spaces, but fullscreen behavior depends on macOS and the foreground app. The build is ad hoc signed for local use. Distribution outside this Mac may require Developer ID signing and notarization.
+The Mac build uses a floating panel. Custom JSON themes, theme-dependent sound selection, fullscreen edge alerts, automatic foreground-window matching, click-to-open, and login startup controls are unavailable in this build. The floating window requests visibility across Spaces, but fullscreen behavior depends on macOS and the foreground app. The build is ad hoc signed for local use. Distribution outside this Mac may require Developer ID signing and notarization.
 
 See also [Windows documentation](../README.md).
 

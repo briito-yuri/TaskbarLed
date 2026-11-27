@@ -28,7 +28,8 @@ public class PanelCustomizationTests
             Assert.IsAssignableFrom<IBrush>(app.Resources["Led.DotGridBrush"]);
         }
 
-        Assert.Equal(11, backgrounds.Count);
+        Assert.Equal(16, backgrounds.Count);
+        Assert.Equal(5, PanelThemes.All.Count(theme => theme.MenuLabel.StartsWith("• ", StringComparison.Ordinal)));
         Assert.Equal("AmberTree", PanelThemes.Apply(app, model, "AmberTree").Id);
         Assert.Equal(Color.Parse("#48483B"), Assert.IsType<SolidColorBrush>(app.Resources["Led.SessionTreeBrush"]).Color);
         Assert.Equal("AmberRail", PanelThemes.Apply(app, model, "AmberRail").Id);

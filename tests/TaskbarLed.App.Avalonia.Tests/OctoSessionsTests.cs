@@ -9,7 +9,7 @@ public class OctoSessionsTests
     [InlineData("working", SessionStatus.Running)]
     [InlineData("paused", SessionStatus.AwaitingInput)]
     [InlineData("done", SessionStatus.Completed)]
-    [InlineData("idle", null)]
+    [InlineData("idle", SessionStatus.Idle)]
     [InlineData("exited", null)]
     public void Octo_reports_real_turn_state_and_duration(string state, SessionStatus? expected)
     {

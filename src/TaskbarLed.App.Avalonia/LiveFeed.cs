@@ -7,7 +7,7 @@ using TaskbarLed.Sources.ClaudeCode;
 
 namespace TaskbarLed.App.Avalonia;
 
-internal sealed class LiveFeed(CultureInfo culture)
+internal sealed class LiveFeed(CultureInfo culture, Action? playCompletion = null)
 {
     private readonly SessionStore _store = new();
     private readonly ClaudeCodeSource _claude = new(new ToolActivityFormatter(ActivityStrings.For(culture), culture));
@@ -20,7 +20,7 @@ internal sealed class LiveFeed(CultureInfo culture)
     private Session[] _codex = [];
     private readonly CodexSessions _codexReader = new();
     private readonly bool _pt = culture.TwoLetterISOLanguageName == "pt";
-    private readonly Dictionary<string, DateTimeOffset> _seenExternal = new(StringComparer.Ordinal);
+    private readonly CompletionAlerts _completions = new();
 
     public PanelFrame Compose(DateTimeOffset now) =>
         Compose(now, Volatile.Read(ref _antigravity));
@@ -28,13 +28,14 @@ internal sealed class LiveFeed(CultureInfo culture)
     internal PanelFrame Compose(DateTimeOffset now, IReadOnlyList<Session> antigravity)
     {
         var external = MergeExternal(Volatile.Read(ref _octo), antigravity, Volatile.Read(ref _codex));
-        var sessions = _store.Snapshot().Concat(external.Where(s =>
-            s.Status != SessionStatus.Completed ||
-            (s.LastUpdated >= now.AddMinutes(-30) &&
-             (!_seenExternal.TryGetValue(s.Id, out var seen) || seen != s.LastUpdated))))
-            .ToArray();
+        var (sessions, sound) = _completions.Update(_store.Snapshot().Concat(external), now);
+        if (sound)
+        {
+            playCompletion?.Invoke();
+        }
+
         var detected = Volatile.Read(ref _detected);
-        var frame = _composer.Compose(sessions, now) with { SessionRows = SessionRows(sessions) };
+        var frame = _composer.Compose(sessions, now) with { SessionRows = SessionRows(sessions, now) };
         if (detected.Length == 0)
         {
             return frame;
@@ -86,11 +87,12 @@ internal sealed class LiveFeed(CultureInfo culture)
         }
     }
 
-    private List<SessionDisplayRow> SessionRows(Session[] sessions)
+    private List<SessionDisplayRow> SessionRows(Session[] sessions, DateTimeOffset now)
     {
         var known = sessions.DistinctBy(s => s.Id).ToDictionary(s => s.Id, StringComparer.Ordinal);
         var groups = sessions.Where(s => s.Status != SessionStatus.Idle)
-            .GroupBy(s => s.ParentId ?? s.Id, StringComparer.Ordinal);
+            .GroupBy(s => s.ParentId ?? s.Id, StringComparer.Ordinal)
+            .OrderByDescending(group => group.Any(s => s.Status == SessionStatus.Completed));
         var rows = new List<SessionDisplayRow>();
         foreach (var group in groups)
         {
@@ -115,10 +117,12 @@ internal sealed class LiveFeed(CultureInfo culture)
                     : project;
             }
 
-            rows.Add(new SessionDisplayRow(parent?.Id, $"{engine} → {SingleLine(title)}", parent?.Status ?? SessionStatus.Idle, true));
+            rows.Add(new SessionDisplayRow(parent?.Id, $"{engine} → {SingleLine(title)}", parent?.Status ?? SessionStatus.Idle, true,
+                _completions.SecondsRemaining(parent?.Id, now), HasStatus: parent is not null));
             foreach (var child in group.Where(s => s.ParentId is not null))
             {
-                rows.Add(new SessionDisplayRow(child.Id, $"{(_pt ? "Subagente" : "Subagent")} {SingleLine(child.DisplayName)}", child.Status, false));
+                rows.Add(new SessionDisplayRow(child.Id, $"{(_pt ? "Subagente" : "Subagent")} {SingleLine(child.DisplayName)}", child.Status, false,
+                    _completions.SecondsRemaining(child.Id, now)));
             }
         }
 
@@ -166,14 +170,26 @@ internal sealed class LiveFeed(CultureInfo culture)
                 var antigravity = Array.Exists(detected, tool => tool == "Antigravity")
                     ? await AntigravitySessions.ScanAsync(geminiHome, cancellationToken).ConfigureAwait(false)
                     : [];
-                foreach (var active in antigravity.Where(s => s.Status == SessionStatus.Running))
+                var known = new List<Session>(antigravity.Length);
+                foreach (var session in antigravity)
                 {
-                    observedAntigravity.Add(active.Id);
+                    if (session.Status == SessionStatus.Running)
+                    {
+                        observedAntigravity.Add(session.Id);
+                        known.Add(session);
+                    }
+                    else if (observedAntigravity.Remove(session.Id))
+                    {
+                        known.Add(session with { Status = SessionStatus.Completed, PromptEndedAt = session.LastUpdated });
+                    }
+                    else
+                    {
+                        known.Add(session);
+                    }
                 }
 
-                var known = antigravity.Where(s => s.Status != SessionStatus.Completed || observedAntigravity.Contains(s.Id)).ToArray();
-                observedAntigravity.IntersectWith(known.Select(s => s.Id));
-                Volatile.Write(ref _antigravity, known);
+                observedAntigravity.IntersectWith(antigravity.Select(s => s.Id));
+                Volatile.Write(ref _antigravity, [.. known]);
                 Volatile.Write(ref _codex, Array.Exists(detected, tool => tool == "Codex")
                     ? _codexReader.Scan(codexHome, DateTimeOffset.UtcNow) : []);
             }
@@ -183,11 +199,9 @@ internal sealed class LiveFeed(CultureInfo culture)
 
     public void Acknowledge(string? sessionId)
     {
-        var completed = Volatile.Read(ref _octo).Concat(Volatile.Read(ref _antigravity)).Concat(Volatile.Read(ref _codex))
-            .FirstOrDefault(s => s.Id == sessionId && s.Status == SessionStatus.Completed);
-        if (completed is not null)
+        if (sessionId is not null)
         {
-            _seenExternal[completed.Id] = completed.LastUpdated;
+            _completions.Dismiss(sessionId);
         }
 
         _store.AcknowledgeCompleted(s => s.Id == sessionId);

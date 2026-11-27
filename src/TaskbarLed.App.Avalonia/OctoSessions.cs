@@ -101,12 +101,13 @@ internal static class OctoSessions
             "working" => SessionStatus.Running,
             "paused" => SessionStatus.AwaitingInput,
             "done" => SessionStatus.Completed,
-            _ => SessionStatus.Idle,
+            "idle" => SessionStatus.Idle,
+            _ => (SessionStatus?)null,
         };
         var id = Number(agent, "id");
         var nested = status.ValueKind == JsonValueKind.Object && status.TryGetProperty("nested", out var child) ? child : default;
         var kind = Text(nested, "kind") ?? Text(agent, "kind");
-        if (state == SessionStatus.Idle || id is not (> 0 and <= uint.MaxValue) || kind is null or "terminal"
+        if (state is null || id is not (> 0 and <= uint.MaxValue) || kind is null or "terminal"
             || Timestamp(status, "state_since_ms") is not { } at)
         {
             return null;
@@ -129,7 +130,7 @@ internal static class OctoSessions
             started = at.AddMilliseconds(-duration);
         }
 
-        return new Session(string.Create(CultureInfo.InvariantCulture, $"octo:{id}"), Source, title, null, state, started ?? at,
+        return new Session(string.Create(CultureInfo.InvariantCulture, $"octo:{id}"), Source, title, null, state.Value, started ?? at,
             state == SessionStatus.Completed ? at : null, null, null, at)
         {
             EngineName = label,

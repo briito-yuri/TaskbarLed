@@ -11,7 +11,7 @@
 
 **English** · [Português](README.pt-BR.md)
 
-[![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.3.0/TaskbarLed-osx-arm64.zip)
+[![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.4.0/TaskbarLed-osx-arm64.zip)
 
 Apple Silicon (M1 or newer), macOS 14+. Unzip, move TaskbarLed.app to Applications, and open it. The runtime is included.
 
