@@ -1,6 +1,6 @@
 # Neon TSB Agents on macOS
 
-The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
+The fork's macOS build can be built for Apple Silicon (M1 and newer) or Intel in two separate ZIPs. Both require macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
 ## Install
 
@@ -15,10 +15,11 @@ The current release uses ad hoc signing. If macOS blocks the app on first open, 
 From the repository root, with the .NET SDK from `global.json` and Apple's command-line tools:
 
 ```sh
-src/TaskbarLed.App.Avalonia/build-macos.sh
+src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64
+src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
 ```
 
-The script produces `artifacts/TaskbarLed-osx-arm64/Neon TSB Agents.app` and `TaskbarLed-osx-arm64.zip` in the same directory. Move the app to its permanent location before registering hooks.
+Choose `osx-arm64` for Apple Silicon or `osx-x64` for Intel. Each build produces `Neon TSB Agents.app` and `TaskbarLed-<rid>.zip` under `artifacts/TaskbarLed-<rid>/`. Both include the runtime for the selected architecture. Move the app to its permanent location before registering hooks.
 
 ```sh
 app="$PWD/artifacts/TaskbarLed-osx-arm64/Neon TSB Agents.app"
@@ -87,4 +88,4 @@ See also [Windows documentation](../README.md).
 
 ## Publish a Mac release
 
-Run the Mac test projects and the build script on an Apple Silicon Mac. Create a GitHub release for a new `macos-vX.Y.Z` tag on the tested commit and attach `artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip`. Update the download links in both READMEs and this guide to the new tag. Verify the public link downloads the same ZIP as the local build. For distribution with Gatekeeper verification, sign with Developer ID and notarize before uploading.
+Run the Mac test projects and the build script on an Apple Silicon Mac. Create a GitHub release for a new `macos-vX.Y.Z` tag on the tested commit and attach the tested architecture-specific ZIPs. Update the download links in both READMEs and this guide to the new tag. Verify the public link downloads the same ZIP as the local build. For distribution with Gatekeeper verification, sign with Developer ID and notarize before uploading.

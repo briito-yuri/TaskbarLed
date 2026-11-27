@@ -3,14 +3,19 @@ set -euo pipefail
 
 cd "$(dirname "$0")/../.."
 dotnet_cmd="${DOTNET:-dotnet}"
-output="$PWD/artifacts/TaskbarLed-osx-arm64"
+rid="${1:-osx-arm64}"
+case "$rid" in
+    osx-arm64|osx-x64) ;;
+    *) printf 'Usage: %s [osx-arm64|osx-x64]\n' "$0" >&2; exit 2 ;;
+esac
+output="$PWD/artifacts/TaskbarLed-$rid"
 app="$output/Neon TSB Agents.app"
 bin="$app/Contents/MacOS"
 stage="$(mktemp -d)"
 trap 'rm -rf "$stage"' EXIT
 
-"$dotnet_cmd" publish src/TaskbarLed.App.Avalonia -c Release -r osx-arm64 --self-contained -o "$stage/app"
-"$dotnet_cmd" publish src/TaskbarLed.Hook -c Release -r osx-arm64 --self-contained -o "$stage/hook"
+"$dotnet_cmd" publish src/TaskbarLed.App.Avalonia -c Release -r "$rid" --self-contained -o "$stage/app"
+"$dotnet_cmd" publish src/TaskbarLed.Hook -c Release -r "$rid" --self-contained -o "$stage/hook"
 mkdir -p "$bin" "$app/Contents/Resources"
 iconset="$stage/NeonAgents.iconset"
 mkdir -p "$iconset"
@@ -44,6 +49,6 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 PLIST
 
 codesign --force --deep --sign - "$app"
-rm -f "$output/TaskbarLed-osx-arm64.zip"
-ditto -c -k --keepParent "$app" "$output/TaskbarLed-osx-arm64.zip"
+rm -f "$output/TaskbarLed-$rid.zip"
+ditto -c -k --keepParent "$app" "$output/TaskbarLed-$rid.zip"
 printf '%s\n' "$app"
