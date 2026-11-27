@@ -94,7 +94,7 @@ public class FloatingPanelTests
         {
             DataContext = viewModel,
             Width = FloatingPanelWindow.PanelWidth,
-            Height = Core.Visibility.PanelLayout.FloatingHeightDip,
+            Height = FloatingPanelWindow.PanelHeight,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Bottom,
             Margin = new Thickness(0, 0, 0, 6 + DockHeight + FloatingPanelWindow.DockGap),

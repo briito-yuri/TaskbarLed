@@ -25,7 +25,7 @@ internal sealed class FloatingPanelWindow : Window
     /// <summary>Space between the panel and the Dock, in DIP/points.</summary>
     public const double DockGap = 8;
 
-    public const double PanelHeight = PanelLayout.FloatingHeightDip + 18;
+    public const double PanelHeight = PanelLayout.FloatingHeightDip + 29;
 
     private readonly PanelViewModel _viewModel;
     private readonly Func<PanelFrame> _frames;
@@ -381,8 +381,8 @@ internal sealed class FloatingPanelWindow : Window
 
         var sessionHeight = _viewModel.IsClearList
             ? _viewModel.SessionGroups.Sum(group => 37 + (group.HasChildren ? 6 + (int)Math.Ceiling(group.Children.Count / 3.0) * 35 : 0))
-            : (_viewModel.IsLcd ? 24 : 12) + (_frame.SessionRows.Count * 24) + (_viewModel.ShowLineMap ? 29 : 0);
-        var height = Math.Clamp(sessionHeight, PanelHeight, 228);
+            : (_viewModel.IsLcd ? 24 : 12) + (_frame.SessionRows.Count * 24);
+        var height = Math.Clamp(sessionHeight + 29, PanelHeight, 228);
         if (height != _panelHeight)
         {
             _panelHeight = height;

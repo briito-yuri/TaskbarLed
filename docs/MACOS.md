@@ -1,4 +1,4 @@
-# Neon Task Bar on macOS
+# Neon TSB Agents on macOS
 
 The fork's macOS build targets Apple Silicon (M1 and newer) and requires macOS 14 Sonoma or later. The bundle includes the .NET 10 runtime for both the panel and hook. Builds from source include the original MIT license and contributor notice in `Contents/Resources/LICENSE`. The macOS port is based on [TaskbarLed by llorenzojorge and contributors](https://github.com/llorenzojorge/TaskbarLed). [Microsoft's .NET compatibility table](https://learn.microsoft.com/en-us/dotnet/core/install/macos#supported-versions)
 
@@ -18,10 +18,10 @@ From the repository root, with the .NET SDK from `global.json` and Apple's comma
 src/TaskbarLed.App.Avalonia/build-macos.sh
 ```
 
-The script produces `artifacts/TaskbarLed-osx-arm64/Neon Task Bar.app` and `TaskbarLed-osx-arm64.zip` in the same directory. Move the app to its permanent location before registering hooks.
+The script produces `artifacts/TaskbarLed-osx-arm64/Neon TSB Agents.app` and `TaskbarLed-osx-arm64.zip` in the same directory. Move the app to its permanent location before registering hooks.
 
 ```sh
-app="$PWD/artifacts/TaskbarLed-osx-arm64/Neon Task Bar.app"
+app="$PWD/artifacts/TaskbarLed-osx-arm64/Neon TSB Agents.app"
 "$app/Contents/MacOS/TaskbarLed" --install-hooks
 open "$app"
 ```
@@ -34,9 +34,9 @@ By default, the panel floats above the Dock on the primary display. It stays vis
 
 ## Move, resize and change the look
 
-Right-click the panel or click the Neon Task Bar menu bar icon. The right-click menu follows the panel theme and highlights **Quit** (**Encerrar** in Portuguese) with a power icon. **Edit position and size** opens a preview you can drag to another spot. Drag the grip on the right edge to change the width. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
+Right-click the panel or click the Neon TSB Agents menu bar icon. The right-click menu follows the panel theme and highlights **Quit** (**Encerrar** in Portuguese) with a power icon. **Edit position and size** opens a preview you can drag to another spot. Drag the grip on the right edge to change the width. **Save** (Enter) stores the placement and snaps it to a nearby screen edge. **Cancel** (Esc) restores the previous placement. **Reset position above Dock** restores the default size and position.
 
-Use **Theme** to switch live between Neon Task Bar, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The five entries marked with • are Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. The default is Neon Task Bar. [See the gallery of all 16 macOS themes](MACOS-THEMES.md). TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
+Use **Theme** to switch live between Neon TSB Agents, Modern Terminal, Matrix, Mono, Minimal, Glass and Paper. On macOS, the menu also includes Âmbar em árvore, Carvão compacto, Âmbar com régua and Lista Clara. These styles apply to the session hierarchy and its state labels. The five entries marked with • are Índice Editorial, Janela Cobalto, Fósforo Violeta, Mapa de Linhas and LCD Oliva. The default is Neon TSB Agents. [See the gallery of all 16 macOS themes](MACOS-THEMES.md). TaskbarLed stores the selected theme and placement in `~/Library/Application Support/TaskbarLed/panel.json`.
 
 ## Automatic local detection
 

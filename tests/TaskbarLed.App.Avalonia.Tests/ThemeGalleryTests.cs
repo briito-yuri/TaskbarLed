@@ -28,7 +28,7 @@ public class ThemeGalleryTests
         var window = new Window
         {
             Width = 598,
-            Height = 194,
+            Height = 223,
             Background = new SolidColorBrush(Color.Parse("#53606C")),
             Content = new Border { Padding = new Thickness(10), Child = view },
         };

@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using TaskbarLed.App.Avalonia.Demo;
 using TaskbarLed.App.Avalonia.Panels;
 using TaskbarLed.App.Avalonia.Presentation;
@@ -14,7 +14,7 @@ namespace TaskbarLed.App.Avalonia;
 
 public sealed partial class App : Application
 {
-    internal const string DisplayName = "Neon Task Bar";
+    internal const string DisplayName = "Neon TSB Agents";
 
     public override void Initialize()
     {
@@ -194,20 +194,7 @@ public sealed partial class App : Application
 
     private static WindowIcon CreateTrayIcon()
     {
-        var dots = new TextBlock
-        {
-            Text = "•••",
-            Foreground = Brushes.Black,
-            Background = Brushes.Transparent,
-            FontWeight = FontWeight.Bold,
-            FontSize = 15,
-            TextAlignment = TextAlignment.Center,
-        };
-        var rect = new Rect(0, 0, 24, 16);
-        dots.Measure(rect.Size);
-        dots.Arrange(rect);
-        using var bitmap = new RenderTargetBitmap(new PixelSize(48, 32), new Vector(192, 192));
-        bitmap.Render(dots);
-        return new WindowIcon(bitmap);
+        using var mark = AssetLoader.Open(new Uri("avares://TaskbarLed/Assets/NeonMark.png"));
+        return new WindowIcon(mark);
     }
 }

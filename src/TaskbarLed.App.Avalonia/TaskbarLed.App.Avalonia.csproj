@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Assets/NeonMark.png" />
     <EmbeddedResource Include="../TaskbarLed.App/Themes/*.xaml" LogicalName="PanelThemes.%(Filename)%(Extension)" />
   </ItemGroup>
 

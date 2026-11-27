@@ -150,13 +150,18 @@
             Background="{DynamicResource Led.BackgroundBrush}"
             BorderBrush="{DynamicResource Led.BorderBrush}" />
 
-    <Grid Classes="panel-content" RowDefinitions="Auto,Auto,*" ColumnDefinitions="*,Auto">
-      <Border Grid.ColumnSpan="2" IsVisible="{Binding ShowLineMap}" Background="#243B4D"
-              Height="26" Margin="0,0,0,3" CornerRadius="4,4,0,0">
-        <TextBlock Text="Neon Task Bar" Foreground="White" FontSize="12" FontWeight="SemiBold"
-                   Margin="10,0,0,0" VerticalAlignment="Center" />
-      </Border>
-      <ItemsControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Channels}" IsVisible="{Binding !HasSubagents}" ClipToBounds="True">
+    <Grid Classes="panel-content" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
+      <Grid Grid.ColumnSpan="2" Height="26" Margin="0,0,0,3">
+        <Border IsVisible="{Binding ShowLineMap}" Background="#243B4D" CornerRadius="4,4,0,0" />
+        <StackPanel Orientation="Horizontal" Spacing="6" Margin="8,0,0,0" VerticalAlignment="Center">
+          <Image Source="/Assets/NeonMark.png" Width="17" Height="17" />
+          <TextBlock Text="Neon TSB Agents" IsVisible="{Binding !ShowLineMap}"
+                     Foreground="{DynamicResource Led.ForegroundBrush}" FontSize="12" FontWeight="SemiBold" />
+          <TextBlock Text="Neon TSB Agents" IsVisible="{Binding ShowLineMap}"
+                     Foreground="White" FontSize="12" FontWeight="SemiBold" />
+        </StackPanel>
+      </Grid>
+      <ItemsControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding Channels}" IsVisible="{Binding !HasSubagents}" ClipToBounds="True">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <panels:TabStripPanel />
@@ -180,7 +185,7 @@
         </ItemsControl.ItemTemplate>
       </ItemsControl>
 
-      <DockPanel Grid.Row="1" Grid.Column="0" LastChildFill="True" IsVisible="{Binding !HasSubagents}">
+      <DockPanel Grid.Row="2" Grid.Column="0" LastChildFill="True" IsVisible="{Binding !HasSubagents}">
         <TextBlock DockPanel.Dock="Left" Classes.pulse="{Binding FeedIsRunning}" Text="{DynamicResource Led.FeedPrefix}" Foreground="{DynamicResource Led.AccentBrush}"
                    VerticalAlignment="Center" FontSize="14" FontFamily="{DynamicResource Led.FontFamily}" />
         <TextBlock Margin="3,0,0,0" Classes="feed" Classes.attention="{Binding FeedIsAttention}"
@@ -194,10 +199,10 @@
       </DockPanel>
 
       <!-- Prompt timer on the feed's line, so the tabs get the whole top row for chat titles. -->
-      <TextBlock Grid.Row="1" Grid.Column="1" IsVisible="{Binding !HasSubagents}" Text="{Binding ElapsedText}" VerticalAlignment="Center" Margin="10,0,0,0"
+      <TextBlock Grid.Row="2" Grid.Column="1" IsVisible="{Binding !HasSubagents}" Text="{Binding ElapsedText}" VerticalAlignment="Center" Margin="10,0,0,0"
                  FontFamily="{DynamicResource Led.FontFamily}" FontSize="12" FontWeight="SemiBold"
                  Foreground="{DynamicResource Led.ForegroundBrush}" />
-      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding ShowSessionList}"
+      <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2" IsVisible="{Binding ShowSessionList}"
                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding SessionRows}">
           <ItemsControl.ItemTemplate>
@@ -273,7 +278,7 @@
           </ItemsControl.ItemTemplate>
         </ItemsControl>
       </ScrollViewer>
-      <ScrollViewer Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding ShowClearList}"
+      <ScrollViewer Grid.Row="3" Grid.ColumnSpan="2" IsVisible="{Binding ShowClearList}"
                     HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <ItemsControl ItemsSource="{Binding SessionGroups}">
           <ItemsControl.ItemTemplate>
