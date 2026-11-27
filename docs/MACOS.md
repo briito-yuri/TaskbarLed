@@ -100,4 +100,16 @@ Preferences remain in `~/Library/Application Support/TaskbarLed`. The public 0.5
 
 ## Publish a Mac release
 
-Run the Mac test projects and the build script on an Apple Silicon Mac. Create a GitHub release for a new `macos-vX.Y.Z` tag on the tested commit and attach the tested architecture-specific ZIPs. Update the download links in both READMEs and this guide to the new tag. Verify the public link downloads the same ZIP as the local build. For distribution with Gatekeeper verification, sign with Developer ID and notarize before uploading.
+Run the Mac tests and verify each installer before publishing it. For public distribution, import both Developer ID identities with their private keys into the build Mac’s keychain. Configure a `notarytool` keychain profile with credentials from the same Apple Developer team. Set all three variables before building:
+
+```sh
+export NEON_MAC_APP_IDENTITY='Developer ID Application: Your Name (TEAMID)'
+export NEON_MAC_INSTALLER_IDENTITY='Developer ID Installer: Your Name (TEAMID)'
+export NEON_MAC_NOTARY_PROFILE='your-keychain-profile'
+src/TaskbarLed.App.Avalonia/build-macos.sh osx-arm64
+src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
+```
+
+The script signs the native files and app with Hardened Runtime, signs the `.pkg`, waits for Apple to accept notarization, attaches and validates the ticket, and runs `pkgutil --check-signature` and `spctl --assess --type install`. It copies the artifacts to the output directory after those checks pass. Publish the stapled `.pkg` files and check their public SHA-256 hashes. The ZIP produced by this flow contains the signed app. Notarization and stapling in this flow apply to the `.pkg`.
+
+Leave all three variables unset for local ad hoc builds. Keep private keys and notarization credentials in the keychain. [Apple Developer ID](https://developer.apple.com/developer-id/) · [Apple notarization guide](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)

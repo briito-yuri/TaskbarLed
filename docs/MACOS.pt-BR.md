@@ -59,3 +59,8 @@ Na versão atual da branch, clique com o botão direito no painel para abrir **T
 3. No Finder, abra **Aplicativos** e mova **Neon TSB Agents.app** para o Lixo. O macOS pode pedir a autorização de um administrador se o app foi instalado pelo `.pkg`.
 
 As preferências ficam em `~/Library/Application Support/TaskbarLed` e são preservadas. A versão pública 0.5.1 aparece como **Neon Task Bar.app**.
+
+
+## Distribuir sem o aviso de verificação
+
+Para gerar instaladores que passam pela verificação do Gatekeeper, configure no Mac de build as identidades **Developer ID Application** e **Developer ID Installer**, com suas chaves privadas, e um perfil de notarização do `notarytool` no Chaveiro. O script usa `NEON_MAC_APP_IDENTITY`, `NEON_MAC_INSTALLER_IDENTITY` e `NEON_MAC_NOTARY_PROFILE` para assinar, notarizar e validar os `.pkg` de ambas as arquiteturas. [Comandos no guia técnico](MACOS.md#publish-a-mac-release)

@@ -18,6 +18,8 @@
 
 [Install instructions](docs/MACOS.md#build-and-connect-claude-code)
 
+If macOS says Apple cannot check the preview for malicious software, try opening the package first. After verifying it came from the official GitHub release, use **System Settings → Privacy & Security → Open Anyway**. [Apple instructions](https://support.apple.com/en-us/102445)
+
 [![Download for Mac](https://img.shields.io/badge/Download%20for%20Mac-Apple%20Silicon-34383D?style=for-the-badge)](https://github.com/briito-yuri/TaskbarLed/releases/download/macos-v0.5.1/TaskbarLed-osx-arm64.zip)
 
 Apple Silicon (M1 or newer), macOS 14+. Unzip, move Neon Task Bar.app to Applications, and open it. The runtime is included.

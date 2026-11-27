@@ -9,4 +9,6 @@ Escolha o instalador para o seu Mac e abra o arquivo baixado. No assistente do m
 
 Ambos exigem macOS 14 ou posterior e incluem o runtime. São instaladores de prévia do commit `9fb170f`, sem assinatura Developer ID Installer ou notarização.
 
+Se aparecer o aviso de que a Apple não pôde verificar o instalador, tente abri-lo e, depois de confirmar a origem do download, selecione **Abrir Mesmo Assim** em **Ajustes do Sistema → Privacidade e Segurança**. [Orientação da Apple](https://support.apple.com/pt-br/102445)
+
 [Guia em português](docs/MACOS.pt-BR.md) · [English guide](docs/MACOS.md)
