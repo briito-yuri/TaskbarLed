@@ -66,7 +66,7 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     public bool ConnectToNext => !Row.LastStation;
     public string StationLabel => Row.StationName ?? Row.Label;
     public string LineLetter => Row.RouteLetter ?? "?";
-    public IBrush LineBrush => SolidColorBrush.Parse(RouteColors.For(LineLetter));
+    public IBrush LineBrush => new SolidColorBrush(Color.Parse(RouteColors.For(LineLetter)));
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Status))]

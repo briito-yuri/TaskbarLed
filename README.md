@@ -42,7 +42,7 @@ You can switch to a click-through mini panel, alerts only, or nothing at all. Ex
 - **Live details.** Current action (editing a file, running a command, searching), the last reply and the prompt timer.
 - **Place it your way.** On the taskbar, floating just above it, or anywhere on screen with edge snapping. Each placement remembers its own spot.
 - **A short sound when it matters.** Two rising notes when a session finishes, the same note twice when one needs you, even over a full-screen video. Only while that session's app is out of sight. Three voices (chime, retro, bell) that follow the theme, or pick one; each sound can be turned off.
-- **Seventeen themes, switched live.** Claude Code by default, plus terminals, retro LCDs, light and dark cards, or [your own](#make-your-own-theme) from a small JSON file.
+- **Eighteen themes, switched live.** Claude Code by default, plus terminals, retro LCDs, light and dark cards, or [your own](#make-your-own-theme) from a small JSON file.
 - **English and Portuguese.** Follows Windows by default, or pick one in the menu.
 - **Works everywhere Claude Code runs.** Desktop app, CLI and IDE extensions (VS Code, JetBrains) share the same hooks.
 - **Light and private.** Event driven, about 60 MB of RAM, and nothing ever leaves your machine.
@@ -63,7 +63,9 @@ Right-click the panel → **Theme**. The panel stays on screen while the menu is
 | <img src="docs/images/theme-OliveLcd.png" alt="Olive LCD"><br>**Olive LCD**: olive pocket-calculator screen | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
 | <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, TaskbarLed's first look | |
 
-On macOS the panel lists sessions and subagents in rows, so the same themes look different there: see the [macOS theme gallery](docs/MACOS-THEMES.md).
+The 18 built-in themes are shared by Windows and macOS, including Octo and Line Map. Both panels can show sessions and subagents in rows with elapsed time. On Windows, toggle **Session list** to switch between the floating list and the compact taskbar ticker. **Background opacity** controls the panel surface. The Windows hook accepts Claude Code and provider-neutral events. See the [theme gallery](docs/MACOS-THEMES.md) for more captures.
+
+<img src="docs/images/macos-sessions-live.png" alt="Mac app running on Apple Silicon with two sessions and a subagent in Line Map" width="75%">
 
 ### Make your own theme
 

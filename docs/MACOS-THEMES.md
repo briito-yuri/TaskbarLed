@@ -1,6 +1,6 @@
 # TaskbarLed themes on macOS
 
-Screenshots of the panel's 17 themes, rendered by TaskbarLed with two sessions and four subagents. Pick a theme from the **Themes** menu in the menu bar.
+Screenshots of the panel's 18 themes, rendered by TaskbarLed with two sessions and four subagents. Pick a theme from the **Themes** menu in the menu bar.
 
 [Português do Brasil](MACOS-THEMES.pt-BR.md) · [Install on Mac](MACOS.md) · [Back to the README](../README.md)
 
