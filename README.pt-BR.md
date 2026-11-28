@@ -63,7 +63,7 @@ Botão direito no painel → **Tema**. O painel fica na tela enquanto o menu est
 | <img src="docs/images/theme-OliveLcd.png" alt="Olive LCD"><br>**Olive LCD**: visor oliva de calculadora | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: terminal preto e branco |
 | <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: terminal LED verde, o primeiro visual do TaskbarLed |  <img src="docs/images/theme-Octo.png" alt="Octo"><br>**Octo**: painel escuro com destaques em rosa |
 
-Os 18 temas vêm tanto no Windows quanto no macOS, incluindo Octo e Line Map. Os dois painéis podem mostrar sessões e subagentes em linhas, com o tempo de execução. No Windows, use **Lista de sessões** para alternar entre a lista flutuante e as abas compactas na barra de tarefas. **Opacidade do fundo** ajusta a superfície do painel. O hook do Windows recebe eventos do Claude Code e de integrações genéricas. Veja mais capturas na [galeria de temas](docs/MACOS-THEMES.pt-BR.md).
+Os 18 temas vêm tanto no Windows quanto no macOS, incluindo Octo e Line Map. Os dois painéis podem mostrar sessões e subagentes em linhas, com o tempo de execução. No Windows, use **Lista de sessões** para alternar entre a lista flutuante e as abas compactas na barra de tarefas. **Opacidade do fundo** ajusta a superfície do painel. **Barra de atividade no topo** mostra uma versão compacta e centralizada. Clique para expandir ou recolher as sessões. O hook do Windows recebe eventos do Claude Code e de integrações genéricas. Veja mais capturas na [galeria de temas](docs/MACOS-THEMES.pt-BR.md).
 
 | Windows (WPF) | macOS |
 | --- | --- |

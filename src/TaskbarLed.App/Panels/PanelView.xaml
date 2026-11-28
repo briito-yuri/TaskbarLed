@@ -169,6 +169,18 @@
             BorderBrush="{DynamicResource Led.BorderBrush}"
             BorderThickness="1" />
 
+    <Grid Margin="12,0"
+          Visibility="{Binding ShowActivitySummary, RelativeSource={RelativeSource AncestorType=panels:PanelView}, Converter={StaticResource BoolToVisibility}}">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <Image Source="/Assets/TaskbarLedMark.png" Width="19" Height="19" VerticalAlignment="Center" HorizontalAlignment="Left" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+        <TextBlock Text="▸" Foreground="{DynamicResource Led.AccentBrush}" Margin="0,0,5,0" />
+        <TextBlock Text="{Binding ActiveCount}" Foreground="{DynamicResource Led.ForegroundBrush}" FontWeight="SemiBold" />
+      </StackPanel>
+    </Grid>
     <ScrollViewer Margin="8,5" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                   Visibility="{Binding ShowSessionRows, RelativeSource={RelativeSource AncestorType=panels:PanelView}, Converter={StaticResource BoolToVisibility}}">
       <StackPanel>

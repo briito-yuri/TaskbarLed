@@ -77,6 +77,11 @@ internal sealed class FloatingPanelWindow : Window
         Height = PanelHeight;
         _panel = new PanelView { DataContext = viewModel };
         Content = _panel;
+        _panel.FindControl<Button>("IslandToggle")!.Click += (_, _) =>
+        {
+            _viewModel.IslandExpanded = !_viewModel.IslandExpanded;
+            RestorePlacement();
+        };
 
         _frameTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(250), DispatcherPriority.Background, (_, _) => Render());
         ApplyFrame();
@@ -176,6 +181,7 @@ internal sealed class FloatingPanelWindow : Window
         }
 
         Persist(_preferences with { DynamicIsland = enabled });
+        _viewModel.IslandExpanded = false;
         _panel.Classes.Set("dynamic-island", enabled);
         RestorePlacement();
     }
@@ -453,12 +459,14 @@ internal sealed class FloatingPanelWindow : Window
         var screen = !island && saved is { } point ? Screens.ScreenFromPoint(point) ?? primary : primary;
         var area = screen.WorkingArea;
         var scale = screen.Scaling;
-        var topInset = island ? Math.Max(0, area.Y - screen.Bounds.Y) / scale : 0;
-        _viewModel.IslandContentMargin = new Thickness(0, topInset, 0, 0);
+        var headerHeight = island ? Math.Max(28, (area.Y - screen.Bounds.Y) / scale - 4) : 0;
+        _viewModel.IslandMode = island;
+        _viewModel.IslandHeaderHeight = headerHeight;
         UpdateIslandWindowLevel(island);
         var editorExtra = _beforeEdit.HasValue ? EditorHeight + 2 : 0;
-        Width = Math.Min(_panelWidth, area.Width / scale);
-        Height = Math.Min(_panelHeight + editorExtra, area.Height / scale) + topInset;
+        var compact = island && !_viewModel.IslandExpanded;
+        Width = Math.Min(compact ? 320 : _panelWidth, area.Width / scale);
+        Height = compact ? headerHeight + 4 : Math.Min(_panelHeight + editorExtra, area.Height / scale) + headerHeight;
 
         if (island)
         {

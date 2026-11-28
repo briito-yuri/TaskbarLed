@@ -134,7 +134,23 @@ public sealed partial class PanelViewModel : ObservableObject
     public partial IReadOnlyList<SessionDisplayRowViewModel> SessionRows { get; set; } = [];
 
     [ObservableProperty]
-    public partial Thickness IslandContentMargin { get; set; }
+    [NotifyPropertyChangedFor(nameof(ShowPanelContent))]
+    public partial bool IslandMode { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowPanelContent))]
+    public partial bool IslandExpanded { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IslandContentMargin))]
+    public partial double IslandHeaderHeight { get; set; }
+
+    public Thickness IslandContentMargin => new(0, IslandHeaderHeight, 0, 0);
+
+    [ObservableProperty]
+    public partial int IslandActivityCount { get; set; }
+
+    public bool ShowPanelContent => !IslandMode || IslandExpanded;
 
     public bool HasSubagents => SessionRows.Count != 0;
 
@@ -190,6 +206,9 @@ public sealed partial class PanelViewModel : ObservableObject
     {
         ArgumentNullException.ThrowIfNull(frame);
         _frame = frame;
+        IslandActivityCount = frame.SessionRows.Count == 0
+            ? frame.Channels.Count(channel => channel.Status is SessionStatus.Running or SessionStatus.AwaitingInput)
+            : frame.SessionRows.Count(row => row.HasStatus && row.Status is SessionStatus.Running or SessionStatus.AwaitingInput);
 
         if (!SessionRows.Select(row => row.Row).SequenceEqual(frame.SessionRows.Select(SessionDisplayRowViewModel.WithoutTelemetry)))
         {

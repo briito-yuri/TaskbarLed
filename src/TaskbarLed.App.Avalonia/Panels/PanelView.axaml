@@ -163,7 +163,7 @@
     <Border Name="PanelFrame" Classes="island-surface" BorderThickness="{DynamicResource Led.FrameThickness}"
             Padding="{DynamicResource Led.PanelPadding}">
 
-      <Grid Name="PanelContent" Margin="{Binding IslandContentMargin}" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
+      <Grid Name="PanelContent" Margin="{Binding IslandContentMargin}" IsVisible="{Binding ShowPanelContent}" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
         <Grid Grid.ColumnSpan="2" Height="26" Margin="0,0,0,3">
           <Border IsVisible="{Binding ShowLineMap}" Background="{DynamicResource Led.BrandHeaderBrush}" CornerRadius="4,4,0,0" />
           <Border HorizontalAlignment="Left" VerticalAlignment="Center" Padding="7,2"
@@ -342,6 +342,19 @@
         </ScrollViewer>
       </Grid>
     </Border>
+        <Button Name="IslandToggle" IsVisible="{Binding IslandMode}" Height="{Binding IslandHeaderHeight}"
+                Margin="3,2,3,0" Padding="10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"
+                Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Led.ForegroundBrush}"
+                AutomationProperties.Name="Dynamic Island">
+          <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+            <Image Source="/Assets/TaskbarLedMark.png" Width="19" Height="19" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+              <TextBlock Text="▸" Foreground="{DynamicResource Led.AccentBrush}" />
+              <TextBlock Text="{Binding IslandActivityCount}" FontWeight="SemiBold" />
+            </StackPanel>
+          </Grid>
+        </Button>
+
 
     <Border Background="{DynamicResource Led.DotGridBrush}" CornerRadius="4" IsHitTestVisible="False" />
 

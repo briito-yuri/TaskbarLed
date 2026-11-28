@@ -116,6 +116,9 @@ public sealed partial class PanelViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ShowRows))]
     public partial IReadOnlyList<SessionListRow> Rows { get; set; } = [];
 
+    [ObservableProperty]
+    public partial int ActiveCount { get; set; }
+
     public bool ShowRows => ShowSessionList && !IsEditing && Rows.Count > 0;
 
     public void Apply(PanelFrame frame, IReadOnlyList<Session>? sessions = null, DateTimeOffset now = default)
@@ -124,6 +127,7 @@ public sealed partial class PanelViewModel : ObservableObject
         _frame = frame;
         _sessions = sessions ?? [];
         _lastFrameAt = now;
+        ActiveCount = _sessions.Count(session => session.Status is SessionStatus.Running or SessionStatus.AwaitingInput);
         var rows = BuildRows(_sessions, now).ToArray();
         if (!Rows.SequenceEqual(rows))
         {

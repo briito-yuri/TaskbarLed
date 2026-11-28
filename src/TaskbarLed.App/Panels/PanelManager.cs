@@ -120,12 +120,21 @@ public sealed class PanelManager : IDisposable
             window.SetClickThrough(mini);
             window.Opacity = mini ? MiniOpacity : 1;
             window.SetBackgroundOpacity(_settings.BackgroundOpacity);
-            window.ShowSessionRows = !mini && _viewModel.ShowRows;
+            var topBar = _settings.TopActivityBar && !mini && !_viewModel.IsEditing;
+            window.SetTopActivityBar(topBar);
+            window.ShowSessionRows = !mini && (topBar ? window.TopActivityExpanded : _viewModel.ShowRows);
             window.Place(mini
                 ? PanelLayout.MiniCorner(monitor.Bounds, monitor.Scale)
-                : PanelBounds(monitor));
+                : topBar ? TopActivityBounds(monitor, window.TopActivityExpanded) : PanelBounds(monitor));
             window.KeepOnTop();
         }
+    }
+
+    private PixelRect TopActivityBounds(MonitorInfo monitor, bool expanded)
+    {
+        var width = Math.Min(monitor.Bounds.Width, (int)Math.Ceiling((expanded ? _settings.CurrentPosition.Width : 320) * monitor.Scale));
+        var height = Math.Min(monitor.Bounds.Height, (int)Math.Ceiling((expanded ? 32 + 23d * _viewModel.Rows.Count : 32) * monitor.Scale));
+        return PixelRect.FromSize(monitor.Bounds.Left + (monitor.Bounds.Width - width) / 2, monitor.Bounds.Top, width, height);
     }
 
     private PixelRect PanelBounds(MonitorInfo monitor)

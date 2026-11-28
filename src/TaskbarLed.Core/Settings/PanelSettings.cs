@@ -116,6 +116,8 @@ public sealed record PanelSettings
 
     public bool ShowSessionList { get; init; } = true;
 
+    public bool TopActivityBar { get; init; }
+
     public double BackgroundOpacity { get; init; } = 1;
 
     /// <summary>Position for the current <see cref="Placement"/>.</summary>

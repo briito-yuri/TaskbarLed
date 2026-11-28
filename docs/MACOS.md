@@ -29,7 +29,7 @@ TaskbarLed floats above the Dock. Activity opens the panel. The menu bar icon ca
 
 Each session and subagent shows elapsed time when a start is known. A tilde marks time measured since the panel first saw an Antigravity worker.
 
-Enable **Dynamic Island mode** from the panel or menu bar to dock it to the top edge of the primary display, centered over the camera cutout when present. It keeps the selected theme. Turn the mode off to restore your saved placement.
+Enable **Dynamic Island mode** from the panel or menu bar to dock it to the top edge of the primary display, centered over the camera cutout when present. It opens as a compact bar with the app mark and activity count. Click the bar to expand or collapse the sessions. It keeps the selected theme. Turn the mode off to restore your saved placement.
 
 ## Connect agents
 

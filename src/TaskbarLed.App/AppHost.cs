@@ -587,6 +587,7 @@ public sealed class AppHost : IDisposable
             RenderFrame();
             UpdateVisibility();
         },
+        ToggleTopActivityBar: () => UpdatePanel(_settings.Panel with { TopActivityBar = !_settings.Panel.TopActivityBar }),
         SelectOpacity: opacity => UpdatePanel(_settings.Panel with { BackgroundOpacity = opacity }),
         ToggleSoundOnDone: () => ToggleSound(SoundCue.Done),
         ToggleSoundOnAttention: () => ToggleSound(SoundCue.Attention),

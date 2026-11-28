@@ -63,7 +63,7 @@ Right-click the panel → **Theme**. The panel stays on screen while the menu is
 | <img src="docs/images/theme-OliveLcd.png" alt="Olive LCD"><br>**Olive LCD**: olive pocket-calculator screen | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
 | <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, TaskbarLed's first look |  <img src="docs/images/theme-Octo.png" alt="Octo"><br>**Octo**: dark panel with pink status accents |
 
-The 18 built-in themes are shared by Windows and macOS, including Octo and Line Map. Both panels can show sessions and subagents in rows with elapsed time. On Windows, toggle **Session list** to switch between the floating list and the compact taskbar ticker. **Background opacity** controls the panel surface. The Windows hook accepts Claude Code and provider-neutral events. See the [theme gallery](docs/MACOS-THEMES.md) for more captures.
+The 18 built-in themes are shared by Windows and macOS, including Octo and Line Map. Both panels can show sessions and subagents in rows with elapsed time. On Windows, toggle **Session list** to switch between the floating list and the compact taskbar ticker. **Background opacity** controls the panel surface. **Top activity bar** is a compact, centered alternative. Click it to expand or collapse the sessions. The Windows hook accepts Claude Code and provider-neutral events. See the [theme gallery](docs/MACOS-THEMES.md) for more captures.
 
 | Windows (WPF) | macOS |
 | --- | --- |
