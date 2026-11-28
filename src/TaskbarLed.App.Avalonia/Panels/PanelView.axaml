@@ -346,7 +346,14 @@
     <Button Name="IslandToggle" IsVisible="{Binding IslandMode}" Height="{Binding IslandHeaderHeight}"
             Margin="3,2,3,0" Padding="10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch"
             HorizontalContentAlignment="Stretch" Background="Transparent" BorderThickness="0"
-            AutomationProperties.Name="Dynamic Island">
+            Focusable="False" AutomationProperties.Name="Dynamic Island">
+      <Button.Template>
+        <ControlTemplate>
+          <Border Background="Transparent" Padding="{TemplateBinding Padding}">
+            <ContentPresenter Content="{TemplateBinding Content}" VerticalAlignment="Center" />
+          </Border>
+        </ControlTemplate>
+      </Button.Template>
       <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
         <Image Source="/Assets/TaskbarLedMark.png" Width="19" Height="19" />
         <Border Name="IslandActivityBadge" Grid.Column="2" MinWidth="39" CornerRadius="8" Padding="5,2"
