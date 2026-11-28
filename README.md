@@ -61,11 +61,13 @@ Right-click the panel → **Theme**. The panel stays on screen while the menu is
 | <img src="docs/images/theme-ClearList.png" alt="Clear List"><br>**Clear List**: light card with a green accent | <img src="docs/images/theme-LineMap.png" alt="Line Map"><br>**Line Map**: light card in transit-map colors |
 | <img src="docs/images/theme-EditorialIndex.png" alt="Editorial Index"><br>**Editorial Index**: cream paper with a serif font | <img src="docs/images/theme-CobaltWindow.png" alt="Cobalt Window"><br>**Cobalt Window**: pale blue card with a cobalt frame |
 | <img src="docs/images/theme-OliveLcd.png" alt="Olive LCD"><br>**Olive LCD**: olive pocket-calculator screen | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: black-and-white terminal |
-| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, TaskbarLed's first look | |
+| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: green LED terminal, TaskbarLed's first look |  <img src="docs/images/theme-Octo.png" alt="Octo"><br>**Octo**: dark panel with pink status accents |
 
 The 18 built-in themes are shared by Windows and macOS, including Octo and Line Map. Both panels can show sessions and subagents in rows with elapsed time. On Windows, toggle **Session list** to switch between the floating list and the compact taskbar ticker. **Background opacity** controls the panel surface. The Windows hook accepts Claude Code and provider-neutral events. See the [theme gallery](docs/MACOS-THEMES.md) for more captures.
 
-<img src="docs/images/macos-sessions-live.png" alt="Mac app running on Apple Silicon with two sessions and a subagent in Line Map" width="75%">
+| Windows (WPF) | macOS |
+| --- | --- |
+| ![Windows panel rendered by TaskbarLed on Windows](docs/images/windows-sessions-LineMap-en.png) | ![Mac app captured on Apple Silicon](docs/images/macos-sessions-live.png) |
 
 ### Make your own theme
 

@@ -61,11 +61,13 @@ Botão direito no painel → **Tema**. O painel fica na tela enquanto o menu est
 | <img src="docs/images/theme-ClearList.png" alt="Clear List"><br>**Clear List**: cartão claro com detalhe verde | <img src="docs/images/theme-LineMap.png" alt="Line Map"><br>**Line Map**: cartão claro nas cores de um mapa de metrô |
 | <img src="docs/images/theme-EditorialIndex.png" alt="Editorial Index"><br>**Editorial Index**: papel creme com fonte serifada | <img src="docs/images/theme-CobaltWindow.png" alt="Cobalt Window"><br>**Cobalt Window**: cartão azul-claro com moldura cobalto |
 | <img src="docs/images/theme-OliveLcd.png" alt="Olive LCD"><br>**Olive LCD**: visor oliva de calculadora | <img src="docs/images/theme-Mono.png" alt="Mono"><br>**Mono**: terminal preto e branco |
-| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: terminal LED verde, o primeiro visual do TaskbarLed | |
+| <img src="docs/images/theme-Matrix.png" alt="Matrix"><br>**Matrix**: terminal LED verde, o primeiro visual do TaskbarLed |  <img src="docs/images/theme-Octo.png" alt="Octo"><br>**Octo**: painel escuro com destaques em rosa |
 
 Os 18 temas vêm tanto no Windows quanto no macOS, incluindo Octo e Line Map. Os dois painéis podem mostrar sessões e subagentes em linhas, com o tempo de execução. No Windows, use **Lista de sessões** para alternar entre a lista flutuante e as abas compactas na barra de tarefas. **Opacidade do fundo** ajusta a superfície do painel. O hook do Windows recebe eventos do Claude Code e de integrações genéricas. Veja mais capturas na [galeria de temas](docs/MACOS-THEMES.pt-BR.md).
 
-<img src="docs/images/macos-sessions-live.png" alt="App Mac em execução no Apple Silicon com duas sessões e um subagente no Mapa de Linhas" width="75%">
+| Windows (WPF) | macOS |
+| --- | --- |
+| ![Painel Windows renderizado pelo TaskbarLed no Windows](docs/images/windows-sessions-LineMap-pt.png) | ![Painel Mac capturado no Apple Silicon](docs/images/macos-sessions-live.png) |
 
 ### Crie o seu próprio tema
 
