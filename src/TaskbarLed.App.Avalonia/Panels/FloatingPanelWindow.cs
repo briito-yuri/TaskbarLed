@@ -43,6 +43,7 @@ internal sealed class FloatingPanelWindow : Window
     private bool _automaticEdit;
     private nint _nativeGlass;
     private double _glassOpacity;
+    private bool _crystalGlass;
     private readonly PanelView _panel;
     private readonly MacUiStrings _strings;
     private PixelPoint? _beforeEdit;
@@ -595,21 +596,25 @@ internal sealed class FloatingPanelWindow : Window
             return;
         }
 
-        if (_viewModel.ThemeId != "LiquidGlass")
+        var crystal = _viewModel.ThemeId == "CrystalLiquid";
+        var glassTheme = crystal || _viewModel.ThemeId == "LiquidGlass";
+        if (_nativeGlass != 0 && (!glassTheme || _crystalGlass != crystal))
         {
-            if (_nativeGlass != 0)
-            {
-                MacFloatingWindow.RemoveLiquidGlass(_nativeGlass);
-                _nativeGlass = 0;
-            }
+            MacFloatingWindow.RemoveLiquidGlass(_nativeGlass);
+            _nativeGlass = 0;
+        }
 
+        if (!glassTheme)
+        {
             return;
         }
 
-        var opacity = _viewModel.PanelOpacity;
+        // Keep even the brightest parts of the clear AppKit surface translucent.
+        var opacity = _viewModel.PanelOpacity * (crystal ? 0.28 : 1);
         if (_nativeGlass == 0 && TryGetPlatformHandle() is IMacOSTopLevelPlatformHandle mac)
         {
-            _nativeGlass = MacFloatingWindow.AddLiquidGlass(mac.NSWindow, ClientSize.Width, ClientSize.Height, opacity);
+            _nativeGlass = MacFloatingWindow.AddLiquidGlass(mac.NSWindow, ClientSize.Width, ClientSize.Height, opacity, crystal);
+            _crystalGlass = crystal;
         }
         else if (_nativeGlass != 0 && opacity != _glassOpacity)
         {

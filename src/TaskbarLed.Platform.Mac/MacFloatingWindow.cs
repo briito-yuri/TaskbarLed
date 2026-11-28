@@ -38,7 +38,7 @@ public static class MacFloatingWindow
     // NSStatusWindowLevel is above the main menu bar.
     public const int StatusWindowLevel = 25;
 
-    public static nint AddLiquidGlass(nint nsWindow, double width, double height, double opacity)
+    public static nint AddLiquidGlass(nint nsWindow, double width, double height, double opacity, bool crystal = false)
     {
         if (nsWindow == 0)
         {
@@ -49,6 +49,20 @@ public static class MacFloatingWindow
         if (host == 0)
         {
             return 0;
+        }
+
+        if (crystal)
+        {
+            var clear = NewView("NSGlassEffectView");
+            if (clear == 0)
+            {
+                return 0;
+            }
+
+            ConfigureClearGlass(clear, width, height);
+            SetGlassOpacity(clear, opacity);
+            AddSubview(host, clear, -1);
+            return clear;
         }
 
         var backing = NewView("NSVisualEffectView");
@@ -73,11 +87,9 @@ public static class MacFloatingWindow
         var glass = NewView("NSGlassEffectView");
         if (glass != 0)
         {
-            MacNative.SendDouble(glass, MacNative.sel_registerName("setCornerRadius:"), 16);
-            MacNative.SendNUInt(glass, MacNative.sel_registerName("setStyle:"), 1); // Clear
+            ConfigureClearGlass(glass, width, height);
             // The clear highlight may change with focus. The active material underneath remains visible.
             SetGlassOpacity(glass, 0.32);
-            SizeToHost(glass, width, height);
             AddSubview(backing, glass, 1);
         }
 
@@ -90,6 +102,13 @@ public static class MacFloatingWindow
     {
         var type = MacNative.objc_lookUpClass(name);
         return type == 0 ? 0 : MacNative.SendPointer(type, MacNative.sel_registerName("new"));
+    }
+
+    private static void ConfigureClearGlass(nint view, double width, double height)
+    {
+        MacNative.SendDouble(view, MacNative.sel_registerName("setCornerRadius:"), 16);
+        MacNative.SendNUInt(view, MacNative.sel_registerName("setStyle:"), 1); // Clear
+        SizeToHost(view, width, height);
     }
 
     private static void SizeToHost(nint view, double width, double height)

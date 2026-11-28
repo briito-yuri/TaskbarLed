@@ -1,10 +1,14 @@
 # Temas do TaskbarLed no macOS
 
-Capturas dos 18 temas do painel renderizadas pelo TaskbarLed com duas sessões e quatro subagentes. Escolha um tema no menu **Temas** da barra.
+Capturas dos 19 temas do painel renderizadas pelo TaskbarLed com duas sessões e quatro subagentes. Escolha um tema no menu **Temas** da barra.
 
 [English](MACOS-THEMES.md) · [Instalação no Mac](MACOS.pt-BR.md) · [Voltar ao README](../README.pt-BR.md)
 
 ## Temas compartilhados
+
+| Crystal Liquid |
+| --- |
+| [![Crystal Liquid](images/macos-themes/CrystalLiquid.png)](images/macos-themes/CrystalLiquid.png) |
 
 | Line Map | Liquid Glass |
 | --- | --- |

@@ -36,6 +36,7 @@ public static class ThemeCatalog
         new("Glass", "Glass", Uppercase: false, Sound: SoundStyle.Bell),
         new("Paper", "Paper", Uppercase: false),
         new("LiquidGlass", "Liquid Glass", Uppercase: false),
+        new("CrystalLiquid", "Crystal Liquid", Uppercase: false),
         new("AmberTree", "Amber Tree", Uppercase: false),
         new("CompactCharcoal", "Compact Charcoal", Uppercase: false),
         new("AmberRail", "Amber Rail", Uppercase: false),

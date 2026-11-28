@@ -22,6 +22,7 @@ internal static class PanelThemes
         new("Minimal", "Minimal"),
         new("Glass", "Glass"),
         new("LiquidGlass", "Liquid Glass"),
+        new("CrystalLiquid", "Crystal Liquid"),
         new("Paper", "Paper"),
         new("AmberTree", "Amber Tree"),
         new("CompactCharcoal", "Compact Charcoal"),
