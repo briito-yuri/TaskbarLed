@@ -66,20 +66,7 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     public bool ConnectToNext => !Row.LastStation;
     public string StationLabel => Row.StationName ?? Row.Label;
     public string LineLetter => Row.RouteLetter ?? "?";
-    public IBrush LineBrush => TransitColors.TryGetValue(LineLetter, out var brush) ? brush : TransitFallback;
-
-    private static readonly Dictionary<string, IBrush> TransitColors = new(StringComparer.Ordinal)
-    {
-        ["A"] = new SolidColorBrush(Color.Parse("#A63831")),
-        ["B"] = new SolidColorBrush(Color.Parse("#23558B")),
-        ["C"] = new SolidColorBrush(Color.Parse("#146B74")),
-        ["D"] = new SolidColorBrush(Color.Parse("#326343")),
-        ["E"] = new SolidColorBrush(Color.Parse("#835789")),
-        ["F"] = new SolidColorBrush(Color.Parse("#935013")),
-        ["G"] = new SolidColorBrush(Color.Parse("#534372")),
-    };
-
-    private static readonly IBrush TransitFallback = new SolidColorBrush(Color.Parse("#465D6B"));
+    public IBrush LineBrush => SolidColorBrush.Parse(RouteColors.For(LineLetter));
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Status))]

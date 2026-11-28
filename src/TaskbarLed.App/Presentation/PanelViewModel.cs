@@ -32,7 +32,11 @@ public sealed partial class ChannelViewModel : ObservableObject
     };
 }
 
-public sealed record SessionListRow(string Label, string Status, bool IsChild, string Route, bool IsDone);
+public sealed record SessionListRow(string Label, string Status, bool IsChild, string Route, bool IsDone)
+{
+    public string RouteColor => RouteColors.For(Route);
+    public string RouteLabel => IsChild ? "●" : Route;
+}
 
 /// <summary>State bound by every panel window. Shared across monitors so they always agree.</summary>
 public sealed partial class PanelViewModel : ObservableObject
@@ -191,7 +195,7 @@ public sealed partial class PanelViewModel : ObservableObject
 
             foreach (var worker in group.Where(session => session.ParentId is not null))
             {
-                yield return Row(worker, true, "●");
+                yield return Row(worker, true, route);
             }
         }
 
@@ -204,7 +208,7 @@ public sealed partial class PanelViewModel : ObservableObject
                 SessionStatus.Completed => portuguese ? "✓ Concluído" : "✓ Done",
                 _ => portuguese ? "Ocioso" : "Idle",
             };
-            var label = child ? "↳  " + session.DisplayName : session.DisplayName;
+            var label = session.DisplayName;
             if (session.Status != SessionStatus.Idle && session.Elapsed(now) is { } elapsed)
             {
                 status += " · " + DurationFormat.Clock(elapsed);
