@@ -66,7 +66,13 @@ public sealed partial class SessionDisplayRowViewModel(SessionDisplayRow row, bo
     public bool ConnectToNext => !Row.LastStation;
     public string StationLabel => Row.StationName ?? Row.Label;
     public string LineLetter => Row.RouteLetter ?? "?";
-    public IBrush LineBrush => new SolidColorBrush(Color.Parse(RouteColors.For(LineLetter)));
+    public IBrush LineBrush => TransitColors.GetValueOrDefault(LineLetter, TransitFallback);
+
+    private static readonly Dictionary<string, IBrush> TransitColors = "ABCDEFG"
+        .Select(letter => letter.ToString())
+        .ToDictionary(letter => letter, letter => (IBrush)new SolidColorBrush(Color.Parse(RouteColors.For(letter))), StringComparer.Ordinal);
+
+    private static readonly IBrush TransitFallback = new SolidColorBrush(Color.Parse(RouteColors.For(string.Empty)));
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Status))]
