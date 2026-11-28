@@ -120,11 +120,29 @@ public sealed class PanelManager : IDisposable
             window.SetClickThrough(mini);
             window.Opacity = mini ? MiniOpacity : 1;
             window.SetBackgroundOpacity(_settings.BackgroundOpacity);
+            window.ShowSessionRows = !mini && _viewModel.ShowRows;
             window.Place(mini
                 ? PanelLayout.MiniCorner(monitor.Bounds, monitor.Scale)
-                : PanelLayout.Compute(_settings, monitor.Bounds, monitor.Taskbar, monitor.Scale, monitor.TaskbarItems));
+                : PanelBounds(monitor));
             window.KeepOnTop();
         }
+    }
+
+    private PixelRect PanelBounds(MonitorInfo monitor)
+    {
+        if (!_viewModel.ShowRows)
+        {
+            return PanelLayout.Compute(_settings, monitor.Bounds, monitor.Taskbar, monitor.Scale, monitor.TaskbarItems);
+        }
+
+        var floating = _settings.Placement == PanelPlacement.Taskbar
+            ? _settings with { Placement = PanelPlacement.AboveTaskbar, AbovePosition = _settings.TaskbarPosition }
+            : _settings;
+        var bounds = PanelLayout.Compute(floating, monitor.Bounds, monitor.Taskbar, monitor.Scale);
+        var height = (int)Math.Ceiling((32 + 23d * _viewModel.Rows.Count) * monitor.Scale);
+        return floating.Placement == PanelPlacement.Free
+            ? bounds with { Bottom = Math.Min(monitor.Bounds.Bottom, bounds.Top + height) }
+            : bounds with { Top = Math.Max(monitor.Bounds.Top, bounds.Bottom - height) };
     }
 
     public void Dispose()

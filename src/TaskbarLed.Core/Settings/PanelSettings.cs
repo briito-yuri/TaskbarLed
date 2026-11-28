@@ -114,6 +114,8 @@ public sealed record PanelSettings
     /// <summary>Theme resource name (see Themes folder in the app).</summary>
     public string Theme { get; init; } = DefaultTheme;
 
+    public bool ShowSessionList { get; init; } = true;
+
     public double BackgroundOpacity { get; init; } = 1;
 
     /// <summary>Position for the current <see cref="Placement"/>.</summary>

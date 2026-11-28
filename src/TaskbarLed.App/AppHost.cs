@@ -206,7 +206,8 @@ public sealed class AppHost : IDisposable
         var now = DateTimeOffset.Now;
         var frame = _composer.Compose(sessions, now);
         _selectedSessionId = frame.SelectedSessionId;
-        _viewModel.Apply(frame);
+        _viewModel.ShowSessionList = _settings.Panel.ShowSessionList;
+        _viewModel.Apply(frame, sessions, now);
         _tray?.SetStatus(sessions.Count == 0 ? SessionStatus.Idle : sessions.Max(s => s.Status));
 
         // Alerts are only for full-screen moments: everywhere else the panel already tells the story.
@@ -394,7 +395,9 @@ public sealed class AppHost : IDisposable
     private void ApplyTheme(string? id)
     {
         ThemeCatalog.Apply(Application.Current.Resources, id);
-        _viewModel.Uppercase = ThemeCatalog.Resolve(id).Uppercase;
+        var theme = ThemeCatalog.Resolve(id);
+        _viewModel.Uppercase = theme.Uppercase;
+        _viewModel.IsLineMap = theme.Id == "LineMap";
     }
 
     // Users' JSON themes: read at startup and again each time the menu opens, so a new or edited
@@ -577,6 +580,12 @@ public sealed class AppHost : IDisposable
         {
             UpdatePanel(_settings.Panel with { Theme = theme });
             ApplyTheme(theme); // Live: every color is a DynamicResource.
+        },
+        ToggleSessionList: () =>
+        {
+            UpdatePanel(_settings.Panel with { ShowSessionList = !_settings.Panel.ShowSessionList });
+            RenderFrame();
+            UpdateVisibility();
         },
         SelectOpacity: opacity => UpdatePanel(_settings.Panel with { BackgroundOpacity = opacity }),
         ToggleSoundOnDone: () => ToggleSound(SoundCue.Done),

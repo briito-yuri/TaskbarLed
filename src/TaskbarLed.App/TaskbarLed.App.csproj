@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="..\TaskbarLed.App.Avalonia\Assets\TaskbarLedMark.png" Link="Assets\TaskbarLedMark.png" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
 

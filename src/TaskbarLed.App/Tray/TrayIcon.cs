@@ -24,6 +24,7 @@ public sealed record TrayCommands(
     Action<FullscreenBehavior> SelectFullscreen,
     Action<string> SelectTheme,
     Action<double> SelectOpacity,
+    Action ToggleSessionList,
     Action ToggleSoundOnDone,
     Action ToggleSoundOnAttention,
     Action<SoundStyle> SelectSoundStyle,
@@ -180,6 +181,7 @@ public sealed class TrayIcon : IDisposable
 
         KeepOpenOnPick(opacityMenu);
         _menu.Items.Add(opacityMenu);
+        _menu.Items.Add(Check(_strings.SessionList, state.Panel.ShowSessionList, _commands.ToggleSessionList));
         _menu.Items.Add(SoundMenu(state.Panel));
 
         // Language names are written in their own language so anyone can find theirs.
