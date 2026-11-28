@@ -36,6 +36,8 @@ public sealed class EditDragEventArgs(EditKind kind, int deltaX, int deltaY, boo
 /// </summary>
 public partial class PanelWindow : Window
 {
+    internal void SetBackgroundOpacity(double opacity) => View.Surface.Opacity = opacity;
+
     private readonly PanelViewModel _viewModel;
     private nint _handle;
     private EditKind? _dragKind;

@@ -29,6 +29,8 @@ O TaskbarLed flutua acima do Dock. O painel aparece quando há atividade. O íco
 
 Cada sessão e subagente mostra o tempo decorrido quando há uma hora de início conhecida. O til indica o tempo desde que o painel viu o agente do Antigravity pela primeira vez.
 
+Ative **Modo Dynamic Island** pelo menu do painel ou da barra de menus para centralizar o painel abaixo da barra de menus do monitor principal. O modo mantém o tema selecionado. Desative-o para voltar à posição salva.
+
 ## Conectar agentes
 
 O painel lê a atividade local de Octo, Codex e Antigravity. Os subagentes aparecem sob a sessão principal mesmo quando ela está ociosa. A detecção de executáveis pode identificar uma ferramenta aberta sem informar sessões individuais. Para incluir um processo personalizado, adicione o nome do executável e um rótulo em `~/Library/Application Support/TaskbarLed/agents.json`.

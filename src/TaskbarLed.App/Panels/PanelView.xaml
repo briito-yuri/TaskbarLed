@@ -164,7 +164,7 @@
   </UserControl.Resources>
 
   <Grid x:Name="Root" Cursor="Hand">
-    <Border CornerRadius="4"
+    <Border x:Name="Surface" CornerRadius="4"
             Background="{DynamicResource Led.BackgroundBrush}"
             BorderBrush="{DynamicResource Led.BorderBrush}"
             BorderThickness="1" />

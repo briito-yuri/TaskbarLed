@@ -119,6 +119,7 @@ public sealed class PanelManager : IDisposable
 
             window.SetClickThrough(mini);
             window.Opacity = mini ? MiniOpacity : 1;
+            window.SetBackgroundOpacity(_settings.BackgroundOpacity);
             window.Place(mini
                 ? PanelLayout.MiniCorner(monitor.Bounds, monitor.Scale)
                 : PanelLayout.Compute(_settings, monitor.Bounds, monitor.Taskbar, monitor.Scale, monitor.TaskbarItems));

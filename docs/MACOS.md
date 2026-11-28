@@ -29,6 +29,8 @@ TaskbarLed floats above the Dock. Activity opens the panel. The menu bar icon ca
 
 Each session and subagent shows elapsed time when a start is known. A tilde marks time measured since the panel first saw an Antigravity worker.
 
+Enable **Dynamic Island mode** from the panel or menu bar to dock it below the menu bar, centered on the primary display. It keeps the selected theme. Turn the mode off to restore your saved placement.
+
 ## Connect agents
 
 The panel reads local Octo, Codex and Antigravity activity. Subagents are shown below their parent even when it is idle. The local executable probe can identify a running tool without reporting individual sessions. Add a custom process name and display label in `~/Library/Application Support/TaskbarLed/agents.json`.

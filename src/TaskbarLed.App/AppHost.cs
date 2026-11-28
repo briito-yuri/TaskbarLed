@@ -576,6 +576,7 @@ public sealed class AppHost : IDisposable
             UpdatePanel(_settings.Panel with { Theme = theme });
             ApplyTheme(theme); // Live: every color is a DynamicResource.
         },
+        SelectOpacity: opacity => UpdatePanel(_settings.Panel with { BackgroundOpacity = opacity }),
         ToggleSoundOnDone: () => ToggleSound(SoundCue.Done),
         ToggleSoundOnAttention: () => ToggleSound(SoundCue.Attention),
         SelectSoundStyle: style =>

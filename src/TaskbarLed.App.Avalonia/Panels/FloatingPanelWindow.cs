@@ -156,12 +156,27 @@ internal sealed class FloatingPanelWindow : Window
     public void ConfigurePlacement(PanelPreferences preferences, Action<PanelPreferences> save)
     {
         _preferences = preferences;
+        _panel.Classes.Set("dynamic-island", preferences.DynamicIsland);
         _viewModel.PanelOpacity = NormalizeOpacity(preferences.PanelOpacity);
         _savePreferences = save;
         ApplyFrame();
     }
 
     public void SetTheme(string id) => Persist(_preferences with { Theme = id });
+
+    public bool IsDynamicIsland => _preferences.DynamicIsland;
+
+    public void SetDynamicIsland(bool enabled)
+    {
+        if (_beforeEdit.HasValue)
+        {
+            EndEdit(save: false);
+        }
+
+        Persist(_preferences with { DynamicIsland = enabled });
+        _panel.Classes.Set("dynamic-island", enabled);
+        RestorePlacement();
+    }
 
     public void ResetPosition()
     {
@@ -430,14 +445,21 @@ internal sealed class FloatingPanelWindow : Window
             return;
         }
 
+        var island = _preferences.DynamicIsland && !_beforeEdit.HasValue;
         var saved = _beforeEdit.HasValue ? Position
             : _preferences is { X: int x, Y: int y } ? new PixelPoint(x, y) : (PixelPoint?)null;
-        var screen = saved is { } point ? Screens.ScreenFromPoint(point) ?? primary : primary;
+        var screen = !island && saved is { } point ? Screens.ScreenFromPoint(point) ?? primary : primary;
         var area = screen.WorkingArea;
         var scale = screen.Scaling;
         var editorExtra = _beforeEdit.HasValue ? EditorHeight + 2 : 0;
         Width = Math.Min(_panelWidth, area.Width / scale);
         Height = Math.Min(_panelHeight + editorExtra, area.Height / scale);
+
+        if (island)
+        {
+            Position = IslandPosition(area, (int)Math.Ceiling(Width * scale));
+            return;
+        }
 
         if (saved is { } position)
         {
@@ -450,6 +472,9 @@ internal sealed class FloatingPanelWindow : Window
         var rect = DockLayout(area, scale, Height, Width);
         Position = new PixelPoint(rect.Left, rect.Top);
     }
+
+    internal static PixelPoint IslandPosition(global::Avalonia.PixelRect area, int width) =>
+        new(area.X + Math.Max(0, (area.Width - width) / 2), area.Y);
 
     internal static int Constrain(int value, int min, int max, bool snap)
     {

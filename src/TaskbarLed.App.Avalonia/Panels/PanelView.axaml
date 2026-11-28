@@ -148,13 +148,19 @@
     <Style Selector="Border.halo.attention">
       <Setter Property="BorderBrush" Value="{DynamicResource Led.AttentionBrush}" />
     </Style>
+    <Style Selector="Border.island-surface">
+      <Setter Property="CornerRadius" Value="{DynamicResource Led.PanelRadius}" />
+    </Style>
+    <Style Selector="UserControl.dynamic-island Border.island-surface">
+      <Setter Property="CornerRadius" Value="0,0,20,20" />
+    </Style>
   </UserControl.Styles>
 
   <Panel>
-    <Border Opacity="{Binding PanelOpacity}" IsHitTestVisible="False"
-            CornerRadius="{DynamicResource Led.PanelRadius}" BorderThickness="{DynamicResource Led.FrameThickness}"
+    <Border Classes="island-surface" Opacity="{Binding PanelOpacity}" IsHitTestVisible="False"
+            BorderThickness="{DynamicResource Led.FrameThickness}"
             Background="{DynamicResource Led.PanelSurfaceBrush}" BorderBrush="{DynamicResource Led.BorderBrush}" />
-    <Border Name="PanelFrame" CornerRadius="{DynamicResource Led.PanelRadius}" BorderThickness="{DynamicResource Led.FrameThickness}"
+    <Border Name="PanelFrame" Classes="island-surface" BorderThickness="{DynamicResource Led.FrameThickness}"
             Padding="{DynamicResource Led.PanelPadding}">
 
       <Grid Name="PanelContent" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
