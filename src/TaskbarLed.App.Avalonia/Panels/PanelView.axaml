@@ -163,7 +163,7 @@
     <Border Name="PanelFrame" Classes="island-surface" BorderThickness="{DynamicResource Led.FrameThickness}"
             Padding="{DynamicResource Led.PanelPadding}">
 
-      <Grid Name="PanelContent" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
+      <Grid Name="PanelContent" Margin="{Binding IslandContentMargin}" RowDefinitions="Auto,Auto,Auto,*" ColumnDefinitions="*,Auto">
         <Grid Grid.ColumnSpan="2" Height="26" Margin="0,0,0,3">
           <Border IsVisible="{Binding ShowLineMap}" Background="{DynamicResource Led.BrandHeaderBrush}" CornerRadius="4,4,0,0" />
           <Border HorizontalAlignment="Left" VerticalAlignment="Center" Padding="7,2"

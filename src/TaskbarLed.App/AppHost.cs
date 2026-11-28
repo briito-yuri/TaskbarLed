@@ -19,6 +19,7 @@ using TaskbarLed.Platform.Windows.Ipc;
 using TaskbarLed.Platform.Windows.System;
 using TaskbarLed.Platform.Windows.Windowing;
 using TaskbarLed.Sources.ClaudeCode;
+using TaskbarLed.Sources.Generic;
 
 namespace TaskbarLed.App;
 
@@ -131,6 +132,7 @@ public sealed class AppHost : IDisposable
         [
             new ClaudeCodeSource(
                 new ToolActivityFormatter(ActivityStrings.For(_culture), _culture)),
+            new GenericAgentSource(),
         ];
         var pump = new EventPump(sources, _store, _log);
         _eventPump = pump;

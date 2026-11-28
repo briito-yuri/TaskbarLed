@@ -31,6 +31,7 @@ internal static class PanelThemes
         new("CobaltWindow", "Cobalt Window"),
         new("VioletPhosphor", "Violet Phosphor"),
         new("LineMap", "Line Map"),
+        new("Octo", "Octo"),
         new("OliveLcd", "Olive LCD", Uppercase: true),
     ];
 

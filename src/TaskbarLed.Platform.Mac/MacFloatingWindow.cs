@@ -29,6 +29,15 @@ public static class MacFloatingWindow
         MacNative.SendBool(nsWindow, MacNative.sel_registerName("setHidesOnDeactivate:"), false);
     }
 
+    public static nint GetLevel(nint nsWindow) =>
+        MacNative.SendPointer(nsWindow, MacNative.sel_registerName("level"));
+
+    public static void SetLevel(nint nsWindow, nint level) =>
+        MacNative.SendNUInt(nsWindow, MacNative.sel_registerName("setLevel:"), unchecked((nuint)level));
+
+    // NSStatusWindowLevel is above the main menu bar.
+    public const int StatusWindowLevel = 25;
+
     public static nint AddLiquidGlass(nint nsWindow, double width, double height, double opacity)
     {
         var glassClass = MacNative.objc_lookUpClass("NSGlassEffectView");

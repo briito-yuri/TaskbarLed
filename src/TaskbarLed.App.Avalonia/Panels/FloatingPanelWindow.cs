@@ -164,6 +164,8 @@ internal sealed class FloatingPanelWindow : Window
 
     public void SetTheme(string id) => Persist(_preferences with { Theme = id });
 
+    private nint? _previousWindowLevel;
+
     public bool IsDynamicIsland => _preferences.DynamicIsland;
 
     public void SetDynamicIsland(bool enabled)
@@ -451,13 +453,16 @@ internal sealed class FloatingPanelWindow : Window
         var screen = !island && saved is { } point ? Screens.ScreenFromPoint(point) ?? primary : primary;
         var area = screen.WorkingArea;
         var scale = screen.Scaling;
+        var topInset = island ? Math.Max(0, area.Y - screen.Bounds.Y) / scale : 0;
+        _viewModel.IslandContentMargin = new Thickness(0, topInset, 0, 0);
+        UpdateIslandWindowLevel(island);
         var editorExtra = _beforeEdit.HasValue ? EditorHeight + 2 : 0;
         Width = Math.Min(_panelWidth, area.Width / scale);
-        Height = Math.Min(_panelHeight + editorExtra, area.Height / scale);
+        Height = Math.Min(_panelHeight + editorExtra, area.Height / scale) + topInset;
 
         if (island)
         {
-            Position = IslandPosition(area, (int)Math.Ceiling(Width * scale));
+            Position = IslandPosition(screen.Bounds, (int)Math.Ceiling(Width * scale));
             return;
         }
 
@@ -471,6 +476,27 @@ internal sealed class FloatingPanelWindow : Window
 
         var rect = DockLayout(area, scale, Height, Width);
         Position = new PixelPoint(rect.Left, rect.Top);
+    }
+
+    private void UpdateIslandWindowLevel(bool island)
+    {
+        if (!OperatingSystem.IsMacOS()
+            || TryGetPlatformHandle() is not IMacOSTopLevelPlatformHandle { NSWindow: var window }
+            || window == 0)
+        {
+            return;
+        }
+
+        if (island)
+        {
+            _previousWindowLevel ??= MacFloatingWindow.GetLevel(window);
+            MacFloatingWindow.SetLevel(window, MacFloatingWindow.StatusWindowLevel);
+        }
+        else if (_previousWindowLevel is { } level)
+        {
+            MacFloatingWindow.SetLevel(window, level);
+            _previousWindowLevel = null;
+        }
     }
 
     internal static PixelPoint IslandPosition(global::Avalonia.PixelRect area, int width) =>

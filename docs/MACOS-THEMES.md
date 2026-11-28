@@ -48,9 +48,9 @@ Screenshot of the packaged app on macOS 26.5.2. The finished row uses test data.
 | --- | --- |
 | [![Minimal](images/macos-themes/Minimal.png)](images/macos-themes/Minimal.png) | [![Glass](images/macos-themes/Glass.png)](images/macos-themes/Glass.png) |
 
-| Paper |
-| --- |
-| [![Paper](images/macos-themes/Paper.png)](images/macos-themes/Paper.png) |
+| Paper | Octo |
+| --- | --- |
+| [![Paper](images/macos-themes/Paper.png)](images/macos-themes/Paper.png) | [![Octo](images/macos-themes/Octo.png)](images/macos-themes/Octo.png) |
 
 ## Update the screenshots
 

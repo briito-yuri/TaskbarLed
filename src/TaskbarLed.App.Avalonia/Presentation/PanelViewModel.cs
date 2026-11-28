@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Media;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -138,6 +139,9 @@ public sealed partial class PanelViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasSubagents), nameof(ShowSessionList), nameof(ShowClearList), nameof(ShowLineMap))]
     public partial IReadOnlyList<SessionDisplayRowViewModel> SessionRows { get; set; } = [];
+
+    [ObservableProperty]
+    public partial Thickness IslandContentMargin { get; set; }
 
     public bool HasSubagents => SessionRows.Count != 0;
 

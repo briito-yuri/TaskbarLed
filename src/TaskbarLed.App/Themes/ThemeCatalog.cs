@@ -44,6 +44,7 @@ public static class ThemeCatalog
         new("CobaltWindow", "Cobalt Window", Uppercase: false),
         new("VioletPhosphor", "Violet Phosphor", Uppercase: false),
         new("LineMap", "Line Map", Uppercase: false),
+        new("Octo", "Octo", Uppercase: false),
         new("OliveLcd", "Olive LCD", Uppercase: true),
     ];
 
