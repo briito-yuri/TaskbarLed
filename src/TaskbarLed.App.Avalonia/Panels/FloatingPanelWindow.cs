@@ -161,7 +161,6 @@ internal sealed class FloatingPanelWindow : Window
     public void ConfigurePlacement(PanelPreferences preferences, Action<PanelPreferences> save)
     {
         _preferences = preferences;
-        _panel.Classes.Set("dynamic-island", preferences.DynamicIsland);
         _viewModel.PanelOpacity = NormalizeOpacity(preferences.PanelOpacity);
         _savePreferences = save;
         ApplyFrame();
@@ -182,7 +181,6 @@ internal sealed class FloatingPanelWindow : Window
 
         Persist(_preferences with { DynamicIsland = enabled });
         _viewModel.IslandExpanded = false;
-        _panel.Classes.Set("dynamic-island", enabled);
         RestorePlacement();
     }
 
@@ -460,6 +458,7 @@ internal sealed class FloatingPanelWindow : Window
         var area = screen.WorkingArea;
         var scale = screen.Scaling;
         var headerHeight = island ? Math.Max(28, (area.Y - screen.Bounds.Y) / scale - 4) : 0;
+        _panel.Classes.Set("dynamic-island", island);
         _viewModel.IslandMode = island;
         _viewModel.IslandHeaderHeight = headerHeight;
         UpdateIslandWindowLevel(island);

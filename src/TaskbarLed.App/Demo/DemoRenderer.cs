@@ -46,6 +46,13 @@ internal static class DemoRenderer
         {
             ThemeCatalog.Apply(app.Resources, theme.Id);
             Save(Taskbar(Frame(Scenario.Mixed, english), width: 560, uppercase: theme.Uppercase, light: theme.Id == "Paper"), folder, $"theme-{theme.Id}.png");
+            if (theme.Id is "Octo" or "OliveLcd" or "Matrix")
+            {
+                var model = new PanelViewModel(string.Empty, english) { ActiveCount = 12 };
+                var top = new PanelView { DataContext = model, Width = 320, Height = 32, ShowActivitySummary = true };
+                Layout(top);
+                Save(top, folder, $"windows-top-{theme.Id}.png");
+            }
         }
 
         foreach (var (suffix, culture) in new[] { ("en", "en-US"), ("pt", "pt-BR") })
