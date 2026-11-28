@@ -66,6 +66,24 @@ internal static unsafe partial class MacNative
     [LibraryImport(ObjC, StringMarshalling = StringMarshalling.Utf8)]
     internal static partial nint sel_registerName(string name);
 
+    [LibraryImport(ObjC, StringMarshalling = StringMarshalling.Utf8)]
+    internal static partial nint objc_lookUpClass(string name);
+
+    [LibraryImport(ObjC, EntryPoint = "objc_msgSend")]
+    internal static partial nint SendPointer(nint receiver, nint selector);
+
+    [LibraryImport(ObjC, EntryPoint = "objc_msgSend")]
+    internal static partial void SendVoid(nint receiver, nint selector);
+
+    [LibraryImport(ObjC, EntryPoint = "objc_msgSend")]
+    internal static partial void SendDouble(nint receiver, nint selector, double value);
+
+    [LibraryImport(ObjC, EntryPoint = "objc_msgSend")]
+    internal static partial void SendRect(nint receiver, nint selector, CGRect rectangle);
+
+    [LibraryImport(ObjC, EntryPoint = "objc_msgSend")]
+    internal static partial void AddSubview(nint receiver, nint selector, nint child, nint position, nint relativeTo);
+
     [LibraryImport(ObjC, EntryPoint = "objc_msgSend")]
     internal static partial void SendNUInt(nint receiver, nint selector, nuint value);
 

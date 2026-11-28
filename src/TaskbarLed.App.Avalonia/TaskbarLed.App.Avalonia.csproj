@@ -3,12 +3,18 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>TaskbarLed</AssemblyName>
     <RootNamespace>TaskbarLed.App.Avalonia</RootNamespace>
     <Description>Cross-platform TaskbarLed panel (Avalonia): a small floating panel above the macOS Dock.</Description>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/TaskbarLedMark.png" />
+    <EmbeddedResource Include="../TaskbarLed.App/Themes/*.xaml" LogicalName="PanelThemes.%(Filename)%(Extension)" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="TaskbarLed.App.Avalonia.Tests" />
@@ -22,6 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TaskbarLed.Sources.ClaudeCode\TaskbarLed.Sources.ClaudeCode.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Octo/TaskbarLed.Sources.Octo.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Codex/TaskbarLed.Sources.Codex.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Antigravity/TaskbarLed.Sources.Antigravity.csproj" />
+    <ProjectReference Include="../TaskbarLed.Sources.Generic/TaskbarLed.Sources.Generic.csproj" />
     <ProjectReference Include="..\TaskbarLed.Core\TaskbarLed.Core.csproj" />
     <ProjectReference Include="..\TaskbarLed.Platform.Mac\TaskbarLed.Platform.Mac.csproj" />
   </ItemGroup>

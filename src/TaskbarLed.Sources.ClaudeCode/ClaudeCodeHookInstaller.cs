@@ -29,18 +29,20 @@ public sealed class ClaudeCodeHookInstaller
 
     // Claude Code hands the hook command to a shell. Inside the double quotes we write, these still mean
     // something to bash or PowerShell: a folder named with them could run a command of its own.
-    private static readonly char[] ShellCharacters = ['"', '$', '`'];
+    private static readonly char[] ShellCharacters = ['"', '$', '`', '\n', '\r'];
 
+    private readonly IReadOnlyList<string> _events;
     private readonly string _settingsPath;
     private readonly string _hookExecutablePath;
     private readonly string _hookCommand;
 
     /// <param name="settingsPath">Claude Code user settings file.</param>
     /// <param name="hookExecutablePath">Absolute path of <c>TaskbarLed.Hook.exe</c>.</param>
-    public ClaudeCodeHookInstaller(string settingsPath, string hookExecutablePath)
+    public ClaudeCodeHookInstaller(string settingsPath, string hookExecutablePath, IReadOnlyList<string>? events = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(settingsPath);
         ArgumentException.ThrowIfNullOrWhiteSpace(hookExecutablePath);
+        _events = events ?? Events;
         _settingsPath = settingsPath;
         _hookExecutablePath = hookExecutablePath;
         _hookCommand = $"\"{hookExecutablePath}\" {ClaudeCodeSource.Id}";
@@ -69,7 +71,7 @@ public sealed class ClaudeCodeHookInstaller
             return false;
         }
 
-        return Events.All(evt => hooks[evt] is JsonArray groups && groups.Any(g => OwnedCommands(g).Contains(_hookCommand)));
+        return _events.All(evt => hooks[evt] is JsonArray groups && groups.Any(g => OwnedCommands(g).Contains(_hookCommand)));
     }
 
     /// <summary>Adds our hooks (replacing older copies of them, e.g. from a previous install path).</summary>
@@ -78,17 +80,19 @@ public sealed class ClaudeCodeHookInstaller
     /// </exception>
     public void Install()
     {
-        if (_hookExecutablePath.IndexOfAny(ShellCharacters) >= 0)
+        if (_hookExecutablePath.IndexOfAny(ShellCharacters) >= 0
+            || (OperatingSystem.IsMacOS() && _hookExecutablePath.StartsWith('/')
+                && _hookExecutablePath.Contains('\\', StringComparison.Ordinal)))
         {
             throw new InvalidOperationException(
-                $"TaskbarLed is in a folder whose name contains a quote, $ or backtick ({_hookExecutablePath}). Move it to a folder without those characters.");
+                $"TaskbarLed is in a folder whose name contains a double quote, $, backtick, line break, or (on macOS) backslash ({_hookExecutablePath}). Move it to a folder without those characters.");
         }
 
         var root = Load() ?? [];
         var hooks = root["hooks"] as JsonObject ?? [];
         root["hooks"] = hooks;
 
-        foreach (var evt in Events)
+        foreach (var evt in _events)
         {
             var groups = hooks[evt] as JsonArray ?? [];
             hooks[evt] = groups;
@@ -118,7 +122,7 @@ public sealed class ClaudeCodeHookInstaller
             return;
         }
 
-        foreach (var evt in Events)
+        foreach (var evt in _events)
         {
             if (hooks[evt] is JsonArray groups)
             {

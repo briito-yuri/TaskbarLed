@@ -3,6 +3,9 @@ namespace TaskbarLed.Core.Ipc;
 /// <summary>Where the hook and the panel meet. Shared by both sides so they can never drift apart.</summary>
 public static class IpcEndpoints
 {
+    /// <summary>Oversized events are intentionally dropped to bound hook memory and spool usage.</summary>
+    public const int MaxPayloadBytes = 2 * 1024 * 1024;
+
     /// <summary>Named pipe for live events, scoped per Windows user.</summary>
     public static string PipeName { get; } = "TaskbarLed.Events." + Sanitize(Environment.UserName);
 
@@ -11,7 +14,9 @@ public static class IpcEndpoints
 
     /// <summary>Per-user data folder (%LOCALAPPDATA%\TaskbarLed).</summary>
     public static string DataDirectory =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarLed");
+        OperatingSystem.IsMacOS()
+            ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "TaskbarLed")
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarLed");
 
     /// <summary>
     /// Where the spool lands when the hook runs inside an MSIX package (Claude Code in the Claude desktop

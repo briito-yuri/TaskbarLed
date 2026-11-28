@@ -116,6 +116,10 @@ dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\Task
 
 TaskbarLed asks before connecting to Claude Code. It adds its hooks to `~/.claude/settings.json`, keeps your existing hooks and settings, and saves a backup next to the file. It also starts with Windows. Both can be turned off from the menu.
 
+## macOS (preview)
+
+The unsigned preview requires macOS 14 or later and supports Apple Silicon and Intel. It shows agent sessions and subagents in a floating panel above the Dock. [macOS guide](docs/MACOS.md) · [Theme gallery](docs/MACOS-THEMES.md)
+
 ## Using it
 
 | To… | Do this |

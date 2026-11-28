@@ -49,19 +49,16 @@ jobs:
 
       - name: Test
         run: |
-          for project in \
-            tests/TaskbarLed.Core.Tests \
-            tests/TaskbarLed.Sources.ClaudeCode.Tests \
-            tests/TaskbarLed.Platform.Mac.Tests \
-            tests/TaskbarLed.App.Avalonia.Tests; do
+          for project in tests/*.Tests; do
             dotnet test "$project" -c Release
           done
 
-      - name: Publish app (Apple silicon)
-        run: dotnet publish src/TaskbarLed.App.Avalonia -c Release -r osx-arm64 --self-contained -o artifacts/TaskbarLed-osx-arm64
+      # Packaging publishes both the app and hook for each architecture.
+      - name: Package app (Apple Silicon)
+        run: src/TaskbarLed.App.Avalonia/build-macos.sh
 
-      - name: Build hook
-        run: dotnet build src/TaskbarLed.Hook -c Release
+      - name: Package app (Intel)
+        run: src/TaskbarLed.App.Avalonia/build-macos.sh osx-x64
 
       - uses: actions/upload-artifact@v4
         with:
@@ -71,4 +68,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: TaskbarLed-osx-arm64
-          path: artifacts/TaskbarLed-osx-arm64
+          path: |
+            artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.zip
+            artifacts/TaskbarLed-osx-arm64/TaskbarLed-osx-arm64.pkg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TaskbarLed-osx-x64
+          path: |
+            artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.zip
+            artifacts/TaskbarLed-osx-x64/TaskbarLed-osx-x64.pkg

@@ -14,6 +14,8 @@ public sealed class ClaudeCodeSource : ISessionSource
     public const string Id = "claude-code";
 
     private readonly ToolActivityFormatter _formatter;
+    private readonly bool _includeSubagents;
+    private readonly ConcurrentDictionary<string, byte> _subagents = new(StringComparer.Ordinal);
     private readonly ITranscriptInterruptionReader _interruptionReader;
     private readonly ITranscriptInfoReader _infoReader;
     private readonly ConcurrentDictionary<string, string> _transcripts = new(StringComparer.Ordinal);
@@ -24,8 +26,9 @@ public sealed class ClaudeCodeSource : ISessionSource
     public ClaudeCodeSource(
         ToolActivityFormatter formatter,
         ITranscriptInterruptionReader? interruptionReader = null,
-        ITranscriptInfoReader? infoReader = null)
+        ITranscriptInfoReader? infoReader = null, bool includeSubagents = false)
     {
+        _includeSubagents = includeSubagents;
         _formatter = formatter ?? throw new ArgumentNullException(nameof(formatter));
         _interruptionReader = interruptionReader ?? new TranscriptInterruptionReader();
         _infoReader = infoReader ?? new TranscriptInfoReader();
@@ -68,6 +71,25 @@ public sealed class ClaudeCodeSource : ISessionSource
             return [];
         }
 
+        if (_includeSubagents && hookEvent is "SubagentStart" or "SubagentStop")
+        {
+            if (sessionId is not { Length: > 0 and <= 256 }
+                || Text(payload, "agent_id") is not { Length: > 0 and <= 256 } agentId)
+            {
+                return [];
+            }
+
+            var child = $"claude-subagent:{sessionId.Length}:{sessionId}:{agentId}";
+            if (hookEvent == "SubagentStop")
+            {
+                return _subagents.TryRemove(child, out _) ? [new ResponseCompleted(child, Id, receivedAt, null)] : [];
+            }
+
+            _subagents.TryAdd(child, 0);
+            return [new ParentIdentified(child, Id, receivedAt, sessionId),
+                new PromptSubmitted(child, Id, receivedAt, Text(payload, "agent_type") ?? agentId, null)];
+        }
+
         if (Text(payload, "transcript_path") is { Length: > 0 } transcript)
         {
             _transcripts[sessionId] = transcript;
@@ -97,8 +119,13 @@ public sealed class ClaudeCodeSource : ISessionSource
                     : new ActivityStarted(sessionId, Id, receivedAt, activity));
                 break;
 
+            case "PostToolUseFailure":
             case "PostToolUse":
                 events.Add(new ActivityFinished(sessionId, Id, receivedAt));
+                break;
+
+            case "PermissionRequest":
+                events.Add(new AttentionRequested(sessionId, Id, receivedAt, Text(payload, "tool_name")));
                 break;
 
             case "Notification":

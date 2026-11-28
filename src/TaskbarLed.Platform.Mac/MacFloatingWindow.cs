@@ -28,4 +28,41 @@ public static class MacFloatingWindow
         MacNative.SendNUInt(nsWindow, MacNative.sel_registerName("setCollectionBehavior:"), CanJoinAllSpaces | Stationary | IgnoresCycle | FullScreenAuxiliary);
         MacNative.SendBool(nsWindow, MacNative.sel_registerName("setHidesOnDeactivate:"), false);
     }
+
+    public static nint AddLiquidGlass(nint nsWindow, double width, double height, double opacity)
+    {
+        var glassClass = MacNative.objc_lookUpClass("NSGlassEffectView");
+        if (nsWindow == 0 || glassClass == 0)
+        {
+            return 0;
+        }
+
+        var host = MacNative.SendPointer(nsWindow, MacNative.sel_registerName("contentView"));
+        if (host == 0)
+        {
+            return 0;
+        }
+
+        var glass = MacNative.SendPointer(glassClass, MacNative.sel_registerName("new"));
+        if (glass == 0)
+        {
+            return 0;
+        }
+
+        MacNative.SendDouble(glass, MacNative.sel_registerName("setCornerRadius:"), 16);
+        MacNative.SendNUInt(glass, MacNative.sel_registerName("setStyle:"), 1); // NSGlassEffectViewStyleClear
+        // Fill the window using the NSView autoresizing mask and the current window content rectangle.
+        MacNative.SendNUInt(glass, MacNative.sel_registerName("setAutoresizingMask:"), 18);
+        MacNative.SendRect(glass, MacNative.sel_registerName("setFrame:"), new MacNative.CGRect { Width = width, Height = height });
+        SetGlassOpacity(glass, opacity);
+        MacNative.AddSubview(host, MacNative.sel_registerName("addSubview:positioned:relativeTo:"), glass, -1, 0);
+        MacNative.SendVoid(glass, MacNative.sel_registerName("release"));
+        return glass;
+    }
+
+    public static void SetGlassOpacity(nint glass, double opacity) =>
+        MacNative.SendDouble(glass, MacNative.sel_registerName("setAlphaValue:"), opacity);
+
+    public static void RemoveLiquidGlass(nint glass) =>
+        MacNative.SendVoid(glass, MacNative.sel_registerName("removeFromSuperview"));
 }

@@ -25,6 +25,22 @@ public sealed record Session(
     DateTimeOffset LastUpdated,
     SessionHost Host = SessionHost.Unknown)
 {
+    /// <summary>The parent session ID for a worker.</summary>
+    public string? ParentId { get; init; }
+
+    /// <summary>The provider name reported by the integration.</summary>
+    public string? EngineName { get; init; }
+
+    /// <summary>The provider conversation identifier, when available.</summary>
+    public Guid? ConversationId { get; init; }
+
+    /// <summary>The PID reported for the local provider process.</summary>
+    public int? ProcessId { get; init; }
+
+
+    /// <summary>Whether timing starts at the first local observation rather than a reported turn start.</summary>
+    public bool IsElapsedApproximate { get; init; }
+
     /// <summary>Best label to identify the session on a tiny display.</summary>
     public string DisplayName =>
         !string.IsNullOrWhiteSpace(Title) ? Title

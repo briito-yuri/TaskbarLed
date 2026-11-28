@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#A7B88C" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#292D27" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#243321" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#3E5037" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#443E24" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#2A4B2C" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#A7B88C" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#243321" />
+  <SolidColorBrush x:Key="Led.AccentBrush" Color="#243321" />
+  <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionTitleBrush" Color="#243321" />
+  <SolidColorBrush x:Key="Led.SessionRunningBrush" Color="#243321" />
+  <SolidColorBrush x:Key="Led.SessionHeaderStatusBrush" Color="#243321" />
+  <SolidColorBrush x:Key="Led.SessionNodeBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionHeaderBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionRailBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionTreeBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionChildBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionStatusBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionDividerBrush" Color="#738464" />
+  <Color x:Key="Led.GlowColor">Transparent</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0</sys:Double>
+  <x:Static x:Key="Led.FeedPrefix" Member="sys:String.Empty" />
+  <FontFamily x:Key="Led.FontFamily">Menlo, Consolas, Courier New</FontFamily>
+  <sys:Double x:Key="Led.PanelRadius">13</sys:Double>
+  <sys:Double x:Key="Led.FrameThickness">9</sys:Double>
+  <Thickness x:Key="Led.PanelPadding">7,6</Thickness>
+</ResourceDictionary>

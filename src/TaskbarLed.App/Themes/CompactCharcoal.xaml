@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <SolidColorBrush x:Key="Led.BackgroundBrush" Color="#242522" />
+  <SolidColorBrush x:Key="Led.BorderBrush" Color="#42443E" />
+  <SolidColorBrush x:Key="Led.ForegroundBrush" Color="#D3D4C9" />
+  <SolidColorBrush x:Key="Led.DimBrush" Color="#A1A397" />
+  <SolidColorBrush x:Key="Led.AttentionBrush" Color="#E8BD79" />
+  <SolidColorBrush x:Key="Led.DoneBrush" Color="#A3BF9D" />
+  <SolidColorBrush x:Key="Led.ChannelOffBrush" Color="#2E302B" />
+  <SolidColorBrush x:Key="Led.EditBrush" Color="#D8B57C" />
+  <SolidColorBrush x:Key="Led.AccentBrush" Color="#D8B57C" />
+  <SolidColorBrush x:Key="Led.DotGridBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionTitleBrush" Color="#F0EDE1" />
+  <SolidColorBrush x:Key="Led.SessionRunningBrush" Color="#D8B57C" />
+  <SolidColorBrush x:Key="Led.SessionHeaderStatusBrush" Color="#D8B57C" />
+  <SolidColorBrush x:Key="Led.SessionNodeBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionHeaderBrush" Color="#2E302B" />
+  <SolidColorBrush x:Key="Led.SessionRailBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionTreeBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionChildBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionStatusBrush" Color="Transparent" />
+  <SolidColorBrush x:Key="Led.SessionDividerBrush" Color="Transparent" />
+  <Color x:Key="Led.GlowColor">Transparent</Color>
+  <sys:Double x:Key="Led.GlowOpacity">0</sys:Double>
+  <x:Static x:Key="Led.FeedPrefix" Member="sys:String.Empty" />
+  <FontFamily x:Key="Led.FontFamily">Menlo, Consolas, Courier New</FontFamily>
+  <sys:Double x:Key="Led.PanelRadius">5</sys:Double>
+</ResourceDictionary>

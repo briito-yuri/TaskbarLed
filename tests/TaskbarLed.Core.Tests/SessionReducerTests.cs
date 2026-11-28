@@ -145,4 +145,12 @@ public class SessionReducerTests
 
     private static Session Fold(params SessionEvent[] events) =>
         events.Aggregate<SessionEvent, Session?>(null, SessionReducer.Apply)!;
+    [Fact]
+    public void A_parent_event_keeps_the_worker_status()
+    {
+        var worker = SessionReducer.Apply(null, new PromptSubmitted("worker", Source, At(0), "Review", null));
+        var linked = SessionReducer.Apply(worker, new ParentIdentified("worker", Source, At(1), "webapp"));
+        Assert.Equal("webapp", linked!.ParentId);
+        Assert.Equal(SessionStatus.Running, linked.Status);
+    }
 }

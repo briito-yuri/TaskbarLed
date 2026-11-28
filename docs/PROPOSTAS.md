@@ -63,33 +63,16 @@ Saídas externas, com **luzes físicas**: teclado RGB e fita LED (via OpenRGB), 
 
 ## P4 — Versão para macOS
 
-**Situação atual:** só Windows. `TaskbarLed.Core`, `TaskbarLed.Sources.ClaudeCode` e `TaskbarLed.Hook` já são .NET 10 puro e rodam no Mac sem mudança. Só a interface (WPF) e `TaskbarLed.Platform.Windows` são do Windows. Os hooks do Claude Code são os mesmos no Mac (`~/.claude/settings.json`).
+A prévia do TaskbarLed roda em uma janela flutuante acima do Dock, com acesso pelo menu da barra de menus. Usa Avalonia, mantém as fontes dos agentes em projetos separados e reaproveita as mesmas definições de tema do Windows. O app inclui integração por hooks, detecção local de agentes, tamanhos manual e automático e controle de opacidade.
 
-**Proposta:** no Mac o painel **não** vai para a barra de menus nem para o Dock, que costumam estar lotados. Ele segue a mesma ideia do Windows: uma janela pequena e flutuante, **centralizada na horizontal e um pouco acima do Dock**, que aparece quando o Claude está minimizado ou escondido e some quando você volta para ele.
-
-| Peça | Windows | Mac |
+| Peça | Windows | macOS |
 |---|---|---|
-| Interface | WPF (`TaskbarLed.App`) | Avalonia (`TaskbarLed.App.Avalonia`), que também roda no Windows para desenvolvimento |
-| Posição | Na barra / acima da barra / livre | Acima do Dock, centralizado (`PanelLayout.AboveDock`). A área útil da tela já desconta o Dock e a barra de menus |
-| Claude visível? | Win32 + oclusão | `CGWindowListCopyWindowInfo`, janelas do app "Claude" na tela |
-| Comportamento da janela | Topmost, sem foco | Todos os Spaces, sem roubar foco, sem ícone no Dock (`LSUIElement` / política *accessory*) |
-| Iniciar com o sistema | Chave `Run` (HKCU) | LaunchAgent em `~/Library/LaunchAgents` |
-| Eventos dos hooks | Named pipe com ACL do usuário | Socket Unix com permissão só do usuário |
-| Dados | `%APPDATA%`, `%LOCALAPPDATA%` | `~/Library/Application Support/TaskbarLed`, log em `~/Library/Logs/TaskbarLed` |
-| Abrir o Claude | Ativa a janela | `open -a Claude` |
-| Menu | Ícone da bandeja + botão direito no painel | Botão direito no painel |
+| Interface | WPF e painel na barra de tarefas | Avalonia e painel acima do Dock |
+| Eventos dos hooks | Named pipe com ACL do usuário e spool | Spool com permissão do usuário |
+| Dados | `%APPDATA%` e `%LOCALAPPDATA%` | `~/Library/Application Support/TaskbarLed` |
+| Distribuição | ZIP x64 | ZIP e instalador para arm64 e x64, na mesma release do Windows |
 
-**Como testar sem ter um Mac:**
-1. `OperatingSystem.IsMacOS()` separa o comportamento em tempo de execução.
-2. A CI ganha um job `macos-latest` (gratuito em repositório público). Ele compila, roda todos os testes .NET puros e gera uma imagem do painel com Avalonia.Headless.
-3. O que a CI não cobre (Dock, Spaces, detecção da janela do Claude, auto-start) precisa de um Mac real: alguém da comunidade, ou um Mac alugado na nuvem por algumas horas.
-
-**Etapas:**
-1. *(feito; o job de macOS passa na CI desde 2026-11-14)* Painel flutuante em Avalonia com dados de demonstração, `PanelLayout.AboveDock`, `TaskbarLed.Platform.Mac` (caminhos, LaunchAgent, visibilidade do Claude, Spaces), teste headless com imagem e job de macOS na CI.
-2. Ligar os eventos reais: servidor de socket Unix, spool e `ClaudeCodeSource`, configurações e log.
-3. Menu no painel (idioma, tema, iniciar com o sistema, conectar ao Claude Code) e os outros temas.
-4. Validar num Mac real.
-5. Distribuição: `.app` self-contained para `osx-arm64` e `osx-x64` no release. Sem conta Apple Developer (US$ 99/ano) o Gatekeeper bloqueia na primeira abertura, e o README explica o *botão direito → Abrir*. Com a conta, assinar e notarizar.
+A prévia requer macOS 14 ou posterior. A validação direta foi num M2 com macOS 26.5.2, com Rosetta para x64. Restam verificação em hardware Intel, macOS anteriores, comportamento em tela cheia, início automático e distribuição assinada. [Guia do macOS](MACOS.pt-BR.md)
 
 ---
 

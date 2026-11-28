@@ -116,6 +116,10 @@ dotnet publish src/TaskbarLed.App -c Release -o "$env:LOCALAPPDATA\Programs\Task
 
 O TaskbarLed pede permissão antes de se conectar ao Claude Code. Ele adiciona hooks ao `~/.claude/settings.json`, mantém seus hooks e configurações atuais e salva um backup ao lado do arquivo. Ele também passa a iniciar com o Windows. Os dois podem ser desligados pelo menu.
 
+## macOS (prévia)
+
+A prévia sem assinatura ou notarização exige macOS 14 ou posterior e oferece versões para Apple Silicon e Intel. O painel flutuante acima do Dock mostra sessões e subagentes. [Guia do macOS](docs/MACOS.pt-BR.md) · [Galeria de temas](docs/MACOS-THEMES.md)
+
 ## Como usar
 
 | Para… | Faça isso |

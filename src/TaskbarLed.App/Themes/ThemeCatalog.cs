@@ -35,6 +35,16 @@ public static class ThemeCatalog
         new("Minimal", "Minimal", Uppercase: false),
         new("Glass", "Glass", Uppercase: false, Sound: SoundStyle.Bell),
         new("Paper", "Paper", Uppercase: false),
+        new("LiquidGlass", ThemeNames.Get("LiquidGlass", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("AmberTree", ThemeNames.Get("AmberTree", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("CompactCharcoal", ThemeNames.Get("CompactCharcoal", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("AmberRail", ThemeNames.Get("AmberRail", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("ClearList", ThemeNames.Get("ClearList", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("EditorialIndex", ThemeNames.Get("EditorialIndex", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("CobaltWindow", ThemeNames.Get("CobaltWindow", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("VioletPhosphor", ThemeNames.Get("VioletPhosphor", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("LineMap", ThemeNames.Get("LineMap", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: false),
+        new("OliveLcd", ThemeNames.Get("OliveLcd", System.Globalization.CultureInfo.CurrentUICulture)!, Uppercase: true),
     ];
 
     /// <summary>The user's themes from the themes folder, as of the last <see cref="LoadCustom"/>.</summary>

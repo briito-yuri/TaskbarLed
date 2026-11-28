@@ -9,6 +9,18 @@ namespace TaskbarLed.Core.Presentation;
 /// <param name="IsSelected">The feed is showing this session.</param>
 public sealed record ChannelState(string SessionId, string Label, SessionStatus Status, bool IsSelected);
 
+/// <summary>A session header or child row with its display state and route information.</summary>
+public sealed record SessionDisplayRow(string? SessionId, string Label, SessionStatus Status, bool IsHeader, int SecondsRemaining = 0, bool HasStatus = true)
+{
+    public string? Engine { get; init; }
+    public string? Heading { get; init; }
+    public string? RouteLetter { get; init; }
+    public string? StationName { get; init; }
+    public bool LastStation { get; init; }
+    public long? ElapsedSeconds { get; init; }
+    public bool IsElapsedApproximate { get; init; }
+}
+
 /// <summary>Everything the panel needs to draw one frame. UI-framework agnostic.</summary>
 /// <param name="Channels">One tab per session, in stable order.</param>
 /// <param name="Feed">Latest line for the selected session; a change means "new line in the feed".</param>
@@ -28,6 +40,9 @@ public sealed record PanelFrame(
     bool NeedsAttention,
     bool HasActivity)
 {
+    /// <summary>Session and worker rows in display order.</summary>
+    public IReadOnlyList<SessionDisplayRow> SessionRows { get; init; } = [];
+
     public static PanelFrame Empty(string feed) =>
         new([], feed, string.Empty, SessionStatus.Idle, null, false, false, false);
 }
