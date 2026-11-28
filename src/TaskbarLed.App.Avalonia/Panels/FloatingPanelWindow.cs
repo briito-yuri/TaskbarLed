@@ -629,7 +629,7 @@ internal sealed class FloatingPanelWindow : Window
     private void Render()
     {
         ApplyFrame();
-        var show = _beforeEdit.HasValue || KeepVisible || _viewModel.HasActivity || ContextMenu?.IsOpen == true;
+        var show = _beforeEdit.HasValue || _preferences.DynamicIsland || KeepVisible || _viewModel.HasActivity || ContextMenu?.IsOpen == true;
         if (show && !IsVisible)
         {
             Show();

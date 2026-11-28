@@ -310,7 +310,7 @@ public sealed class AppHost : IDisposable
             _targets = PanelManager.Targets(_monitors, panel);
             _fullscreen = _targets.ToDictionary(m => m.Handle, FullscreenDetector.Detect);
 
-            var shouldShow = !_allInSight && (_viewModel.HasActivity || !panel.HideWhenIdle);
+            var shouldShow = panel.TopActivityBar || (!_allInSight && (_viewModel.HasActivity || !panel.HideWhenIdle));
             var preview = _menuOpen || DateTimeOffset.Now < _previewUntil;
             _panels.Sync(_targets, _fullscreen, shouldShow, preview);
 
